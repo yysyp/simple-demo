@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: simple-demo
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 7KB #i.e. 1MB Priority 2, This config also works for limit the upload Maximum size.
+      max-request-size: 3KB #i.e.100KB Priority 1, Limit the multipart/form-data file upload Maximum size.
+
+springdoc:
+  pathsToMatch: /healthz, /api/**
+  writer-with-default-pretty-printer: true
+  api-docs.enabled: true
+  api-docs.path: /springdoc/api-docs
+  resolve-schema-properties: true
+  swagger-ui:
+    enabled: true
+    path: /springdoc/docs.html
+    url: /springdoc/api-docs
+    displayRequestDuration: true
+    showExtensions: true
+    showCommonExtensions: true
+    disable-swagger-default-url: true
+    operationsSorter: method
+swagger:
+  application-name: ${spring.application.name}
+  application-version: 1.0
+  application-description: Springdoc Openapi Of Simple Demo
+  try-host: http://localhost:8080
