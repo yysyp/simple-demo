@@ -2,6 +2,7 @@ package ps.demo.util;
 
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +24,10 @@ import java.util.regex.Pattern;
 
 public class MyFileUtil {
 
+    public static final String DIR_SEPERATOR = "/";
     private static Integer BUFFER_SIZE = 1024 * 1024 * 10;
+
+    private static int FILE_NAME_LENGTH = 128;
 
     public static MessageDigest MD5 = null;
 
@@ -33,6 +37,11 @@ public class MyFileUtil {
         } catch (NoSuchAlgorithmException ne) {
             ne.printStackTrace();
         }
+    }
+
+    public static String toValidFileName(String input) {
+        return StringUtils.abbreviate(input.replaceAll("[:\\\\/*\"?|<>']",
+                "-"), FILE_NAME_LENGTH);
     }
 
     public static String getUserHomeDir() {
@@ -46,11 +55,17 @@ public class MyFileUtil {
     }
 
     public static File getFileInHomeDir(String fileName) {
-        return new File(getUserHomeDir() + "/" + fileName);
+        return new File(getUserHomeDir() + DIR_SEPERATOR + toValidFileName(fileName));
     }
 
-    public static File getLogInHomeDir(String key) {
-        return new File(getUserHomeDir() + "/" + key + "-" + MyTimeUtil.getNowStr() + ".log");
+    public static File getFileTsInHomeDir(String key) {
+        return new File(getUserHomeDir() + DIR_SEPERATOR + MyTimeUtil.getNowStr() + "-" + toValidFileName(key));
+    }
+
+    public static File getFileDateDirInHomeDir(String key) {
+        return new File(getUserHomeDir() + DIR_SEPERATOR
+                + MyTimeUtil.getNowStr("yyyy-MM-dd") + DIR_SEPERATOR
+                + MyTimeUtil.getNowStr("HHmmss") + "-" + toValidFileName(key));
     }
 
     public static void setFullPermission(File file) {
@@ -320,7 +335,7 @@ public class MyFileUtil {
             return null;
         } finally {
             try {
-                if (fileInputStream != null){
+                if (fileInputStream != null) {
                     fileInputStream.close();
                 }
             } catch (IOException e) {
@@ -360,8 +375,9 @@ public class MyFileUtil {
             while (-1 != (index = fis.read(buf, 0, buf.length))) {
                 fos.write(buf, 0, index);
                 try {
-                    Thread.sleep(100+rd.nextInt(900));
-                } catch (Exception e) {}
+                    Thread.sleep(100 + rd.nextInt(900));
+                } catch (Exception e) {
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

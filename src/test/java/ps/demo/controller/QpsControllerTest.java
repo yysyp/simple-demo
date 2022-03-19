@@ -2,7 +2,6 @@ package ps.demo.controller;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import ps.demo.util.MyFileUtil;
@@ -18,13 +17,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @Slf4j
 public class QpsControllerTest {
 
 
-    static File logfile = MyFileUtil.getLogInHomeDir("QpsTest");
+    static File logfile = MyFileUtil.getFileTsInHomeDir("QpsTest");
 
     public static void main(String[] args) throws Exception {
 
