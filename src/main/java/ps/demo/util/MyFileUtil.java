@@ -1,18 +1,39 @@
 package ps.demo.util;
 
 import org.apache.catalina.core.ApplicationPart;
+import org.apache.commons.io.FileUtils;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.math.BigInteger;
+import java.net.FileNameMap;
+import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MyFileUtil {
+
+    private static Integer BUFFER_SIZE = 1024 * 1024 * 10;
+
+    public static MessageDigest MD5 = null;
+
+    static {
+        try {
+            MD5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException ne) {
+            ne.printStackTrace();
+        }
+    }
 
     public static String getUserHomeDir() {
         return Paths.get(System.getProperty("user.home")).toAbsolutePath()
@@ -219,6 +240,145 @@ public class MyFileUtil {
             return "";
         }
 
+    }
+
+    public final static boolean cleanFile(File file) {
+        try (
+                FileWriter fw = new FileWriter(file)
+        ) {
+            fw.write("");
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public final static String mimeType(String file) throws IOException {
+        FileNameMap fileNameMap = URLConnection.getFileNameMap();
+        return fileNameMap.getContentTypeFor(file);
+    }
+
+    public final static Date modifyTime(File file) {
+        return new Date(file.lastModified());
+    }
+
+    /**
+     * 复制文件
+     *
+     * @param resourcePath 源文件
+     * @param targetPath   目标文件
+     * @return 是否成功
+     */
+    public final static boolean copy(String resourcePath, String targetPath) {
+        File file = new File(resourcePath);
+        return copy(file, targetPath);
+    }
+
+    /**
+     * 复制文件
+     * 通过该方式复制文件文件越大速度越是明显
+     *
+     * @param file       需要处理的文件
+     * @param targetFile 目标文件
+     * @return 是否成功
+     */
+    public final static boolean copy(File file, String targetFile) {
+        try (
+                FileInputStream fin = new FileInputStream(file);
+                FileOutputStream fout = new FileOutputStream(new File(targetFile))
+        ) {
+            FileChannel in = fin.getChannel();
+            FileChannel out = fout.getChannel();
+            //设定缓冲区
+            ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+            while (in.read(buffer) != -1) {
+                //准备写入，防止其他读取，锁住文件
+                buffer.flip();
+                out.write(buffer);
+                //准备读取。将缓冲区清理完毕，移动文件内部指针
+                buffer.clear();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String fileMD5(File file) {
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file);
+            byte[] buffer = new byte[8192];
+            int length;
+            while ((length = fileInputStream.read(buffer)) != -1) {
+                MD5.update(buffer, 0, length);
+            }
+            return new BigInteger(1, MD5.digest()).toString(16);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (fileInputStream != null){
+                    fileInputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static List<String> searchInFile(File file, String regex) {
+        List<String> findings = new ArrayList<>();
+        Pattern pt = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        String content = null;
+        try {
+            content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Matcher mt = pt.matcher(content);
+        while (mt.find()) {
+            findings.add(content.substring(mt.start(), mt.end()));
+        }
+        return findings;
+    }
+
+
+    public static void copy(File from, File to, int bufsize) {
+
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+
+        try {
+            fis = new FileInputStream(from);
+            fos = new FileOutputStream(to);
+            byte[] buf = new byte[bufsize];
+            int index;
+            Random rd = new Random();
+            while (-1 != (index = fis.read(buf, 0, buf.length))) {
+                fos.write(buf, 0, index);
+                try {
+                    Thread.sleep(100+rd.nextInt(900));
+                } catch (Exception e) {}
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeSilently(fis);
+            closeSilently(fos);
+        }
+    }
+
+    public static void closeSilently(Closeable c) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (Exception e) {
+
+            }
+        }
     }
 
 }

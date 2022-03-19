@@ -34,7 +34,7 @@ public class QpsControllerTest {
         (while submit () not waiting for the completion of all tasks and throws nothing).
          */
 
-        int[] qpsArr = new int [] {2, 3, 4, 5};
+        int[] qpsArr = new int [] {100, 500, 1000};
         int requestsPerStage = 10;
 
         ExecutorService executorService = Executors.newCachedThreadPool();
