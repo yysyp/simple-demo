@@ -63,9 +63,12 @@ public class MyFileUtil {
     }
 
     public static File getFileDateDirInHomeDir(String key) {
-        return new File(getUserHomeDir() + DIR_SEPERATOR
-                + MyTimeUtil.getNowStr("yyyy-MM-dd") + DIR_SEPERATOR
-                + MyTimeUtil.getNowStr("HHmmss") + "-" + toValidFileName(key));
+        File dir = new File(getUserHomeDir() + DIR_SEPERATOR
+                + MyTimeUtil.getNowStr("yyyy-MM-dd") + DIR_SEPERATOR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return new File(dir.getPath() + DIR_SEPERATOR + MyTimeUtil.getNowStr("HHmmss") + "-" + toValidFileName(key));
     }
 
     public static void setFullPermission(File file) {

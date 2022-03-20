@@ -91,6 +91,53 @@ public class MyReadWriteUtil {
     }
 
 
+    public static String readFileContent(File file, String encoding) {
+        BufferedReader bf = null;
+        try {
+            bf = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+            String content = "";
+            StringBuilder sb = new StringBuilder();
+            while ((content = bf.readLine()) != null) {
+                sb.append(content);
+                sb.append('\n');
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            //e.printStackTrace();
+            System.out.println(e.getMessage());
+        } finally {
+            if (bf != null) {
+                try {
+                    bf.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return null;
+    }
+    public static void writeFileContent(String content, File file) {
+        writeFileContent(content, file, "UTF-8");
+    }
+
+    public static void writeFileContent(String content, File file, String encoding) {
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding));
+            bw.write(content);
+        } catch (IOException e) {
+            //e.printStackTrace();
+            System.out.println(e.getMessage());
+        } finally {
+            if (bw != null) {
+                try {
+                    bw.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
+
+
 
 
 }
