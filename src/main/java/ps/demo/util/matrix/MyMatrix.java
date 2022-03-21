@@ -17,11 +17,11 @@ import java.util.Map;
 @ToString
 public class MyMatrix implements Serializable {
 
-    protected Integer rows;
+    protected Integer rows = 0;
 
-    protected Integer cols;
+    protected Integer cols = 0;
 
-    protected List<List<MyCell>> table;
+    protected List<List<MyCell>> table = new ArrayList<>(new ArrayList<>());
 
     public MyMatrix() {
 
@@ -47,6 +47,80 @@ public class MyMatrix implements Serializable {
                 row.add(new MyCell(c, r));
             }
             table.add(row);
+        }
+    }
+
+    public void fillTable(List<List<Object>> rowsAndColData) {
+        if (rowsAndColData == null) {
+            return;
+        }
+        int dataRows = rowsAndColData.size();
+        if (rows <= 0 || cols <= 0) {
+            rows = dataRows;
+            cols = rowsAndColData.get(0).size();
+            initTable();
+        }
+        for (int r = 0; r < this.rows; r++) {
+            if (r >= dataRows) {
+                return;
+            }
+            List<MyCell> row = this.table.get(r);
+            List<Object> dataRow = rowsAndColData.get(r);
+            if (dataRow == null) {
+                continue;
+            }
+            int dataCols = dataRow.size();
+            for (int c = 0; c < this.cols; c++) {
+                if (c >= dataCols) {
+                    continue;
+                }
+                MyCell cell = row.get(c);
+                Object data = dataRow.get(c);
+                cell.setData(data);
+            }
+        }
+    }
+
+    public void addRow() {
+        this.addRow(new ArrayList<>());
+    }
+
+    public void addRow(List<Object> rowdata) {
+        if (rowdata == null) {
+            return;
+        }
+        int r = rows;
+        rows++;
+        List<MyCell> row = new ArrayList<>();
+        table.add(row);
+        int length = rowdata.size();
+        for (int c = 0; c < this.cols; c++) {
+            MyCell cell = new MyCell(c, r);
+            if (c < length) {
+                cell.setData(rowdata.get(c));
+            }
+            row.add(cell);
+        }
+    }
+
+    public void addColumn() {
+        this.addColumn(new ArrayList<>());
+    }
+
+    public void addColumn(List<Object> coldata) {
+        if (coldata == null) {
+            return;
+        }
+        int c = cols;
+        cols++;
+        int length = coldata.size();
+        for (int r = 0; r < this.rows; r++) {
+            List<MyCell> row = table.get(r);
+            MyCell cell = new MyCell(c, r);
+            if (r < length) {
+                cell.setData(coldata.get(r));
+            }
+            row.add(cell);
         }
     }
 

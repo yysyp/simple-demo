@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MyReadWriteUtil {
 
-    public static void writeToFileInHomeDir(File file, Object content) {
-        writeToFileInHomeDir(file, content, StandardCharsets.UTF_8, true);
+    public static void writeToFile(File file, Object content) {
+        writeToFile(file, content, StandardCharsets.UTF_8, true);
     }
 
-    public static void writeToFileInHomeDir(File file, Object content, Charset charsetName, boolean append) {
+    public static void writeToFile(File file, Object content, Charset charsetName, boolean append) {
         try {
             String lineEnding = System.lineSeparator();
             FileUtils.writeStringToFile(file, MyJsonUtil.object2Json(content) + lineEnding, charsetName, append);
@@ -29,7 +29,7 @@ public class MyReadWriteUtil {
         }
     }
 
-    public static <T> T readObjectFromFileInHomeDir(File file, Class<T> c) {
+    public static <T> T readObjectFromFile(File file, Class<T> c) {
         try {
             return MyJsonUtil.json2Object(FileUtils.readFileToString(file, StandardCharsets.UTF_8), c);
         } catch (IOException e) {
@@ -37,11 +37,11 @@ public class MyReadWriteUtil {
         }
     }
 
-    public static <T> void writeObjectsToFileInHomeDir(File file, List<T> lists) {
-        writeObjectsToFileInHomeDir(file, lists, true);
+    public static <T> void writeObjectsToFile(File file, List<T> lists) {
+        writeObjectsToFile(file, lists, true);
     }
 
-    public static <T> void writeObjectsToFileInHomeDir(File file, List<T> lists, boolean append) {
+    public static <T> void writeObjectsToFile(File file, List<T> lists, boolean append) {
         try {
             List<String> stringList = MyJsonUtil.listObject2ListJson(lists);
             FileUtils.writeLines(file, stringList, append);
@@ -50,11 +50,11 @@ public class MyReadWriteUtil {
         }
     }
 
-    public static <T> List<T> readObjectsFromFileInHomeDir(File file, Class<T> c) {
-        return readObjectsFromFileInHomeDir(file, StandardCharsets.UTF_8, c);
+    public static <T> List<T> readObjectsFromFile(File file, Class<T> c) {
+        return readObjectsFromFile(file, StandardCharsets.UTF_8, c);
     }
 
-    public static <T> List<T> readObjectsFromFileInHomeDir(File file, Charset charset, Class<T> c) {
+    public static <T> List<T> readObjectsFromFile(File file, Charset charset, Class<T> c) {
         try {
             List<String> lines = FileUtils.readLines(file, charset);
             return lines.stream().map(s -> MyJsonUtil.json2Object(s, c)).collect(Collectors.toList());

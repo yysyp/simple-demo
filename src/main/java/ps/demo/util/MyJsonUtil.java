@@ -19,6 +19,7 @@ public class MyJsonUtil {
     private static ObjectMapper mapper = new ObjectMapper();
 
     static {
+        mapper.findAndRegisterModules();
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //Set to ignore exists in json but not in java properties
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

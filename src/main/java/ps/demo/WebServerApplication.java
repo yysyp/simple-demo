@@ -8,7 +8,7 @@ import ps.demo.util.SwingTool;
 
 @Slf4j
 @SpringBootApplication
-public class WebServerApplication {
+public class WebServerApplication { //implements CommandLineRunner {
 
     public static void main(String[] args) {
         SpringApplication.run(WebServerApplication.class, args);

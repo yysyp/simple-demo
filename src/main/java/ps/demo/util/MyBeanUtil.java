@@ -12,6 +12,10 @@ import java.util.List;
 @Slf4j
 public class MyBeanUtil {
 
+    public static List<Object> convertToListObject(List<? extends Object> subTypeList) {
+        return new ArrayList<>(subTypeList);
+    }
+
     public static List<String> getBeanProperties(Object obj) {
         List<String> propertyNames = new ArrayList<>();
         try {

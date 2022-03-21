@@ -1,6 +1,7 @@
 package ps.demo.util;
 
 import ps.demo.dto.Person;
+import ps.demo.util.matrix.MyMatrix;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,20 @@ class MyStreamUtilTest {
                 Collectors.groupingBy(u -> u.getTitle()+"#"+u.getAge())
         );
         System.out.println("===>>2.1: " + collect2_1);
+
+        List<List<Object>> table = new ArrayList<>();
+        for (Map.Entry<String, List<Person>> entry : collect2_1.entrySet()) {
+            List<Person> personList = entry.getValue();
+            Double averageAge = personList.stream().collect(Collectors.averagingDouble(Person::getAge));
+            List<Object> row = new ArrayList<>();
+            table.add(row);
+            row.add(entry.getKey());
+            row.add(averageAge);
+            row.addAll(personList);
+        }
+        MyMatrix myMatrix = new MyMatrix();
+        myMatrix.fillTable(table);
+        System.out.println("===>>2.2: " + myMatrix);
 
 
         List<Person> list1 = list.stream().filter(MyStreamUtil.distinctByKey(e -> e.getAge())).collect(Collectors.toList());

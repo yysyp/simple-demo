@@ -107,6 +107,14 @@ public class MyExcelUtil {
     }
 
 
+    public static void writeBySimple(String filePath, List<List<Object>> data) {
+        List<String> head = new ArrayList<>();
+        for (int i = 0, len = data.get(0).size(); i < len; i++) {
+            head.add(""+i);
+        }
+        writeSimpleBySheet(filePath, data, head, null);
+    }
+
     public static void writeBySimple(String filePath, List<List<Object>> data, List<String> head) {
         writeSimpleBySheet(filePath, data, head, null);
     }
