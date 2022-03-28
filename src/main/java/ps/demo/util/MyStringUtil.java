@@ -1,9 +1,20 @@
 package ps.demo.util;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class MyStringUtil {
     public static final char UNDERLINE = '_';
+
+
+    public static String randomAscii(int bytes) {
+        return RandomStringUtils.randomAscii(bytes);
+    }
+
+    public static String randomAlphabetic(int bytes) {
+        return RandomStringUtils.randomAlphabetic(bytes);
+    }
+
 
     public static String toJavaName(String dbName) {
         if (StringUtils.isBlank(dbName)) {

@@ -1,6 +1,8 @@
 server:
   port: 8080
 
+json:
+  request-size-limit: 1048576 # 1m
 spring:
   application:
     name: simple-demo
@@ -9,8 +11,8 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 7KB #i.e. 1MB Priority 2, This config also works for limit the upload Maximum size.
-      max-request-size: 3KB #i.e.100KB Priority 1, Limit the multipart/form-data file upload Maximum size.
+      max-file-size: 7KB #单个文件的大小 i.e. 1MB Priority 2, This config also works for limit the upload Maximum size.
+      max-request-size: 3KB #设置单次请求的文件的总大小 i.e.100KB Priority 1, Limit the multipart/form-data file upload Maximum size.
 
 springdoc:
   pathsToMatch: /healthz, /api/**

@@ -11,6 +11,11 @@ import ps.demo.util.SwingTool;
 public class WebServerApplication { //implements CommandLineRunner {
 
     public static void main(String[] args) {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        log.info("--->>maxMemory={}, totalMemory={}, freeMemory={}", maxMemory, totalMemory, freeMemory);
+
         SpringApplication.run(WebServerApplication.class, args);
 
 //        SpringApplication springApplication = new SpringApplication(WebServerApplication.class);

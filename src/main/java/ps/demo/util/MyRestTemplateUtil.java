@@ -57,6 +57,12 @@ public class MyRestTemplateUtil {
 
 
 
+    public String submitFormForString(String url, MultiValueMap<String, String> formMap) {
+        ParameterizedTypeReference<String> responseType = new ParameterizedTypeReference<String>() {
+        };
+        return submitFormForObject(url, formMap, responseType).getBody();
+    }
+
     public <T> ResponseEntity<T> submitFormForObject(String url, MultiValueMap<String, String> formMap, ParameterizedTypeReference<T> responseType) {
         HttpHeaders headers = new HttpHeaders();
         return submitFormForObject(url, headers, formMap, responseType);
@@ -72,6 +78,12 @@ public class MyRestTemplateUtil {
             log.info("--->>Rest call submitFormForObject error, url={}, message={}", url, e.getMessage(), e);
             throw new RuntimeException(e);
         }
+    }
+
+    public String postJsonObjectForString(String url, String jsonStr) {
+        ParameterizedTypeReference<String> responseType = new ParameterizedTypeReference<String>() {
+        };
+        return postJsonObjectForObject(url, jsonStr, responseType).getBody();
     }
 
     public <T> ResponseEntity<T> postJsonObjectForObject(String url, String jsonStr, ParameterizedTypeReference<T> responseType) {
@@ -91,6 +103,11 @@ public class MyRestTemplateUtil {
         }
     }
 
+    public String getForString(String url, Object... uriVariables) {
+        ParameterizedTypeReference<String> responseType = new ParameterizedTypeReference<String>() {
+        };
+        return getForObject(url, responseType, uriVariables).getBody();
+    }
 
     public <T> ResponseEntity<T> getForObject(String url, ParameterizedTypeReference<T> responseType, Object... uriVariables) {
         HttpHeaders headers = new HttpHeaders();

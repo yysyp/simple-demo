@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MyReadWriteUtil {
 
+    public static void writeToFileTsInHomeDir(Object content) {
+        writeToFile(MyFileUtil.getFileTsInHomeDir(".log"), content);
+    }
+
     public static void writeToFile(File file, Object content) {
         writeToFile(file, content, StandardCharsets.UTF_8, true);
     }
@@ -115,11 +119,11 @@ public class MyReadWriteUtil {
         }
         return null;
     }
-    public static void writeFileContent(String content, File file) {
-        writeFileContent(content, file, "UTF-8");
+    public static void writeFileContent(File file, String content) {
+        writeFileContent(file, content, "UTF-8");
     }
 
-    public static void writeFileContent(String content, File file, String encoding) {
+    public static void writeFileContent(File file, String content, String encoding) {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding));

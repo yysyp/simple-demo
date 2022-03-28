@@ -101,13 +101,13 @@ public class SwingTool {
     public static void pageSource() {
         sleep(WAIT_TIME);
         File html = MyFileUtil.getFileDateDirInHomeDir(driver.getTitle() + ".html");
-        MyReadWriteUtil.writeFileContent(driver.getPageSource(), html);
+        MyReadWriteUtil.writeFileContent(html, driver.getPageSource());
     }
 
     public static void save(String text) {
         sleep(WAIT_TIME);
         File txt = MyFileUtil.getFileDateDirInHomeDir(driver.getTitle() + ".txt");
-        MyReadWriteUtil.writeFileContent(text, txt);
+        MyReadWriteUtil.writeFileContent(txt, text);
     }
 
     public static Object js(String script, Object... args) {
