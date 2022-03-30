@@ -10,6 +10,8 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 public class UploadHi {
 
+    private int index;
+
     private String fileStr;
 
     private int num;

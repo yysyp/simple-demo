@@ -3,6 +3,7 @@ server:
 
 json:
   request-size-limit: 1048576 # 1m
+  #request-size-limit: 1073741824 # 1g
 spring:
   application:
     name: simple-demo

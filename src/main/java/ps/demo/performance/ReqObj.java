@@ -12,6 +12,8 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 public class ReqObj {
 
+    private int index;
+
     private String fileStr;
 
     private int num;

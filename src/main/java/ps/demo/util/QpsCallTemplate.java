@@ -6,10 +6,10 @@ import java.util.concurrent.*;
 
 public class QpsCallTemplate {
 
-    private int[] qps;
+    private double[] qps;
     private int calls;
 
-    public QpsCallTemplate(int[] qps, int calls) {
+    public QpsCallTemplate(double[] qps, int calls) {
         this.qps = qps;
         this.calls = calls;
     }
@@ -20,11 +20,11 @@ public class QpsCallTemplate {
         int index = 0;
         List<Future<T>> futureList = new ArrayList<>();
         for (int i = 0, len = qps.length; i < len; i++) {
-            int curQps = qps[i];
+            double curQps = qps[i];
             for (int c = 0; c < calls; c++) {
                 futureList.add(executorService.submit(callables.get(index++)));
                 try {
-                    Thread.sleep(1000 / curQps);
+                    Thread.sleep((long) (1000 / curQps));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

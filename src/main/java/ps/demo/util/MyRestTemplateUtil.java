@@ -46,6 +46,8 @@ public class MyRestTemplateUtil {
             SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
             CloseableHttpClient httpClient = HttpClients.custom()
                     .setSSLSocketFactory(sslConnectionSocketFactory)
+                    .disableAutomaticRetries()
+                    .disableAuthCaching()
                     .build();
             HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
             requestFactory.setHttpClient(httpClient);

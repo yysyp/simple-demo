@@ -1,6 +1,7 @@
 package ps.demo.controller;
 
 import com.alibaba.excel.util.StringUtils;
+import com.sun.org.apache.xml.internal.security.utils.Base64;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -16,9 +17,12 @@ import ps.demo.exception.ServerApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yunpeng.song on 5/15/2020.
@@ -32,7 +36,12 @@ public class MyUploadController {
     @PostMapping(value = "/hi", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String hi(@RequestBody UploadHi uploadHi) {
-        log.info("--->> uploadHi={}", uploadHi);
+        log.info("--->> uploadHi.index={}, num={}", uploadHi.getIndex(), uploadHi.getNum());
+        int size = uploadHi.getFileStr().getBytes(StandardCharsets.UTF_8).length;
+        List<Object> multipleStr = new ArrayList<>();
+        for (int i = 0; i < uploadHi.getNum(); i++) {
+            multipleStr.add(new byte[size]);
+        }
         return LocalDateTime.now().toString() + uploadHi.getLength();
     }
 
