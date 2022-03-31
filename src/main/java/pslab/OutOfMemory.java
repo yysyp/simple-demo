@@ -1,4 +1,4 @@
-package ps.demo.lab;
+package pslab;
 
 
 import java.util.HashMap;

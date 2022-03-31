@@ -1,5 +1,6 @@
 package ps.demo.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class ApplicationJsonRequestSizeLimitFilter extends OncePerRequestFilter {
 
@@ -23,7 +25,7 @@ public class ApplicationJsonRequestSizeLimitFilter extends OncePerRequestFilter 
                                     HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         if (isApplicationJson(request) && request.getContentLengthLong() > requestSizeLimit) {
-            throw new IOException("Request content exceeded limit of ["+requestSizeLimit+"] bytes");
+            throw new IOException("My JsonLimit Request content exceeded limit of ["+requestSizeLimit+"] bytes");
         }
         filterChain.doFilter(request, response);
     }
@@ -33,7 +35,7 @@ public class ApplicationJsonRequestSizeLimitFilter extends OncePerRequestFilter 
             return (MediaType.APPLICATION_JSON.isCompatibleWith(MediaType
                     .parseMediaType(httpRequest.getHeader(HttpHeaders.CONTENT_TYPE))));
         } catch (Exception e) {
-            logger.info("ApplicationJson limit err={}", e);
+            log.info("ApplicationJson limit err={}", e.getMessage());
             return false;
         }
     }

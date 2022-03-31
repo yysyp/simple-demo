@@ -1,17 +1,12 @@
 package ps.demo.util;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-@Slf4j
 public class MyCmdRun implements Runnable {
 
     private String command;
@@ -68,7 +63,8 @@ public class MyCmdRun implements Runnable {
             new RedirCmdStreamThread(process.getErrorStream(), "ERR").start();
             exitCode = process.waitFor();
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            e.printStackTrace();
+            //log.error(e.getMessage(), e);
         }
     }
 
@@ -89,11 +85,13 @@ public class MyCmdRun implements Runnable {
                 int i = 0;
                 while ((line = br.readLine()) != null) {
                     output.put(i++, line);
-                    log.info(printType + ">" + line);
+                    System.out.println(printType + ">" + line);
+                    //log.info(printType + ">" + line);
                 }
 
             } catch (IOException e) {
-                log.error(e.getMessage(), e);
+                e.printStackTrace();
+                //log.error(e.getMessage(), e);
             }
         }
     }

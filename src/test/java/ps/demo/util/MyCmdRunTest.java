@@ -6,7 +6,8 @@ public class MyCmdRunTest {
         //new MyCmdRun("ping baidu.com").run();
         //MyCmdRun myCmdRun = new MyCmdRun("ping -t baidu.com");
         ///bin/sh -c xxx
-        MyCmdRun myCmdRun = new MyCmdRun("cmd /c for /l %i in (1,1,1000) do (echo this is line%i)");
+        MyCmdRun myCmdRun = new MyCmdRun(
+                "cmd /c echo off && for /l %i in (1,1,1000) do (echo this is line%i)");
         Thread thread = new Thread(myCmdRun);
         thread.start();
         Thread.sleep(10000);
