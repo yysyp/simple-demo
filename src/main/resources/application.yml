@@ -32,6 +32,7 @@ springdoc:
     enabled: true
     path: /springdoc/docs.html
     url: /springdoc/api-docs
+    #configUrl: /xxx/springdoc/api-docs/swagger-config
     displayRequestDuration: true
     showExtensions: true
     showCommonExtensions: true

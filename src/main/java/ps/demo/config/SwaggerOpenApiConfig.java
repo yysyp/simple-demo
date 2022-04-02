@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -80,7 +81,11 @@ public class SwaggerOpenApiConfig implements WebMvcConfigurer {
     public OpenApiCustomiser customerGlobalHeaderOpenApiCustomiser() {
         return openApi -> openApi.getPaths().values().stream().flatMap(pathItem -> pathItem.readOperations().stream())
                 .forEach(operation -> {
-                    operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/myGlobalHeader"));
+                    operation.addParametersItem(new HeaderParameter()
+                            .$ref("#/components/parameters/myGlobalHeader"))
+                    .addParametersItem(new Parameter()
+                    .in("header").required(false).schema(new Schema().type(""))
+                            .description("hhh").name("aaatoken"));
                 });
     }
 
