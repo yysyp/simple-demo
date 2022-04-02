@@ -6,60 +6,54 @@ import java.nio.channels.FileLock;
 import java.util.concurrent.TimeUnit;
 
 public class SelfGuardedCmder {
-    private static String startBat = "SelfGuardedCmder.bat";
-    private static String workLockName = ".sfgc-lock-wk";
-    private static String backupLockName = ".sfgc-lock-bk";
-    private static String toExitIndicator = ".sfgc-lock.exit";
-    private static File logFile = new File("SelfGuardedCmder.log");
+
+    private static File startBatFile = new File("sgc.bat");
+    private static File argsFile = new File("sgc.args");
+    private static String defaultCmd = "cmd /c if %time:~0,2% geq 23 (shutdown -s -t 120) else if %time:~0,2% leq 5 (shutdown -s -t 120) && exit";
+    private static String workLockName = ".sgc-lock-wk";
+    private static String backupLockName = ".sgc-lock-bk";
+    private static String toExitIndicator = ".sgc-lock.exit";
+    private static File logFile = new File("sgc.log");
+    private static int heartbeat = 1000;
+
+    private static int executeInterval = 60;
+    private static String command = defaultCmd;
     private static boolean logFlag = false;
 
     public static void main(String[] args) throws IOException {
         log(getProcessId() + "> -------------------------------------------");
-        StringBuffer selfStartCmd = new StringBuffer("java pslab.SelfGuardedCmder ");
-
-        if (args.length < 2) {
-            StringBuffer usage = new StringBuffer("#Usage:");
-            usage.append(selfStartCmd.toString());
-            usage.append("checkIntervalSeconds ");
-            usage.append("command ");
-            usage.append("[logFlag]");
-            usage.append(System.lineSeparator());
-            usage.append("i.e. ");
-            usage.append(selfStartCmd.toString());
-            usage.append("3 \"cmd /c echo %time%>>echo-per3s.log\" 1");
-            System.out.println(getProcessId() + "> " + usage);
-            System.exit(0);
+        if (args.length < 2 && !argsFile.exists()) {
+            usageTip();
+            initiateStartBat();
+            return;
         }
-
-        int interval = Integer.parseInt(args[0]) * 1000;
-        String cmd = args[1];
-
-        if (args.length > 2 && !args[2].trim().equals("")) {
-            logFlag = true;
+        if (argsFile.exists()) {
+            loadArgsFile();
         }
-
-        selfStartCmd.append(args[0]);
-        selfStartCmd.append(" ");
-        selfStartCmd.append("\"");
-        selfStartCmd.append(cmd);
-        selfStartCmd.append("\"");
-        if (logFlag) {
-            selfStartCmd.append(" 1");
+        if (args.length >= 2) {
+            parseArgs(args);
         }
+        initiateStartBat();
 
-        File startBatFile = new File(startBat);
-        String startBatCmd = "";
-        if (!startBatFile.exists()) {
-            startBatFile.createNewFile();
-            writeFileContent(startBatFile, selfStartCmd.toString(), "UTF-8");
-        }
-        startBatCmd = "cmd /c \"" + startBatFile.getAbsolutePath() + "\"";
-        log(getProcessId() + "> Start command is:" + selfStartCmd);
-        log(getProcessId() + "> And startBatCmd is:" + startBatCmd);
+        log(getProcessId() + "> The restart bat is:" + startBatFile.getAbsolutePath());
         File workLockFile = new File(workLockName);
         Guard workGuard = new Guard(workLockFile);
         Guard backupGuard = new Guard(new File(backupLockName));
-        log(getProcessId() + "> Begin looping, lock=" + workLockFile.getAbsolutePath());
+        log(getProcessId() + "> Begin to loop with executeInterval=["
+                + executeInterval + "] command=[" + command + "] logFlag=[" + logFlag + "]");
+        doLoop(workGuard, backupGuard);
+
+    }
+
+    private static void initiateStartBat() throws IOException {
+        if (!startBatFile.exists()) {
+            startBatFile.createNewFile();
+            writeFileContent(startBatFile, "java pslab.SelfGuardedCmder", "UTF-8");
+        }
+    }
+
+    private static void doLoop(Guard workGuard, Guard backupGuard) {
+        int countDown = executeInterval;
         while (true) {
             try {
                 if (checkToExit()) {
@@ -73,25 +67,27 @@ public class SelfGuardedCmder {
                     System.exit(0);
                 }
                 if (workGuard.lockedByMe()) {
-                    log(getProcessId() + "> Run cmd:[" + cmd + "]");
                     if (backupGuard.lockedByMe()) {
                         backupGuard.unlock();
-                        Thread.sleep(interval);
+                        Thread.sleep(heartbeat);
                     }
-                    exec(cmd);
+                    log(getProcessId() + "> Run cmd:[" + command + "]");
+                    countDown--;
+                    if (countDown == 0) {
+                        exec(command);
+                        countDown = executeInterval;
+                    }
                     //check whether backup process is still alive
                     if (backupGuard.tryLock()) {
                         backupGuard.unlock();
                         //start backup process...
-                        log(getProcessId() + "> Backup down, starting backup with cmd: [" + startBatCmd + "]");
-                        exec(startBatCmd);
+                        startBackup();
                     }
                 } else {
                     if (workGuard.tryLock()) {
                         log(getProcessId() + "> Got work lock");
                         //start backup process...
-                        log(getProcessId() + "> Starting backup with cmd: [" + startBatCmd + "]");
-                        exec(startBatCmd);
+                        startBackup();
                     } else if (!backupGuard.lockedByMe()) {
                         log(getProcessId() + "> Trying backup lock.");
                         backupGuard.tryLock();
@@ -101,13 +97,49 @@ public class SelfGuardedCmder {
                 log(e);
             }
             try {
-                Thread.sleep(interval);
+                Thread.sleep(heartbeat);
             } catch (InterruptedException e) {
             }
         }
+    }
+
+    private static void startBackup() throws IOException, InterruptedException {
+        log(getProcessId() + "> Backup down, starting backup with bat:" + startBatFile.getAbsolutePath());
+        exec("\"" + startBatFile + "\"");
+    }
+
+    private static void usageTip() {
+        writeFileContent(argsFile, "3" + System.lineSeparator() + command
+                , "UTF-8");
+
+        logFlag = true;
+        StringBuffer usage = new StringBuffer("#Usage:");
+        usage.append("java pslab.SelfGuardedCmder ");
+        usage.append("executeIntervalSeconds ");
+        usage.append("command ");
+        usage.append("[logFlag]");
+        usage.append(System.lineSeparator());
+        usage.append("i.e. ");
+        usage.append("java pslab.SelfGuardedCmder ");
+        usage.append("3 \"cmd /c echo %time%>>echo-per3s.log\" 1");
+        usage.append(System.lineSeparator());
+        usage.append("Place \".sgc-lock.exit\" file to stop.");
+        log(usage.toString());
 
     }
 
+    public static void loadArgsFile() {
+        String[] args = readFileContent(argsFile, "UTF-8").split(System.lineSeparator());
+        parseArgs(args);
+    }
+
+    private static void parseArgs(String[] args) {
+        executeInterval = Integer.parseInt(args[0]);
+        command = args[1];
+        if (args.length > 2 && !args[2].trim().equals("")) {
+            logFlag = true;
+        }
+    }
 
     private static boolean checkToExit() {
         File toExitFile = new File(toExitIndicator);
@@ -129,7 +161,6 @@ public class SelfGuardedCmder {
             return;
         }
         try {
-            System.out.println(str);
             str += System.lineSeparator();
             BufferedWriter out = new BufferedWriter(
                     new FileWriter(logFile, true));
@@ -142,11 +173,36 @@ public class SelfGuardedCmder {
         }
     }
 
+    public static String readFileContent(File file, String encoding) {
+        BufferedReader bf = null;
+        try {
+            bf = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+            String content = "";
+            StringBuilder sb = new StringBuilder();
+            while ((content = bf.readLine()) != null) {
+                sb.append(content);
+                sb.append(System.lineSeparator());
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            //e.printStackTrace();
+            log(e.getMessage());
+        } finally {
+            if (bf != null) {
+                try {
+                    bf.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return null;
+    }
+
     public static void writeFileContent(File file, String content, String encoding) {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding));
-            bw.write(content);
+            bw.write(content + System.lineSeparator());
         } catch (IOException e) {
             //log(e);
             log(e.getMessage());
