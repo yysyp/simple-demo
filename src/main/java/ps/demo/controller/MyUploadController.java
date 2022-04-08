@@ -36,6 +36,11 @@ public class MyUploadController {
     @ResponseBody
     public String hi(@RequestBody UploadHi uploadHi) {
         log.info("--->> uploadHi.index={}, num={}", uploadHi.getIndex(), uploadHi.getNum());
+        try {
+            Thread.sleep(uploadHi.getNum()*1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         int size = uploadHi.getFileStr().getBytes(StandardCharsets.UTF_8).length;
         List<Object> multipleStr = new ArrayList<>();
         for (int i = 0; i < uploadHi.getNum(); i++) {

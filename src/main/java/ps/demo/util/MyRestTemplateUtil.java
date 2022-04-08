@@ -59,20 +59,17 @@ public class MyRestTemplateUtil {
 
 
 
-    public String submitFormForString(String url, MultiValueMap<String, String> formMap) {
+    public String submitFormForString(String url, HttpHeaders headers, MultiValueMap<String, Object> formMap) {
         ParameterizedTypeReference<String> responseType = new ParameterizedTypeReference<String>() {
         };
-        return submitFormForObject(url, formMap, responseType).getBody();
+        return submitFormForObject(url, headers, formMap, responseType).getBody();
     }
 
-    public <T> ResponseEntity<T> submitFormForObject(String url, MultiValueMap<String, String> formMap, ParameterizedTypeReference<T> responseType) {
-        HttpHeaders headers = new HttpHeaders();
-        return submitFormForObject(url, headers, formMap, responseType);
-    }
-
-    public <T> ResponseEntity<T> submitFormForObject(String url, HttpHeaders headers, MultiValueMap<String, String> formMap, ParameterizedTypeReference<T> responseType) {
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formMap, headers);
+    public <T> ResponseEntity<T> submitFormForObject(String url, HttpHeaders headers, MultiValueMap<String, Object> formMap, ParameterizedTypeReference<T> responseType) {
+        if (null == headers.getContentType()) {
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        }
+        HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(formMap, headers);
         try {
             ResponseEntity<T> responseEntity = restTemplate.exchange(url, HttpMethod.POST, request, responseType);
             return responseEntity;

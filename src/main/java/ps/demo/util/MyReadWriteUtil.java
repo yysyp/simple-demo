@@ -11,10 +11,50 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class MyReadWriteUtil {
+
+    public static void writeProperties(File file, Properties prop, boolean append) {
+        Writer writer = null;
+        try {
+            writer = new FileWriter(file, append);
+            prop.store(writer, MyTimeUtil.getNowStr());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
+
+    public static Properties readProperties(File file) {
+        Properties prop = new Properties();
+        FileReader fileReader = null;
+        //InputStream inStream=null;
+        try {
+            fileReader = new FileReader(file);
+            prop.load(fileReader);
+            //inStream = new FileInputStream(file);
+            //prop.load(inStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fileReader != null) {
+                try {
+                    fileReader.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return prop;
+    }
 
     public static void writeToFileTsInHomeDir(Object content) {
         writeToFile(MyFileUtil.getFileTsInHomeDir(".log"), content);

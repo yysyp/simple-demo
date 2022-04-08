@@ -1,12 +1,15 @@
 server:
   port: 8080
-  max-http-header-size: 1KB
+  max-http-header-size: 1KB #?
   tomcat:
-    max-swallow-size: 2KB
-    max-http-post-size: 3KB
-    connection-timeout: 5s
+    accept-count: 10 #no use
+    max-connections: 20 #no use
+    max-swallow-size: 2KB #no use
+    max-http-post-size: 3KB #no use
+
+    connection-timeout: 10s #control the SocketWrapperBase.getReadTimeout
     threads:
-      max: 5
+      max: 3
 
 json:
   request-size-limit: 1048576 # 1m
@@ -19,8 +22,8 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 7KB #单个文件的大小 The maximum allowed size of a single uploaded file. i.e. 1MB Priority 2, This config also works for limit the upload Maximum size.
-      max-request-size: 5KB #设置单次请求的文件的总大小 The maximum allowed size of a complete request. i.e. 100KB Priority 1, Limit the multipart/form-data file upload Maximum size.
+      max-file-size: 10GB #单个文件的大小 The maximum allowed size of a single uploaded file. i.e. 1MB Priority 2, This config also works for limit the upload Maximum size.
+      max-request-size: 100GB #设置单次请求的文件的总大小 The maximum allowed size of a complete request. i.e. 100KB Priority 1, Limit the multipart/form-data file upload Maximum size.
 
 springdoc:
   pathsToMatch: /healthz, /api/**

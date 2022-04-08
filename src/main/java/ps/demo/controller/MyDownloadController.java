@@ -3,6 +3,7 @@ package ps.demo.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,6 +33,13 @@ public class MyDownloadController {
     final Base64.Decoder decoder = Base64.getDecoder();
     final Base64.Encoder encoder = Base64.getEncoder();
 
+    /**
+     * The key should be the base64 absolute path;
+     * @param key
+     * @param request
+     * @param response
+     * @return
+     */
     //String key = new String(encoder.encode("C:\\Users\\yunpeng.song\\test.txt".getBytes()), "UTF-8")
     @GetMapping("/file/key")
     @ResponseBody
@@ -62,11 +70,38 @@ public class MyDownloadController {
         }
     }
 
+    /**
+     * path will be the relative path to upload-folder.
+     * ex: 2022-04-07/example.jpg
+     * @param path
+     * @param request
+     * @return
+     */
+    @GetMapping("/file/path")
+    public ResponseEntity<Resource> downloadFileByPath(
+            @RequestParam(value="path", required = true) String path
+            , HttpServletRequest request) {
+        return getResourceByFile(path, request);
+    }
 
+    /**
+     * fileName: the relative filename to upload-folder.
+     * ex: abc.txt
+     * @param fileName
+     * @param request
+     * @return
+     */
     @GetMapping("/file/name/{fileName:.+}")
     public ResponseEntity<Resource> downloadFileByName(@PathVariable String fileName, HttpServletRequest request) {
+        return getResourceByFile(fileName, request);
+    }
+
+    private ResponseEntity<Resource> getResourceByFile(String fileName, HttpServletRequest request) {
         // Load file as Resource
         Resource resource = fileService.loadFileAsResource(fileName);
+
+        //InputStream inputStream = inputStream = new FileInputStream(fileName);
+        //Resource springResource = new InputStreamResource(inputStream);
 
         // Try to determine file's content type
         String contentType = null;
