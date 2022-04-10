@@ -11,6 +11,9 @@ spring:
             max-request-size: 1MB
 </pre>
 
+#Remove seleniumn and Tess4J:
+1, rename bathsbc-trim.txt to bathsbc-trim.bat
+2, run bathsbc-trim.bat
 
 
 
