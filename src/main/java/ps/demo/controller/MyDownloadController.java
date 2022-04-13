@@ -1,5 +1,6 @@
 package ps.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -77,6 +78,7 @@ public class MyDownloadController {
      * @param request
      * @return
      */
+    @Operation(summary = "File download by relative path from System.getProperty(\"user.dir\") + \"/upload-folder/\"")
     @GetMapping("/file/path")
     public ResponseEntity<Resource> downloadFileByPath(
             @RequestParam(value="path", required = true) String path

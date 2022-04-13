@@ -46,3 +46,8 @@ swagger:
   application-version: 1.0
   application-description: Springdoc Openapi Of Simple Demo
   try-host: http://localhost:8080
+
+throttling:
+  permitsPerSecond: 1
+  timeoutMs: 1000
+  msg: hahaha too many

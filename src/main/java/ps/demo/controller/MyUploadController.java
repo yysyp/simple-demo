@@ -1,6 +1,7 @@
 package ps.demo.controller;
 
 import com.alibaba.excel.util.StringUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -15,7 +16,7 @@ import ps.demo.exception.CodeEnum;
 import ps.demo.exception.ServerApiException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -49,6 +50,7 @@ public class MyUploadController {
         return LocalDateTime.now().toString() + uploadHi.getLength();
     }
 
+    @Operation(summary = "File upload with multipart form data")
     @PostMapping(value = "/file", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @ResponseBody
     public String uploadFile(@RequestParam("file") MultipartFile file,
@@ -70,7 +72,27 @@ public class MyUploadController {
             File destFile = Paths.get(destFileName).toFile();
             log.info("--------->>File uploaded to file={}", destFile);
             destFile.getParentFile().mkdirs();
-            file.transferTo(destFile);
+
+            //Use inputStream/outputStream to read write file.
+            try (
+                    BufferedInputStream bi = new BufferedInputStream(file.getInputStream());
+                    OutputStream fout = new FileOutputStream(destFile);
+                    BufferedOutputStream bo = new BufferedOutputStream(fout);
+//                    InputStreamReader inputStreamReader = new InputStreamReader(file.getInputStream());
+//                    BufferedReader br = new BufferedReader(inputStreamReader);
+//                    FileWriter fileWriter = new FileWriter(destFile);
+                    ) {
+
+                int len = -1;
+                byte[] buf = new byte[1024];
+                while ((len = bi.read(buf)) != -1) {
+                    bo.write(buf, 0, len);
+                }
+
+            }
+
+            //Or use file transferTo method to transfer file.
+            //file.transferTo(destFile);
 
         } catch (Exception e) {
             throw new ServerApiException(CodeEnum.INTERNAL_SERVER_ERROR, true, "--------->>File upload failed, ex:" + e.getMessage());
