@@ -1,5 +1,7 @@
 package ps.demo.exception;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * Define all the error code, error info.
  * When throwing exception, use:
@@ -16,6 +18,9 @@ public enum CodeEnum {
     METHOD_NOT_ALLOWED("405", 405),
     REQUEST_TIMEOUT("408", 408),
     UNSUPPORTED_MEDIA_TYPE("415", 415),
+
+    PAYLOAD_TOO_LARGE("413", HttpStatus.PAYLOAD_TOO_LARGE.value()),
+    TOO_MANY_REQUESTS("429", HttpStatus.TOO_MANY_REQUESTS.value()),
 
     // Server Error
     INTERNAL_SERVER_ERROR("500", 500),

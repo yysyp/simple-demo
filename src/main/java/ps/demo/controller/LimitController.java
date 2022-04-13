@@ -16,7 +16,7 @@ public class LimitController {
 
     @Operation(summary = "Throttling control demo, limit1")
     @GetMapping("/test1")
-    @Limit(key = "limit1", permitsPerSecond = "${throttling.permitsPerSecond}", timeoutMs = "${throttling.timeoutMs}", timeunit = TimeUnit.MILLISECONDS, msg = "${throttling.msg}-1")
+    @Limit(key = "limit1", permitsPerSecond = "${throttling.permitsPerSecond}", timeoutMs = "${throttling.timeoutMs}", message = "${throttling.message}-1")
     public String limit1() {
         log.info("Permits bucket get limit1 success");
         return "ok";

@@ -48,6 +48,6 @@ swagger:
   try-host: http://localhost:8080
 
 throttling:
-  permitsPerSecond: 1
+  permitsPerSecond: 0.1
   timeoutMs: 1000
-  msg: hahaha too many
+  message: hahaha too many

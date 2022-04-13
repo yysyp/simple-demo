@@ -8,17 +8,15 @@ import java.util.concurrent.TimeUnit;
 @Documented
 public @interface Limit {
 
-    String permitsPerSecond();
-
     String key() default "";
+
+    String permitsPerSecond();
 
     /**
      * The maximum time waiting for getting the token.
      */
-    String timeoutMs() default "0";
+    String timeoutMs() default "1";
 
-    TimeUnit timeunit() default TimeUnit.MILLISECONDS;
-
-    String msg() default "System is busy, please try again later";
+    String message() default "System is busy, please try again later";
 
 }

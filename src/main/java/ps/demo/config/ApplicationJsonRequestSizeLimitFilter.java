@@ -8,6 +8,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ps.demo.exception.BadRequestException;
+import ps.demo.exception.CodeEnum;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,7 +19,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(-2147483647) //The second outermost order.
 public class ApplicationJsonRequestSizeLimitFilter extends OncePerRequestFilter {
 
     @Value("${json.request-size-limit}")
@@ -28,7 +30,8 @@ public class ApplicationJsonRequestSizeLimitFilter extends OncePerRequestFilter 
                                     HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         if (isApplicationJson(request) && request.getContentLengthLong() > requestSizeLimit) {
-            throw new IOException("My JsonLimit Request content exceeded limit of ["+requestSizeLimit+"] bytes");
+            throw new BadRequestException(CodeEnum.PAYLOAD_TOO_LARGE);
+            //"My JsonLimit Request content exceeded limit of ["+requestSizeLimit+"] bytes");
         }
         filterChain.doFilter(request, response);
     }
