@@ -1,5 +1,6 @@
 package ps.demo.annotation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -11,6 +12,7 @@ import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
+@Slf4j
 @Configuration
 public class LimitPropAwareConfig implements ApplicationContextAware, EmbeddedValueResolverAware {
 
@@ -35,11 +37,13 @@ public class LimitPropAwareConfig implements ApplicationContextAware, EmbeddedVa
     @PostConstruct
     public void validation() throws Exception {
         for (String bname : applicationContext.getBeanDefinitionNames()) {
+
             Object b = applicationContext.getBean(bname);
             Class clazz = b.getClass();
             if (org.springframework.aop.support.AopUtils.isAopProxy(b)) {
                 clazz = org.springframework.aop.support.AopUtils.getTargetClass(b);
             }
+
             for (Method m : clazz.getDeclaredMethods()) {
                 if (m.isAnnotationPresent(Limit.class)) {
                     Limit limit = m.getAnnotation(Limit.class);

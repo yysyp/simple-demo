@@ -31,44 +31,20 @@ spring:
       max-file-size: 10GB #单个文件的大小 The maximum allowed size of a single uploaded file. i.e. 1MB Priority 2, This config also works for limit the upload Maximum size.
       max-request-size: 100GB #设置单次请求的文件的总大小 The maximum allowed size of a complete request. i.e. 100KB Priority 1, Limit the multipart/form-data file upload Maximum size.
 
+#Non-dev environment should config database and set spring.profiles.active=prod
   datasource:
-    url: jdbc:h2:file:./h2/simpledemo
-    username: sa
-    password: sa
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://localhost:3306/simpledemo?useSSL=false
+    username: root
+    password: root
 
   h2:
     console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
+      enabled: false
 
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
 
-springdoc:
-  pathsToMatch: /healthz, /api/**
-  writer-with-default-pretty-printer: true
-  api-docs.enabled: true
-  api-docs.path: /springdoc/api-docs
-  resolve-schema-properties: true
-  swagger-ui:
-    enabled: true
-    path: /springdoc/docs.html
-    url: /springdoc/api-docs
-    #configUrl: /xxx/springdoc/api-docs/swagger-config
-    displayRequestDuration: true
-    showExtensions: true
-    showCommonExtensions: true
-    disable-swagger-default-url: true
-    operationsSorter: method
-swagger:
-  application-name: ${spring.application.name}
-  application-version: 1.0
-  application-description: Springdoc Openapi Of Simple Demo
-  try-host: http://localhost:8080
 
 json:
   request-size-limit: 1048576 # 1m

@@ -16,13 +16,9 @@ import javax.sql.DataSource;
 @RequestMapping("/healthz")
 public class HealthzController {
 
-    @Autowired
-    DataSource dataSource;
-
     @GetMapping
     @ResponseBody
     public HealthzResponse health() {
-        log.info("simple-demo datasource={}", dataSource);
         HealthzResponse healthzResponse = new HealthzResponse();
 
         healthzResponse.setData(new HealthzResponse.Data(HealthzResponse.Status.UP));

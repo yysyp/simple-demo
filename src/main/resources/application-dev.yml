@@ -1,0 +1,45 @@
+
+spring:
+  datasource:
+    url: jdbc:h2:file:./ignorefolder/h2/simpledemo
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+  jpa:
+    hibernate:
+      ddl-auto: update # Hibernate ddl auto (create, create-drop, validate, update)
+
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+springdoc:
+  pathsToMatch: /healthz, /api/**
+  writer-with-default-pretty-printer: true
+  api-docs.enabled: true
+  api-docs.path: /springdoc/api-docs
+  resolve-schema-properties: true
+  swagger-ui:
+    enabled: true
+    path: /springdoc/docs.html
+    url: /springdoc/api-docs
+    #configUrl: /xxx/springdoc/api-docs/swagger-config
+    displayRequestDuration: true
+    showExtensions: true
+    showCommonExtensions: true
+    disable-swagger-default-url: true
+    operationsSorter: method
+swagger:
+  application-name: ${spring.application.name}
+  application-version: 1.0
+  application-description: Springdoc Openapi Of Simple Demo
+  try-host: http://localhost:8080

@@ -71,7 +71,7 @@ public class SwaggerOpenApiConfig implements WebMvcConfigurer {
 //                )
                 .externalDocs(new ExternalDocumentation()
                         .description("H2-console")
-                        .url("/h2-console?url=jdbc:h2:mem:testdb"));
+                        .url("/h2-console?url=jdbc:h2:file:./ignorefolder/h2/simpledemo"));
     }
 
     /**
