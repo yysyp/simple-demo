@@ -25,32 +25,24 @@ public class KuaimaTest {
         JSONObject jsonObject = new JSONObject();
         JSONArray jsonArray = new JSONArray();
 
-        JSONObject line = new JSONObject();
-        line.put("name", "firstName");
-        line.put("type", "String");
-        jsonArray.put(line);
 
-        line.put("name", "lastName");
-        line.put("type", "String");
-        jsonArray.put(line);
-
-        line.put("name", "age");
-        line.put("type", "Integer");
-        jsonArray.put(line);
-
-        line.put("name", "score");
-        line.put("type", "BigDecimal");
-        jsonArray.put(line);
-
-        line.put("name", "birthday");
-        line.put("type", "Date");
-        jsonArray.put(line);
+        jsonArray.put(buildLine("firstName", "String"));
+        jsonArray.put(buildLine("lastName", "String"));
+        jsonArray.put(buildLine("age", "Integer"));
+        jsonArray.put(buildLine("score", "BigDecimal"));
+        jsonArray.put(buildLine("birthday", "Date"));
 
         jsonObject.put("name", "Student");
         jsonObject.put("attrs", jsonArray);
-        jsonArray.put(line);
 
         System.out.println(jsonObject.toString());
         System.out.println("Done!");
+    }
+
+    public static JSONObject buildLine(String name, String type) throws JSONException {
+        JSONObject line = new JSONObject();
+        line.put("name", name);
+        line.put("type", type);
+        return line;
     }
 }
