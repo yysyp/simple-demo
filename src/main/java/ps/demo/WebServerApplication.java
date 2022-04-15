@@ -18,7 +18,9 @@ public class WebServerApplication { //implements CommandLineRunner {
         long maxMemory = Runtime.getRuntime().maxMemory();
         long totalMemory = Runtime.getRuntime().totalMemory();
         //long freeMemory = Runtime.getRuntime().freeMemory();
-        log.info("--->>maxMemory={}, totalMemory={}, usedMemory={}", maxMemory/1024/1024, totalMemory/1024/1024, (maxMemory-totalMemory)/1024/1024);
+        log.info("--->>maxMemory={}m, totalMemory={}m, usedMemory={}m",
+                maxMemory / 1024 / 1024, totalMemory / 1024 / 1024,
+                (maxMemory - totalMemory) / 1024 / 1024);
         SpringApplication.run(WebServerApplication.class, args);
 
 //        SpringApplication springApplication = new SpringApplication(WebServerApplication.class);

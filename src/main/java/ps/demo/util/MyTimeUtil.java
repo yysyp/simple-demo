@@ -5,17 +5,26 @@ import java.time.format.DateTimeFormatter;
 
 public class MyTimeUtil {
 
-    public static final String DATE_FORMAT_STR_DATETTIME = "yyyy-MM-dd'T'HH:mm:ss";
-
-//    public static final String DATE_FORMAT_STR_DATETTIMESSSZ = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    //public final static String DATE_FORMAT_STR_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    //public static final String DATE_FORMAT_STR_DATETTIMESSSZ = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String DATE_FORMAT_STR_DATETTIMESSS = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+    public static final String DATE_FORMAT_STR_DATETTIME = "yyyy-MM-dd'T'HH:mm:ss";
+    public final static String DATE_FORMAT_STR_PLAIN_DATE = "yyyy-MM-dd";
 
     public static String getNowStr() {
         return getNowStr("yyyy-MM-dd_HHmmss");
     }
 
+    public static String getNowStryMdTHmsS() {
+        return getNowStr(DATE_FORMAT_STR_DATETTIMESSS);
+    }
+
     public String getNowStryMdTHms() {
         return getNowStr(DATE_FORMAT_STR_DATETTIME);
+    }
+
+    public String getNowStryMd() {
+        return getNowStr(DATE_FORMAT_STR_PLAIN_DATE);
     }
 
     public static String getNowStr(String pattern) {

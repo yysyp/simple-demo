@@ -59,7 +59,7 @@ public class ApiBaseException extends RuntimeException {
             String trace = ExceptionUtils.getStackTrace(this);
             errorResponse.setTrace(trace);
         }
-        errorResponse.setTimestamp(MyTimeUtil.getNowStr());
+        errorResponse.setTimestamp(MyTimeUtil.getNowStryMdTHmsS());
         errorResponse.setPath(MyRequestContextUtil.getRequest().getPathInfo());
         return errorResponse;
     }

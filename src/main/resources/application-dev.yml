@@ -23,7 +23,7 @@ spring:
         format_sql: true
 
 springdoc:
-  pathsToMatch: /healthz, /api/**
+  pathsToMatch: /healthz, /api/**, /tpage/**
   writer-with-default-pretty-printer: true
   api-docs.enabled: true
   api-docs.path: /springdoc/api-docs

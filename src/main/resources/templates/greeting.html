@@ -1,0 +1,12 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>greeting</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+Greeting:
+<p th:text="'Hello, ' + ${greeting.name} + '!'" />
+<p th:text="'Today is ' + ${greeting.date} + '.'"/>
+</body>
+</html>

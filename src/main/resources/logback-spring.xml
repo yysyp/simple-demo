@@ -25,12 +25,12 @@
             <fileNamePattern>log/${logging.name}.%d.%i.log</fileNamePattern>
             <!-- Old log files will be automatically deleted when below condition does not meet.
 			each file should be at most 10mb, keep 3650 days worth of history, but at most 10gb -->
-            <maxHistory>3650</maxHistory>
+            <maxHistory>5</maxHistory>
             <totalSizeCap>${logging.total-size-cap}</totalSizeCap>
             <cleanHistoryOnStart>true</cleanHistoryOnStart>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10mb</maxFileSize>
+                <maxFileSize>5mb</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
