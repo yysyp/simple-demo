@@ -3,20 +3,13 @@ package pslab;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.StringTemplateResolver;
-import ps.demo.util.MyArgsUtil;
-import ps.demo.util.MyFileUtil;
-import ps.demo.util.MyReadWriteUtil;
-import ps.demo.util.MyThymeleafUtil;
-import ps.demo.util.json.JSONException;
+import ps.demo.util.*;
 import ps.demo.util.json.JSONObject;
 
 import java.io.File;
-import java.time.LocalDateTime;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.util.*;
 
 @Slf4j
@@ -24,14 +17,31 @@ public class Kuaima {
 
     private static Properties properties;
 
-    public static void main(String[] args) throws JSONException {
+    private static File contentmd5checkFile;
+    private static Properties contentmd5check;
+
+    public static void main(String[] args) throws Exception {
         Map<String, String> argsMap = MyArgsUtil.assemberArgs(args);
         String tfsource = StringUtils.isBlank(argsMap.get("tfsource")) ? "tfsource" : argsMap.get("tfsource").trim();
 
         properties = MyReadWriteUtil.readProperties(new File(tfsource, "tf.properties"));
+        File targetDir = new File(properties.getProperty("tftargetPath"));
+        if (!targetDir.exists()) {
+            targetDir.mkdirs();
+        }
+        String contentmd5checkPath = properties.getProperty("contentmd5check");
+        contentmd5checkFile = new File(contentmd5checkPath);
+        if (!contentmd5checkFile.exists()) {
+            contentmd5checkFile.createNewFile();
+        }
+        contentmd5check = MyReadWriteUtil.readProperties(contentmd5checkFile);
+
         Collection<File> tfs = FileUtils.listFiles(new File(tfsource), new String[]{"tf"}, false);
 
         String encoding = properties.getProperty("encoding");
+        if (StringUtils.isBlank(encoding)) {
+            encoding = Charset.defaultCharset().name();
+        }
         String targetPath = properties.getProperty("tftargetPath");
         File header = new File(tfsource, "header_tf");
         File footer = new File(tfsource, "footer_tf");
@@ -57,8 +67,10 @@ public class Kuaima {
                 content.append(footerContent);
                 String result = MyThymeleafUtil.processText(content.toString(), propMap);
                 File absPath = new File(targetPath, relativePath);
-                MyFileUtil.createFiles(absPath);
-                MyReadWriteUtil.writeFileContent(absPath, result, encoding);
+                MyFileUtil.createDir(absPath.getParent());
+                //MyReadWriteUtil.writeFileContent(absPath, result, encoding);
+                fileCheckToOverwrite(absPath, result);
+                MyReadWriteUtil.writeProperties(contentmd5checkFile, contentmd5check, false);
             } catch (Exception e) {
                 log.error("Kuaima processing err, msg={}", e.getMessage(), e);
             }
@@ -67,8 +79,39 @@ public class Kuaima {
         log.info("Kuaima processing Done!");
     }
 
-//    public static JSONObject parseJSON(String jsonStr) {
-//        JSONObject jsonObject = JSONObject.fromObject(joStr);
-//    }
+    private static void fileCheckToOverwrite(File file, String newContent) throws IOException {
+        String key = file.getAbsolutePath();
+        String savedMd5 = (String) contentmd5check.get(key);
+        contentmd5check.setProperty(key, MyMD5Util.getMD5(newContent));
+
+        if (!file.exists()) {
+            writeFileContent(newContent, file);
+            return;
+        }
+        String contentMd5 = MyMD5Util.getMD5(readFileContent(file));
+        if (contentMd5.equals(savedMd5)) {
+            writeFileContent(newContent, file);
+            return;
+        }
+
+        //Not matching create _fix file
+        File fixFile = new File(file.getAbsolutePath()+"-fix");
+        writeFileContent(newContent, fixFile);
+    }
+
+    private static String readFileContent(File file) throws IOException {
+        if (StringUtils.isEmpty(properties.getProperty("encoding"))) {
+            return FileUtils.readFileToString(file, Charset.defaultCharset());
+        }
+        return FileUtils.readFileToString(file, properties.getProperty("encoding"));
+    }
+
+    private static void writeFileContent(String content, File file) throws IOException {
+        if (StringUtils.isEmpty(properties.getProperty("encoding"))) {
+            FileUtils.writeStringToFile(file, content, Charset.defaultCharset());
+        } else {
+            FileUtils.writeStringToFile(file, content, properties.getProperty("encoding"));
+        }
+    }
 
 }
