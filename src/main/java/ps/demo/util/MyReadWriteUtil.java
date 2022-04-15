@@ -8,10 +8,7 @@ import java.net.FileNameMap;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -135,6 +132,9 @@ public class MyReadWriteUtil {
     }
 
 
+    public static String readFileContent(File file) {
+        return readFileContent(file, "UTF-8");
+    }
     public static String readFileContent(File file, String encoding) {
         BufferedReader bf = null;
         try {
