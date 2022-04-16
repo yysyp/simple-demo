@@ -10,14 +10,14 @@ import lombok.*;
 @ToString
 public class HealthzResponse extends BasicOkResponse {
 
-    Data data;
+    private Health data;
 
     @NoArgsConstructor
     @AllArgsConstructor
     @Getter
     @Setter
     @ToString
-    public static class Data {
+    public static class Health {
         Status status;
     }
 

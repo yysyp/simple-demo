@@ -32,6 +32,7 @@ public class Kuaima {
         String contentmd5checkPath = properties.getProperty("contentmd5check");
         contentmd5checkFile = new File(contentmd5checkPath);
         if (!contentmd5checkFile.exists()) {
+            contentmd5checkFile.getParentFile().mkdirs();
             contentmd5checkFile.createNewFile();
         }
         contentmd5check = MyReadWriteUtil.readProperties(contentmd5checkFile);

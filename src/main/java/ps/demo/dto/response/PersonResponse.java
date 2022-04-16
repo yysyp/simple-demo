@@ -10,7 +10,7 @@ import ps.demo.dto.Person;
 @AllArgsConstructor
 public class PersonResponse extends BasicOkResponse {
 
-    Person data;
+    private Person data;
 
 
 }

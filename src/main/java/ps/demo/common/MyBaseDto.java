@@ -6,6 +6,7 @@ package ps.demo.common;
 import lombok.*;
 
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -18,8 +19,11 @@ import java.time.Instant;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-@MappedSuperclass
-public class BaseEntity {
+public class MyBaseDto implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private Long id;
 
 	private String createdBy;
 

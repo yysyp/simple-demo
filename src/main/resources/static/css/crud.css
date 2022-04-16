@@ -1,0 +1,62 @@
+body {  }
+
+.error {
+    color: #FF0000;
+}
+.header-container {
+    text-align: center;
+}
+.content-root {
+    text-align: center;
+}
+.footer-container {
+    text-align: center;
+}
+form {
+  margin: 0px;
+}
+.form-container {
+  display: inline-block;
+}
+.query-container {
+    margin-bottom: 0.5rem;
+}
+.query-container > span {
+  display: inline-block;
+}
+
+.list-container {
+
+}
+
+.list {
+  display: inline-block;
+  width: 95%;
+  overflow: auto;
+}
+
+.list-table {
+  width: 100%;
+}
+
+.list-navigator {
+  display: inline-block;
+  right: 5%;
+  width: 95%;
+  text-align: right;
+}
+
+.list-navigator > span {
+    display: inline-block;
+}
+
+#navigateToFirstPage { cursor:pointer; }
+#navigateToPreviousPage { cursor:pointer; }
+#navigateToNextPage { cursor:pointer; }
+#navigateToLastPage { cursor:pointer; }
+.list-navigator > span.enabled {
+color: #00F;
+}
+.list-navigator > span.disabled {
+color: #000;
+}

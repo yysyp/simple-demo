@@ -2,10 +2,16 @@ package ps.demo.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class MyHeaderUtil {
 
     public static boolean isTrace() {
-        String trace = MyRequestContextUtil.getRequest().getHeader("trace");
-        return StringUtils.isNotBlank(trace);
+        HttpServletRequest httpServletRequest = MyRequestContextUtil.getRequest();
+        if (httpServletRequest != null) {
+            String trace = httpServletRequest.getHeader("trace");
+            return StringUtils.isNotBlank(trace);
+        }
+        return false;
     }
 }

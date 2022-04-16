@@ -7,6 +7,8 @@ import ps.demo.util.MyHeaderUtil;
 import ps.demo.util.MyRequestContextUtil;
 import ps.demo.util.MyTimeUtil;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class ApiBaseException extends RuntimeException {
     private static final long serialVersionUID = 5391996017578973640L;
     private final CodeEnum codeEnum;
@@ -60,7 +62,10 @@ public class ApiBaseException extends RuntimeException {
             errorResponse.setTrace(trace);
         }
         errorResponse.setTimestamp(MyTimeUtil.getNowStryMdTHmsS());
-        errorResponse.setPath(MyRequestContextUtil.getRequest().getPathInfo());
+        HttpServletRequest request = MyRequestContextUtil.getRequest();
+        if (request != null) {
+            errorResponse.setPath(request.getPathInfo());
+        }
         return errorResponse;
     }
 

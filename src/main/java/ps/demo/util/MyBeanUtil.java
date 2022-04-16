@@ -90,5 +90,8 @@ public class MyBeanUtil {
 //    }
 
 
+    public static void copyProperties(Object source, Object target) {
+        BeanUtils.copyProperties(source, target);
+    }
 
 }

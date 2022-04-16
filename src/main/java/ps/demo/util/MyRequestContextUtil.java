@@ -3,6 +3,7 @@ package ps.demo.util;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -15,12 +16,17 @@ import javax.servlet.http.HttpSession;
 /**
  * @desc
  */
+@Component
 public class MyRequestContextUtil implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
 
     public static HttpServletRequest getRequest() {
-       return getRequestAttributes().getRequest();
+        ServletRequestAttributes servletRequestAttributes = getRequestAttributes();
+        if (servletRequestAttributes == null) {
+            return null;
+        }
+       return servletRequestAttributes.getRequest();
     }
 
     public static HttpServletResponse getResponse() {

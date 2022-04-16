@@ -4,7 +4,7 @@ package ps.demo.order.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ps.demo.common.BaseEntity;
+import ps.demo.common.MyBaseEntity;
 
 import javax.persistence.*;
 
@@ -13,11 +13,11 @@ import javax.persistence.*;
 @ToString
 @Entity
 @Table(name = "cart_line")
-public class CartLine extends BaseEntity {
+public class CartLine extends MyBaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+//    private Long id;
 
     @Column(name = "product_id", nullable = false)
     private Long productId;

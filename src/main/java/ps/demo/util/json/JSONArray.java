@@ -612,4 +612,8 @@ public class JSONArray {
         // diverge from the original, which doesn't implement hashCode
         return values.hashCode();
     }
+
+    public List<Object> getValues() {
+        return this.values;
+    }
 }

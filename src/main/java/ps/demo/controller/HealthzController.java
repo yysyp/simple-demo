@@ -21,7 +21,7 @@ public class HealthzController {
     public HealthzResponse health() {
         HealthzResponse healthzResponse = new HealthzResponse();
 
-        healthzResponse.setData(new HealthzResponse.Data(HealthzResponse.Status.UP));
+        healthzResponse.setData(new HealthzResponse.Health(HealthzResponse.Status.UP));
 
         return healthzResponse;
     }

@@ -1,3 +1,16 @@
-[# th:with="var1='hello/1!',
-var2=2222
+[# th:with="entityName=${entityJson.get('name')}+${entitySuffix},
+entityKey=${#strings.toLowerCase(entityName)},
+daoName=${entityName}+${daoSuffix},
+daoKey=${#strings.toLowerCase(daoName)},
+serviceName=${entityName}+${serviceSuffix},
+serviceKey=${#strings.toLowerCase(serviceName)},
+dtoName=${entityName}+${dtoSuffix},
+dtoKey=${#strings.toLowerCase(dtoName)},
+controllerName=${entityName}+${controllerSuffix},
+controllerKey=${#strings.toLowerCase(controllerName)},
+reqName=${entityName}+${reqSuffix},
+reqKey=${#strings.toLowerCase(reqName)},
+respName=${entityName}+${respSuffix},
+respKey=${#strings.toLowerCase(respName)},
+entityAttrs=${entityJson.get('attrs').values}
 "]
