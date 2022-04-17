@@ -1,22 +1,25 @@
 package [(${packageName}+'.'+${moduleName}+'.'+${dtoFolder})];
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import java.util.Date;
-import java.util.List;
-import java.util.*;
-import java.math.*;
-import ps.demo.common.MyBaseDto;
 import lombok.*;
 import java.util.*;
 import java.math.*;
+
+import ps.demo.common.MyPageReq;
+
+
+@ToString
 @Getter
 @Setter
-@ToString
-public class [(${dtoName})] extends MyBaseDto {
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+public class [(${reqName})] extends MyPageReq {
+    private String key;
 [# th:each="attr,attrStat:${entityAttrs}" ]
     private [(${attr.get('type')})] [(${attr.get('name')})];
 [/]
 
 }
+
+
+

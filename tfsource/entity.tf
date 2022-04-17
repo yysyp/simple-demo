@@ -1,20 +1,28 @@
-package [(${packageName}+'.'+${moduleName}+'.'+${dtoFolder})];
+package [(${packageName}+'.'+${moduleName}+'.'+${entityFolder})];
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 import java.util.Date;
-import java.util.List;
+
+import ps.demo.common.MyBaseEntity;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.*;
 import java.math.*;
-import ps.demo.common.MyBaseDto;
+
 import lombok.*;
 import java.util.*;
 import java.math.*;
+
 @Getter
 @Setter
 @ToString
-public class [(${dtoName})] extends MyBaseDto {
+@Entity
+@Table(name = "[(${tableName})]")
+public class [(${entityName})] extends MyBaseEntity {
 [# th:each="attr,attrStat:${entityAttrs}" ]
     private [(${attr.get('type')})] [(${attr.get('name')})];
 [/]

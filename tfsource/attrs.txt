@@ -1,0 +1,60 @@
+All To add:
+import lombok.*;
+import java.util.*;
+import java.math.*;
+
+DTO,Req,Entity:
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    private [(${attr.get('type')})] [(${attr.get('name')})];
+[/]
+
+TfController:
+if (StringUtils.isNotBlank(key)) {
+    String percentWrapKey = "%" + key + "%";
+    [# th:each="attr,attrStat:${entityAttrs}" ]
+        [# th:if="${attr.get('type') eq 'String'}"]
+        [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](percentWrapKey);
+        [/]
+    [/]
+}
+
+Service:
+Predicate predicate = null;
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    [# th:if="${attr.get('type') eq 'String'}"]
+    [# th:if="${attrStat.index eq 0}"]
+    if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
+        predicate = cb.or(cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
+    }
+    [/]
+    [# th:if="${attrStat.index neq 0}"]
+    if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
+        predicate = cb.or(predicate, cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
+    }
+    [/]
+    [/]
+[/]
+return predicate;
+
+html-form:
+<table>
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input  type="text" maxlength="255" id="[(${attr.get('name')})]" name="[(${attr.get('name')})]"  th:value="*{[(${attr.get('name')})]}"    ><label> &nbsp;</label></td></tr>
+[/]
+<tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
+</table>
+
+html-list:
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    <td th:text="${[(${dtoKey})].[(${attr.get('name')})]}"></td>
+[/]
+
+html-modify:
+[# th:each="attr,attrStat:${entityAttrs}" ]
+<tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input  type="text" maxlength="255" id="[(${attr.get('name')})]" name="[(${attr.get('name')})]"  th:value="*{[(${attr.get('name')})]}"    ><label> &nbsp;</label></td></tr>
+[/]
+
+html-view:
+[# th:each="attr,attrStat:${entityAttrs}" ]
+<tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><span th:text="*{[(${attr.get('name')})]}" ></span><label> &nbsp;</label></td></tr>
+[/]

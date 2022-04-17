@@ -81,7 +81,7 @@ public class SystemTrackingTfController extends MyBaseController {
         SystemTrackingDto systemTrackingDto = new SystemTrackingDto();
         String key = systemTrackingReq.getKey();
         if (StringUtils.isNotBlank(key)) {
-            String percentWrapKey = "%"+key+"%";
+            String percentWrapKey = "%" + key + "%";
             systemTrackingDto.setCountSource(percentWrapKey);
             systemTrackingDto.setFetchSourceByPage(percentWrapKey);
         }

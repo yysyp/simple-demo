@@ -1,22 +1,30 @@
 
 
-package ps.demo.school.dto;
+package ps.demo.school.entity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 import java.util.Date;
-import java.util.List;
+
+import ps.demo.common.MyBaseEntity;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.*;
 import java.math.*;
-import ps.demo.common.MyBaseDto;
+
 import lombok.*;
 import java.util.*;
 import java.math.*;
+
 @Getter
 @Setter
 @ToString
-public class StudentDto extends MyBaseDto {
+@Entity
+@Table(name = "student")
+public class Student extends MyBaseEntity {
 
     private String firstName;
     private String lastName;

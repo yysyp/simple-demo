@@ -2,21 +2,21 @@
 
 package ps.demo.school.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import java.util.Date;
-import java.util.List;
-import java.util.*;
-import java.math.*;
-import ps.demo.common.MyBaseDto;
 import lombok.*;
 import java.util.*;
 import java.math.*;
+
+import ps.demo.common.MyPageReq;
+
+
+@ToString
 @Getter
 @Setter
-@ToString
-public class StudentDto extends MyBaseDto {
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+public class StudentReq extends MyPageReq {
+    private String key;
 
     private String firstName;
     private String lastName;
@@ -26,5 +26,8 @@ public class StudentDto extends MyBaseDto {
 
 
 }
+
+
+
 
 

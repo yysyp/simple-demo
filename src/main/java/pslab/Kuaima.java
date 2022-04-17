@@ -43,7 +43,7 @@ public class Kuaima {
         if (StringUtils.isBlank(encoding)) {
             encoding = Charset.defaultCharset().name();
         }
-        String targetPath = properties.getProperty("tftargetPath");
+        //String targetPath = properties.getProperty("tftargetPath");
         File header = new File(tfsource, "header_tf");
         File footer = new File(tfsource, "footer_tf");
         String headerContent = MyReadWriteUtil.readFileContent(header, encoding);
@@ -52,6 +52,11 @@ public class Kuaima {
         String entityJson = properties.getProperty("entityJson");
         JSONObject jsonObject = new JSONObject(entityJson);
         propMap.put("entityJson", jsonObject);
+        String uncEntityName = StringUtils.uncapitalize(jsonObject.getString("name"));
+        String tableName = MyStringUtil.toDbName(uncEntityName);
+        propMap.put("tableName", tableName);
+        String uriName = MyStringUtil.toUriName(uncEntityName);
+        propMap.put("uriName", uriName);
         for (File tf : tfs) {
             String fileName = tf.getName();
             String relativePath = properties.getProperty(fileName);
@@ -67,7 +72,7 @@ public class Kuaima {
                 content.append(System.lineSeparator());
                 content.append(footerContent);
                 String result = MyThymeleafUtil.processText(content.toString(), propMap);
-                File absPath = new File(targetPath, relativePath);
+                File absPath = new File(targetDir, relativePath);
                 MyFileUtil.createDir(absPath.getParent());
                 //MyReadWriteUtil.writeFileContent(absPath, result, encoding);
                 fileCheckToOverwrite(absPath, result);

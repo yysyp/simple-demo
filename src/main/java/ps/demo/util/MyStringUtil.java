@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class MyStringUtil {
     public static final char UNDERLINE = '_';
+    public static final char HYPHEN = '-';
 
 
     public static String randomAscii(int bytes) {
@@ -35,16 +36,25 @@ public class MyStringUtil {
         return sb.toString();
     }
 
-    public static String toDbName(String javaName) {
-        if (StringUtils.isBlank(javaName)) {
-            return javaName;
+    public static String toDbName(String javaAttr) {
+        return camelCaseToNewChar(javaAttr, UNDERLINE);
+    }
+
+    public static String toUriName(String javaAttr) {
+        return camelCaseToNewChar(javaAttr, HYPHEN);
+    }
+
+    public static String camelCaseToNewChar(String camelVariable, char ch) {
+        if (StringUtils.isBlank(camelVariable)) {
+            return camelVariable;
         }
-        int len = javaName.length();
+        String uncCamelVriable = StringUtils.uncapitalize(camelVariable);
+        int len = uncCamelVriable.length();
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
-            char c = javaName.charAt(i);
+            char c = uncCamelVriable.charAt(i);
             if (Character.isUpperCase(c)) {
-                sb.append(UNDERLINE);
+                sb.append(ch);
                 sb.append(Character.toLowerCase(c));
             } else {
                 sb.append(c);
