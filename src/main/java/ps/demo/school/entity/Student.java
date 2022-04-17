@@ -30,6 +30,7 @@ public class Student extends MyBaseEntity {
     private String lastName;
     private Integer age;
     private BigDecimal score;
+    private Boolean passed;
     private Date birthday;
 
 

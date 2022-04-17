@@ -22,6 +22,7 @@ public class StudentReq extends MyPageReq {
     private String lastName;
     private Integer age;
     private BigDecimal score;
+    private Boolean passed;
     private Date birthday;
 
 

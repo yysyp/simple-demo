@@ -30,7 +30,7 @@
             <input type="hidden" name="id" th:value="*{id}">
             <table>
 [# th:each="attr,attrStat:${entityAttrs}" ]
-    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input [# th:if="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="number"[/] [# th:unless="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="text"[/] [# th:if="${attr.get('nullable') eq 'no'}"]required[/] id="[(${attr.get('name')})]" name="[(${attr.get('name')})]" [# th:if="${attr.get('maxlength') != null}"]maxlength="[(${attr.get('maxlength')})]"[/] th:value="*{[(${attr.get('name')})]}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input [# th:if="${attr.get('type') eq 'Boolean'}"]maxlength="1" range="[0,1]"[/] [# th:if="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="number"[/] [# th:unless="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="text"[/] [# th:if="${attr.get('nullable') eq 'no'}"]required[/] id="[(${attr.get('name')})]" name="[(${attr.get('name')})]" [# th:if="${attr.get('maxlength') != null}"]maxlength="[(${attr.get('maxlength')})]"[/] [# th:if="${attr.get('type') eq 'Date'}"]th:value="*{#dates.format([(${attr.get('name')})], 'yyyy-MM-dd HH:mm:ss')}"[/] [# th:unless="${attr.get('type') eq 'Date'}"]th:value="*{[(${attr.get('name')})]}"[/] ><label> &nbsp;</label></td></tr>
 [/]
                 <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
             </table>
@@ -64,19 +64,15 @@ $(function() {
     $("#createform").validate();
 });
 
-    #foreach($column in $tablemd.columnsMetadataDtoList)
-    #if($column.loAttrName != 'id' && $column.loAttrName != 'createTime' && $column.loAttrName != 'updateTime' && $column.loAttrName != 'createBy' && $column.loAttrName != 'updateBy'
-    && $column.loAttrName != 'deleted' && $column.loAttrName != 'version')
-    #if($column.attrType == 'Date')
-    $('#$column.loAttrName').datetimepicker({
-        dateFormat: "yy-mm-dd",
-        timeFormat: "hh:mm:ss"
-    });
-    #end
-    #end
-    #end
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    [# th:if="${attr.get('type') eq 'Date'}"]
+        $('#[(${attr.get('name')})]').datetimepicker({
+            dateFormat: "yy-mm-dd",
+            timeFormat: "hh:mm:ss"
+        });
+    [/]
+[/]
 
-    $("#createform").validate();
 
 /*]]>*/
 </script>
