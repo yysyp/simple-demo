@@ -20,7 +20,6 @@
 <body>
 <div th:replace="~{fragments/header::header}"></div>
 
-<h3>list:</h3>
 <div class="content-root">
 
     <form id="queryform" th:action="@{/api/school/student/list}" method="POST" th:object="${studentModel.studentreq}">
@@ -118,7 +117,7 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
 
     $("#queryform input[name='key']").keyup(function () {

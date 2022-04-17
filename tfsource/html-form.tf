@@ -18,9 +18,8 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">[List]</a>
 
-<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">GoTo List</a>
-<h3>Form:</h3>
 <div class="content-root">
 
     <div class="form-container">
@@ -59,19 +58,21 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
-    $("#createform").validate();
-});
 
-[# th:each="attr,attrStat:${entityAttrs}" ]
-    [# th:if="${attr.get('type') eq 'Date'}"]
-        $('#[(${attr.get('name')})]').datetimepicker({
-            dateFormat: "yy-mm-dd",
-            timeFormat: "hh:mm:ss"
-        });
+    [# th:each="attr,attrStat:${entityAttrs}" ]
+        [# th:if="${attr.get('type') eq 'Date'}"]
+            $('#[(${attr.get('name')})]').datetimepicker({
+                dateFormat: "yy-mm-dd",
+                timeFormat: "hh:mm:ss"
+            });
+        [/]
     [/]
-[/]
+
+    $("#createform").validate();
+
+});
 
 
 /*]]>*/

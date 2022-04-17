@@ -9,14 +9,14 @@
 <div th:fragment="header" class="header-container">
     <h1>simple-demo</h1>
     <div style="text-align: right;">
-        <div sec:authorize="isAnonymous()">
-            <a th:href="@{/}">Login</a>
-        </div>
-        <div sec:authorize="isAuthenticated()">
-            <span sec:authorize="hasRole('ROLE_ADMIN')">Admin</span>
-            <span sec:authentication="principal.username"></span>
-            <a th:href="@{/api/logout}">Logout</a>
-        </div>
+<!--        <div sec:authorize="isAnonymous()">-->
+<!--            <a th:href="@{/}">Login</a>-->
+<!--        </div>-->
+<!--        <div sec:authorize="isAuthenticated()">-->
+<!--            <span sec:authorize="hasRole('ROLE_ADMIN')">Admin</span>-->
+<!--            <span sec:authentication="principal.username"></span>-->
+<!--            <a th:href="@{/api/logout}">Logout</a>-->
+<!--        </div>-->
     </div>
     <hr/>
 </div>

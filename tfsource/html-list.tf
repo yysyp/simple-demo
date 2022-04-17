@@ -18,7 +18,6 @@
 <body>
 <div th:replace="~{fragments/header::header}"></div>
 
-<h3>list:</h3>
 <div class="content-root">
 
     <form id="queryform" th:action="@{/api/[(${moduleName})]/[(${uriName})]/list}" method="POST" th:object="${[(${entityKey})]Model.[(${reqKey})]}">
@@ -106,7 +105,7 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
 
     $("#queryform input[name='key']").keyup(function () {

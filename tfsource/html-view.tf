@@ -18,9 +18,8 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">[List]</a>
 
-<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">GoTo List</a>
-<h3>View:</h3>
 <div class="content-root">
     <div class="form-container">
     <form id="viewform" th:object="${[(${entityKey})]Model.[(${dtoKey})]}">
@@ -51,7 +50,7 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
 
 });

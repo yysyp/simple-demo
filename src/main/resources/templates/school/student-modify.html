@@ -20,9 +20,8 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/school/student}">[List]</a>
 
-<a th:href="@{/api/school/student}">GoTo List</a>
-<h3>Modify:</h3>
 <div class="content-root">
 
 <div class="content-root">
@@ -34,12 +33,12 @@
     <table>
 
 
-<tr><td><label>firstName:</label></td><td width="75%"><input  type="text" maxlength="255" id="firstName" name="firstName"  th:value="*{firstName}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>lastName:</label></td><td width="75%"><input  type="text" maxlength="255" id="lastName" name="lastName"  th:value="*{lastName}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>age:</label></td><td width="75%"><input  type="text" maxlength="255" id="age" name="age"  th:value="*{age}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>score:</label></td><td width="75%"><input  type="text" maxlength="255" id="score" name="score"  th:value="*{score}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>passed:</label></td><td width="75%"><input  type="text" maxlength="255" id="passed" name="passed"  th:value="*{passed}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>birthday:</label></td><td width="75%"><input  type="text" maxlength="255" id="birthday" name="birthday"  th:value="*{birthday}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>firstName:</label></td><td width="75%"><input   type="text" required id="firstName" name="firstName" maxlength="25"  th:value="*{firstName}" ><label> &nbsp;</label></td></tr>
+    <tr><td><label>lastName:</label></td><td width="75%"><input   type="text"  id="lastName" name="lastName" maxlength="25"  th:value="*{lastName}" ><label> &nbsp;</label></td></tr>
+    <tr><td><label>age:</label></td><td width="75%"><input  type="number"   id="age" name="age"   th:value="*{age}" ><label> &nbsp;</label></td></tr>
+    <tr><td><label>score:</label></td><td width="75%"><input  type="number"   id="score" name="score"   th:value="*{score}" ><label> &nbsp;</label></td></tr>
+    <tr><td><label>passed:</label></td><td width="75%"><input maxlength="1" range="[0,1]" type="number"   id="passed" name="passed"   th:value="*{passed}" ><label> &nbsp;</label></td></tr>
+    <tr><td><label>birthday:</label></td><td width="75%"><input   type="text"  id="birthday" name="birthday"  th:value="*{#dates.format(birthday, 'yyyy-MM-dd HH:mm:ss')}"  ><label> &nbsp;</label></td></tr>
 
         <tr><td colspan="2" style="text-align: center;"><input type="reset" value="Reset" style="width:150px;">&nbsp;&nbsp;<input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
     </table>
@@ -67,12 +66,27 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
+
+
+    
+    
+    
+    
+    
+    
+        $('#birthday').datetimepicker({
+            dateFormat: "yy-mm-dd",
+            timeFormat: "hh:mm:ss"
+        });
+    
+
 
 $("#modifyform").validate();
 
 });
+
 /*]]>*/
 </script>
 <div th:replace="~{fragments/footer::footer}"></div>

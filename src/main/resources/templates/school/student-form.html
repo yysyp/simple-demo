@@ -20,9 +20,8 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/school/student}">[List]</a>
 
-<a th:href="@{/api/school/student}">GoTo List</a>
-<h3>Form:</h3>
 <div class="content-root">
 
     <div class="form-container">
@@ -66,24 +65,26 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
+
+    
+        
+        
+        
+        
+        
+        
+            $('#birthday').datetimepicker({
+                dateFormat: "yy-mm-dd",
+                timeFormat: "hh:mm:ss"
+            });
+        
+    
+
     $("#createform").validate();
+
 });
-
-
-    
-    
-    
-    
-    
-    
-        $('#birthday').datetimepicker({
-            dateFormat: "yy-mm-dd",
-            timeFormat: "hh:mm:ss"
-        });
-    
-
 
 
 /*]]>*/

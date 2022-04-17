@@ -18,9 +18,8 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">[List]</a>
 
-<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">GoTo List</a>
-<h3>Modify:</h3>
 <div class="content-root">
 
 <div class="content-root">
@@ -32,7 +31,7 @@
     <table>
 
 [# th:each="attr,attrStat:${entityAttrs}" ]
-<tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input  type="text" maxlength="255" id="[(${attr.get('name')})]" name="[(${attr.get('name')})]"  th:value="*{[(${attr.get('name')})]}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input [# th:if="${attr.get('type') eq 'Boolean'}"]maxlength="1" range="[0,1]"[/] [# th:if="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="number"[/] [# th:unless="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="text"[/] [# th:if="${attr.get('nullable') eq 'no'}"]required[/] id="[(${attr.get('name')})]" name="[(${attr.get('name')})]" [# th:if="${attr.get('maxlength') != null}"]maxlength="[(${attr.get('maxlength')})]"[/] [# th:if="${attr.get('type') eq 'Date'}"]th:value="*{#dates.format([(${attr.get('name')})], 'yyyy-MM-dd HH:mm:ss')}"[/] [# th:unless="${attr.get('type') eq 'Date'}"]th:value="*{[(${attr.get('name')})]}"[/] ><label> &nbsp;</label></td></tr>
 [/]
         <tr><td colspan="2" style="text-align: center;"><input type="reset" value="Reset" style="width:150px;">&nbsp;&nbsp;<input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
     </table>
@@ -60,12 +59,22 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
+
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    [# th:if="${attr.get('type') eq 'Date'}"]
+        $('#[(${attr.get('name')})]').datetimepicker({
+            dateFormat: "yy-mm-dd",
+            timeFormat: "hh:mm:ss"
+        });
+    [/]
+[/]
 
 $("#modifyform").validate();
 
 });
+
 /*]]>*/
 </script>
 <div th:replace="~{fragments/footer::footer}"></div>
