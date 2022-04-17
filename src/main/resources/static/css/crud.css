@@ -60,3 +60,7 @@ color: #00F;
 .list-navigator > span.disabled {
 color: #000;
 }
+
+tbody, td, tfoot, th, thead, tr {
+    border-width: 1px;
+}

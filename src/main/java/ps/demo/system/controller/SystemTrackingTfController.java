@@ -81,8 +81,9 @@ public class SystemTrackingTfController extends MyBaseController {
         SystemTrackingDto systemTrackingDto = new SystemTrackingDto();
         String key = systemTrackingReq.getKey();
         if (StringUtils.isNotBlank(key)) {
-            systemTrackingDto.setCountSource(key);
-            systemTrackingDto.setFetchSourceByPage(key);
+            String percentWrapKey = "%"+key+"%";
+            systemTrackingDto.setCountSource(percentWrapKey);
+            systemTrackingDto.setFetchSourceByPage(percentWrapKey);
         }
         //MyBeanUtil.copyProperties(systemTrackingReq, systemTrackingDto);
         Page<SystemTrackingDto> systemTrackingDtoPage = systemTrackingServiceImpl.findByPage(systemTrackingDto, pageable);

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -20,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.math.*;
+
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +32,8 @@ import ps.demo.system.dto.SystemTrackingReq;
 import ps.demo.system.entity.SystemTracking;
 import ps.demo.system.repository.SystemTrackingRepository;
 import ps.demo.util.MyBeanUtil;
+
+import javax.persistence.criteria.*;
 
 
 @Slf4j
@@ -85,12 +89,31 @@ public class SystemTrackingServiceImpl {
 
         SystemTracking systemTracking = new SystemTracking();
         MyBeanUtil.copyProperties(systemTrackingDto, systemTracking);
-        ExampleMatcher matching = ExampleMatcher.matching()
-        .withMatcher("countSource", ExampleMatcher.GenericPropertyMatchers.contains())
-        .withMatcher("fetchSourceByPage", ExampleMatcher.GenericPropertyMatchers.contains());
 
-        Example<SystemTracking> example = Example.of(systemTracking, matching);
-        Page<SystemTracking> page = systemTrackingRepository.findAll(example, pageable);
+//        ExampleMatcher matching = ExampleMatcher.matching()
+//        .withMatcher("countSource", ExampleMatcher.GenericPropertyMatchers.contains())
+//        .withMatcher("fetchSourceByPage", ExampleMatcher.GenericPropertyMatchers.contains());
+//        Example<SystemTracking> example = Example.of(systemTracking, matching);
+//        Page<SystemTracking> page = systemTrackingRepository.findAll(example, pageable);
+
+        Specification<SystemTracking> spec = new Specification<SystemTracking>() {
+            @Override
+            public Predicate toPredicate(Root<SystemTracking> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Predicate predicate = null;
+                if (StringUtils.isNotBlank(systemTracking.getCountSource())) {
+                    predicate = cb.or(cb.like(root.get("countSource"), systemTracking.getCountSource()));
+                }
+                if (StringUtils.isNotBlank(systemTracking.getFetchSourceByPage())) {
+                    predicate = cb.or(predicate, cb.like(root.get("fetchSourceByPage"), systemTracking.getFetchSourceByPage()));
+                }
+                return predicate;
+                //return cb.or(cb.like(root.get("countSource"), systemTracking.getCountSource()),
+                //cb.like(root.get("fetchSourceByPage"), systemTracking.getFetchSourceByPage()));
+
+            }
+        };
+
+        Page<SystemTracking> page = systemTrackingRepository.findAll(spec, pageable);
         Page<SystemTrackingDto> pageDto = page.map((e) -> {
             SystemTrackingDto systemTrackingDtoResult = new SystemTrackingDto();
             MyBeanUtil.copyProperties(e, systemTrackingDtoResult);
