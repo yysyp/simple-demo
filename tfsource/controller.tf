@@ -49,6 +49,7 @@ public class [(${controllerName})] extends MyBaseController {
     public ModelAndView save([(${reqName})] [(${reqKey})]) {
         [(${dtoName})] [(${dtoKey})] = new [(${dtoName})]();
         MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
+        initBaseCreateModifyTs([(${dtoKey})]);
         [(${dtoName})] [(${entityKey})]Result = [(${serviceKey})].save([(${dtoKey})]);
         return new ModelAndView("redirect:/api/[(${moduleName})]/[(${uriName})]");
     }
@@ -109,6 +110,7 @@ public class [(${controllerName})] extends MyBaseController {
 
     @PostMapping("/modify")
     public ModelAndView saveOrUpdate([(${dtoName})] [(${dtoKey})]) {
+        initBaseCreateModifyTs([(${dtoKey})]);
         [(${dtoName})] updated[(${dtoName})] = [(${serviceKey})].save([(${dtoKey})]);
         return new ModelAndView("redirect:/api/[(${moduleName})]/[(${uriName})]");
     }

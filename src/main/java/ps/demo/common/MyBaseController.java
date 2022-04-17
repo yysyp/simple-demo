@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +42,17 @@ public class MyBaseController {
         }
         Pageable pageable = PageRequest.of((int) (myPageReq.getCurrent() - 1), (int) myPageReq.getSize(), sort);
         return pageable;
+    }
+
+    protected void initBaseCreateModifyTs(MyBaseDto myBaseDto) {
+        if (myBaseDto.getCreatedOn() == null) {
+            myBaseDto.setCreatedOn(Instant.now());
+            myBaseDto.setIsActive(true);
+            myBaseDto.setIsLogicalDeleted(false);
+            myBaseDto.setCreatedBy("default");
+        }
+        myBaseDto.setModifiedOn(Instant.now());
+        myBaseDto.setModifiedBy("default");
     }
 
 }
