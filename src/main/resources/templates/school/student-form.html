@@ -32,11 +32,11 @@
             <input type="hidden" name="id" th:value="*{id}">
             <table>
 
-    <tr><td><label>firstName:</label></td><td width="75%"><input  type="text" maxlength="255" id="firstName" name="firstName"  th:value="*{firstName}"    ><label> &nbsp;</label></td></tr>
-    <tr><td><label>lastName:</label></td><td width="75%"><input  type="text" maxlength="255" id="lastName" name="lastName"  th:value="*{lastName}"    ><label> &nbsp;</label></td></tr>
-    <tr><td><label>age:</label></td><td width="75%"><input  type="text" maxlength="255" id="age" name="age"  th:value="*{age}"    ><label> &nbsp;</label></td></tr>
-    <tr><td><label>score:</label></td><td width="75%"><input  type="text" maxlength="255" id="score" name="score"  th:value="*{score}"    ><label> &nbsp;</label></td></tr>
-    <tr><td><label>birthday:</label></td><td width="75%"><input  type="text" maxlength="255" id="birthday" name="birthday"  th:value="*{birthday}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>firstName:</label></td><td width="75%"><input  type="text" required id="firstName" name="firstName" maxlength="25" th:value="*{firstName}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>lastName:</label></td><td width="75%"><input  type="text"  id="lastName" name="lastName" maxlength="25" th:value="*{lastName}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>age:</label></td><td width="75%"><input type="number"   id="age" name="age"  th:value="*{age}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>score:</label></td><td width="75%"><input type="number"   id="score" name="score"  th:value="*{score}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>birthday:</label></td><td width="75%"><input  type="text"  id="birthday" name="birthday"  th:value="*{birthday}"    ><label> &nbsp;</label></td></tr>
 
                 <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
             </table>

@@ -347,9 +347,9 @@ public class JSONObject {
      */
     public Object get(String name) throws JSONException {
         Object result = nameValuePairs.get(name);
-        if (result == null) {
-            throw new JSONException("No value for " + name);
-        }
+//        if (result == null) {
+//            throw new JSONException("No value for " + name);
+//        }
         return result;
     }
 

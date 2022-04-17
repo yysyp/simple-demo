@@ -30,7 +30,7 @@
             <input type="hidden" name="id" th:value="*{id}">
             <table>
 [# th:each="attr,attrStat:${entityAttrs}" ]
-    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input  type="text" maxlength="255" id="[(${attr.get('name')})]" name="[(${attr.get('name')})]"  th:value="*{[(${attr.get('name')})]}"    ><label> &nbsp;</label></td></tr>
+    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input [# th:if="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="number"[/] [# th:unless="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="text"[/] [# th:if="${attr.get('nullable') eq 'no'}"]required[/] id="[(${attr.get('name')})]" name="[(${attr.get('name')})]" [# th:if="${attr.get('maxlength') != null}"]maxlength="[(${attr.get('maxlength')})]"[/] th:value="*{[(${attr.get('name')})]}"    ><label> &nbsp;</label></td></tr>
 [/]
                 <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
             </table>
@@ -63,6 +63,20 @@ $(function() {
     });
     $("#createform").validate();
 });
+
+    #foreach($column in $tablemd.columnsMetadataDtoList)
+    #if($column.loAttrName != 'id' && $column.loAttrName != 'createTime' && $column.loAttrName != 'updateTime' && $column.loAttrName != 'createBy' && $column.loAttrName != 'updateBy'
+    && $column.loAttrName != 'deleted' && $column.loAttrName != 'version')
+    #if($column.attrType == 'Date')
+    $('#$column.loAttrName').datetimepicker({
+        dateFormat: "yy-mm-dd",
+        timeFormat: "hh:mm:ss"
+    });
+    #end
+    #end
+    #end
+
+    $("#createform").validate();
 
 /*]]>*/
 </script>
