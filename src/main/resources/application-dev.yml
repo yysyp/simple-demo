@@ -23,7 +23,8 @@ spring:
         format_sql: true
 
 springdoc:
-  pathsToMatch: /healthz, /api/**, /tpage/**
+  #paths-to-match: /api/**, /healthz, /tpage/**
+  packagesToScan: ps.demo
   writer-with-default-pretty-printer: true
   api-docs.enabled: true
   api-docs.path: /springdoc/api-docs
@@ -43,3 +44,6 @@ swagger:
   application-version: 1.0
   application-description: Springdoc Openapi Of Simple Demo
   try-host: http://localhost:8080
+
+exception:
+  bodyTrace: true

@@ -54,3 +54,9 @@ throttling:
   permitsPerSecond: 0.1
   timeoutMs: 1000
   message: hahaha too many
+
+exception:
+  bodyTrace: false
+
+dir:
+  upload-folder: upload-folder

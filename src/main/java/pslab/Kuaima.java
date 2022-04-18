@@ -88,20 +88,20 @@ public class Kuaima {
     private static void fileCheckToOverwrite(File file, String newContent) throws IOException {
         String key = file.getAbsolutePath();
         String savedMd5 = (String) contentmd5check.get(key);
-        contentmd5check.setProperty(key, MyMD5Util.getMD5(newContent));
+        contentmd5check.setProperty(key, MyMD5Util.getMD5(newContent+"".trim()));
 
         if (!file.exists()) {
             writeFileContent(newContent, file);
             return;
         }
-        String contentMd5 = MyMD5Util.getMD5(readFileContent(file));
+        String contentMd5 = MyMD5Util.getMD5(readFileContent(file)+"".trim());
         if (contentMd5.equals(savedMd5)) {
             writeFileContent(newContent, file);
             return;
         }
 
         //Not matching create _fix file
-        File fixFile = new File(file.getAbsolutePath()+"-fix");
+        File fixFile = new File(file.getAbsolutePath()+".kmfix");
         writeFileContent(newContent, fixFile);
     }
 

@@ -2,6 +2,7 @@ package ps.demo.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -20,6 +21,9 @@ import java.util.Map;
 @RequestMapping({"${server.error.path:${error.path:/error}}"})
 public class ErrorHandlerController extends AbstractErrorController {
 
+    @Value("${exception.bodyTrace}")
+    private boolean exceptionBodyTrace;
+
     @Autowired
     public ErrorHandlerController(ErrorAttributes errorAttributes) {
         super(errorAttributes);
@@ -28,7 +32,7 @@ public class ErrorHandlerController extends AbstractErrorController {
     @RequestMapping
     public ResponseEntity<ErrorResponse> error(HttpServletRequest request) {
         log.info("--->>ErrorHandlerController error");
-        BadRequestException exception = new BadRequestException(CodeEnum.METHOD_NOT_ALLOWED);
+        BadRequestException exception = new BadRequestException(CodeEnum.NOT_FOUND);
         ErrorResponse errorResponse = exception.toErrorResponse();
         HttpStatus status = HttpStatus.valueOf(exception.getCodeEnum().getHttpCode());
         ErrorAttributeOptions options = ErrorAttributeOptions.defaults();
@@ -39,7 +43,7 @@ public class ErrorHandlerController extends AbstractErrorController {
         Map<String, Object> body = this.getErrorAttributes(request, options);
 
         log.error("--->>Error handling, handleError, data={}", body);
-        if (MyHeaderUtil.isTrace()) {
+        if (exceptionBodyTrace) {
             errorResponse.setTrace(body.toString());
         }
         errorResponse.setPath(request.getPathInfo());
