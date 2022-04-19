@@ -1,7 +1,12 @@
 package ps.demo.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class MyTimeUtil {
 
@@ -34,13 +39,28 @@ public class MyTimeUtil {
     }
 
 
-//    public static String getTimestamp() {
-//        LocalDateTime localDateTime = LocalDateTime.now();
-//        return localDateTime.toString();
-//    }
-//    public static String getNow() {
-//        java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss");
-//        return java.time.LocalDateTime.now().format(dateTimeFormatter);
+    public static Date toDate(String dateStr, String pattern) {
+        try {
+            Date date = new SimpleDateFormat(pattern).parse(dateStr);
+            return date;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static long subtractDays(Date date1, Date data2) {
+        long diff = date1.getTime() - data2.getTime();
+        TimeUnit time = TimeUnit.DAYS;
+        long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
+        return diffrence;
+    }
+
+//    public static Date toDate(String dateStr, String pattern) {
+//        java.time.format.DateTimeFormatter dateTimeFormatter =
+//                java.time.format.DateTimeFormatter.ofPattern(pattern);
+//        Instant instant = Instant.from(dateTimeFormatter.parse(dateStr));
+//        return Date.from(instant);
+//
 //    }
 
 }

@@ -5,10 +5,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.sql.OracleJoinFragment;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @desc
@@ -97,5 +100,17 @@ public class MyJsonUtil {
             log.info("--->> error json2Object TypeReference err={}", e.getMessage());
         }
         return (T) t;
+    }
+
+    public static String simpleMap2json(Map<String, Object> simpleMap) {
+        return object2Json(simpleMap);
+    }
+    public static Map<String, Object> json2SimpleMap(String json) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(json)) {
+            return new HashMap<String, Object>();
+        }
+        TypeReference typeReference = new TypeReference<Map<String, Object>>() {
+        };
+        return (Map<String, Object>) MyJsonUtil.json2Object(json, typeReference);
     }
 }
