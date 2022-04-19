@@ -2,17 +2,11 @@ package ps.demo.performance;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import org.apache.commons.logging.LogFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.spi.LoggerContext;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import ps.demo.util.*;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class PerformanceTest {
 
@@ -55,7 +49,7 @@ public class PerformanceTest {
         System.out.println("--->>Result="+reqObjList.size());
         System.out.println("--->>Done!");
 
-        MyReadWriteUtil.writeToFileTsInHomeDir(reqObjList);
+        MyReadWriteUtil.writeObjectToFileTsInHomeDir(reqObjList);
         qpsCallTemplate.shutdown();
 
     }

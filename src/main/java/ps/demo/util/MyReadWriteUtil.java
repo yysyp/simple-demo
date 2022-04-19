@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
-import java.net.FileNameMap;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -53,15 +51,15 @@ public class MyReadWriteUtil {
         return prop;
     }
 
-    public static void writeToFileTsInHomeDir(Object content) {
-        writeToFile(MyFileUtil.getFileTsInHomeDir(".log"), content);
+    public static void writeObjectToFileTsInHomeDir(Object content) {
+        writeObjectToFile(MyFileUtil.getFileTsInHomeDir(".log"), content);
     }
 
-    public static void writeToFile(File file, Object content) {
-        writeToFile(file, content, StandardCharsets.UTF_8, true);
+    public static void writeObjectToFile(File file, Object content) {
+        writeObjectToFile(file, content, StandardCharsets.UTF_8, true);
     }
 
-    public static void writeToFile(File file, Object content, Charset charsetName, boolean append) {
+    public static void writeObjectToFile(File file, Object content, Charset charsetName, boolean append) {
         try {
             String lineEnding = System.lineSeparator();
             FileUtils.writeStringToFile(file, MyJsonUtil.object2Json(content) + lineEnding, charsetName, append);
@@ -143,7 +141,7 @@ public class MyReadWriteUtil {
             StringBuilder sb = new StringBuilder();
             while ((content = bf.readLine()) != null) {
                 sb.append(content);
-                sb.append('\n');
+                sb.append(System.lineSeparator());
             }
             return sb.toString();
         } catch (IOException e) {

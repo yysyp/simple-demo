@@ -19,7 +19,7 @@ public class BigfileMultipleUploadTest {
         File file = MyFileUtil.getFileTsInHomeDir("bigfile-500m.txt");
         for (int i = 0; i < 500; i++) {
             String str = MyStringUtil.randomAlphabetic(1024*1024);
-            MyReadWriteUtil.writeToFile(file, str, Charset.forName("UTF-8"), true);
+            MyReadWriteUtil.writeObjectToFile(file, str, Charset.forName("UTF-8"), true);
         }
         System.out.println("file created!");
 

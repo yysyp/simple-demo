@@ -4,12 +4,9 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import lombok.*;
 import org.slf4j.LoggerFactory;
-import ps.demo.performance.ReqObj;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class QpsCallTemplateTest {
 
@@ -53,7 +50,7 @@ public class QpsCallTemplateTest {
         System.out.println("--->>Result="+reqObjList.size());
         System.out.println("--->>Done!");
 
-        MyReadWriteUtil.writeToFileTsInHomeDir(reqObjList);
+        MyReadWriteUtil.writeObjectToFileTsInHomeDir(reqObjList);
         qpsCallTemplate.shutdown();
 
     }

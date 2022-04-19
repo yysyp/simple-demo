@@ -64,7 +64,7 @@ public class QpsControllerTest {
         for (Future<QpsBean> future : futureList) {
             QpsBean qpsBean = future.get();
             log.info("--->>"+qpsBean);
-            MyReadWriteUtil.writeToFile(logfile, qpsBean);
+            MyReadWriteUtil.writeObjectToFile(logfile, qpsBean);
         }
 
         log.info("--->> to shut down executor...");
