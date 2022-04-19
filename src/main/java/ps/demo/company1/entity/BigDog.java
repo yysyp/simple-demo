@@ -1,6 +1,6 @@
 
 
-package ps.demo.company.entity;
+package ps.demo.company1.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,8 +23,8 @@ import java.math.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "abc_staff")
-public class AbcStaff extends MyBaseEntity {
+@Table(name = "big_dog")
+public class BigDog extends MyBaseEntity {
 
     private String firstName;
     private String lastName;

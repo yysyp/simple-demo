@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 >
 <head>
-    <title>system-tracking</title>
+    <title>big-dog</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -18,19 +20,25 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/company1/big-dog}">[List]</a>
 
-<a th:href="@{/api/system/system-tracking}">GoTo List</a>
-<h3>Form:</h3>
 <div class="content-root">
 
     <div class="form-container">
-        <form id="createform" th:action="@{/api/system/system-tracking/save}" method="POST"
-              th:object="${systemTrackingModel.systemTrackingDto}">
+        <form id="createform" th:action="@{/api/company1/big-dog/save}" method="POST"
+              th:object="${bigdogModel.bigdogdto}">
 
             <input type="hidden" name="id" th:value="*{id}">
             <table>
-<tr><td><label>countSource:</label></td><td width="75%"><input  type="text" maxlength="255" id="countSource" name="countSource"  th:value="*{countSource}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>fetchSourceByPage:</label></td><td width="75%"><input  type="text" maxlength="255" id="fetchSourceByPage" name="fetchSourceByPage"  th:value="*{fetchSourceByPage}"    ><label> &nbsp;</label></td></tr>
+
+    <tr><td><label>firstName:</label></td><td width="75%"><input type="text" id="firstName" name="firstName"  required="required" maxlength="25" th:value="*{firstName}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>lastName:</label></td><td width="75%"><input type="text" id="lastName" name="lastName"   maxlength="25" th:value="*{lastName}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>age:</label></td><td width="75%"><input type="number" id="age" name="age"   maxlength="50" th:value="*{age}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>score:</label></td><td width="75%"><input type="number" id="score" name="score"   maxlength="50" th:value="*{score}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>passed:</label></td><td width="75%"><input type="checkbox" id="passed" name="passed"  th:checked="*{passed}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments"  rows="10" cols="50"  maxlength="255" th:text="*{comments}" ></textarea><label> &nbsp;</label></td></tr>
+    <tr><td><label>birthday:</label></td><td width="75%"><input type="text" id="birthday" name="birthday"   th:value="*{#dates.format(birthday, 'yyyy-MM-dd HH:mm:ss')}" /><label> &nbsp;</label></td></tr>
+
                 <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
             </table>
 
@@ -58,10 +66,28 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
+
+    
+        
+        
+        
+        
+        
+        
+        
+            $('#birthday').datetimepicker({
+                dateFormat: "yy-mm-dd",
+                timeFormat: "hh:mm:ss"
+            });
+        
+    
+
     $("#createform").validate();
+
 });
+
 
 /*]]>*/
 </script>
@@ -69,3 +95,5 @@ $(function() {
 <div th:replace="~{fragments/footer::footer}"></div>
 </body>
 </html>
+
+

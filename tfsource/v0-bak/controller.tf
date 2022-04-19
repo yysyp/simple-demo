@@ -1,5 +1,3 @@
-
-
 package [(${packageName}+'.'+${moduleName}+'.'+${controllerFolder})];
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +48,8 @@ public class [(${controllerName})] extends MyBaseController {
     }
 
     @PostMapping("/save")
-    public ModelAndView save([(${reqName})] [(${reqKey})], HttpServletRequest request) {
+    public ModelAndView save([(${reqName})] [(${reqKey})]) {
         [(${dtoName})] [(${dtoKey})] = new [(${dtoName})]();
-        [# th:each="attr,attrStat:${entityAttrs}" ]
-            [# th:if="${attr.get('type') eq 'Boolean'}"]
-            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));
-            [/]
-        [/]
         MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
         initBaseCreateModifyTs([(${dtoKey})]);
         [(${dtoName})] [(${entityKey})]Result = [(${serviceKey})].save([(${dtoKey})]);
@@ -102,7 +95,7 @@ public class [(${controllerName})] extends MyBaseController {
             [/]
         }
         //MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
-        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByPage([(${dtoKey})], true, pageable);
+        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByPage([(${dtoKey})], pageable);
         MyPageResData<[(${dtoName})]> myPageResData = new MyPageResData<>([(${dtoKey})]Page,
                 [(${reqKey})].getCurrent(), [(${reqKey})].getSize());
         model.addAttribute("[(${reqKey})]", [(${reqKey})]);
@@ -118,13 +111,8 @@ public class [(${controllerName})] extends MyBaseController {
     }
 
     @PostMapping("/modify")
-    public ModelAndView saveOrUpdate([(${dtoName})] [(${dtoKey})], HttpServletRequest request) {
+    public ModelAndView saveOrUpdate([(${dtoName})] [(${dtoKey})]) {
         initBaseCreateModifyTs([(${dtoKey})]);
-        [# th:each="attr,attrStat:${entityAttrs}" ]
-            [# th:if="${attr.get('type') eq 'Boolean'}"]
-            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));
-            [/]
-        [/]
         [(${dtoName})] updated[(${dtoName})] = [(${serviceKey})].save([(${dtoKey})]);
         return new ModelAndView("redirect:/api/[(${moduleName})]/[(${uriName})]");
     }
@@ -136,5 +124,3 @@ public class [(${controllerName})] extends MyBaseController {
     }
 
 }
-
-

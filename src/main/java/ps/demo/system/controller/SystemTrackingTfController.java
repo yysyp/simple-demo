@@ -86,7 +86,7 @@ public class SystemTrackingTfController extends MyBaseController {
             systemTrackingDto.setFetchSourceByPage(percentWrapKey);
         }
         //MyBeanUtil.copyProperties(systemTrackingReq, systemTrackingDto);
-        Page<SystemTrackingDto> systemTrackingDtoPage = systemTrackingServiceImpl.findByPage(systemTrackingDto, pageable);
+        Page<SystemTrackingDto> systemTrackingDtoPage = systemTrackingServiceImpl.findByPage(systemTrackingDto, true, pageable);
         MyPageResData<SystemTrackingDto> myPageResData = new MyPageResData<>(systemTrackingDtoPage,
                 systemTrackingReq.getCurrent(), systemTrackingReq.getSize());
         model.addAttribute("systemTrackingReq", systemTrackingReq);

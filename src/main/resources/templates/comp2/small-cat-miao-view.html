@@ -4,7 +4,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 >
 <head>
-    <title>abc-staff</title>
+    <title>small-cat-miao</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -20,20 +20,25 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
-<a th:href="@{/api/company/abc-staff}">[List]</a>
+<a th:href="@{/api/comp2/small-cat-miao}">[List]</a>
 
 <div class="content-root">
     <div class="form-container">
-    <form id="viewform" th:object="${abcstaffModel.abcstaffdto}">
+    <form id="viewform" th:object="${smallcatmiaoModel.smallcatmiaodto}">
     <table>
     <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
     
     <tr><td><label>firstName:</label></td><td width="75%"><input type="text" id="firstName" name="firstName" readonly="readonly" required="required" maxlength="25" th:value="*{firstName}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>lastName:</label></td><td width="75%"><input type="text" id="lastName" name="lastName" readonly="readonly"  maxlength="25" th:value="*{lastName}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>lastName2:</label></td><td width="75%"><input type="text" id="lastName2" name="lastName2" readonly="readonly"  maxlength="50" th:value="*{lastName2}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>age:</label></td><td width="75%"><input type="number" id="age" name="age" readonly="readonly"  maxlength="50" th:value="*{age}" /></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>score:</label></td><td width="75%"><input type="number" id="score" name="score" readonly="readonly"  maxlength="50" th:value="*{score}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>score1:</label></td><td width="75%"><input type="number" id="score1" name="score1" readonly="readonly"  maxlength="50" th:value="*{score1}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>score2:</label></td><td width="75%"><input type="number" id="score2" name="score2" readonly="readonly"  maxlength="50" th:value="*{score2}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>addr:</label></td><td width="75%"><textarea type="text" id="addr" name="addr" readonly="readonly" rows="10" cols="50"  maxlength="100" th:text="*{addr}" ></textarea></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>seat:</label></td><td width="75%"><input type="number" id="seat" name="seat" readonly="readonly"  maxlength="50" th:value="*{seat}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>passed:</label></td><td width="75%"><input type="checkbox" id="passed" name="passed" readonly="readonly" th:checked="*{passed}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments" readonly="readonly" rows="10" cols="50"  maxlength="255" th:text="*{comments}" ></textarea></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>passed2:</label></td><td width="75%"><input type="checkbox" id="passed2" name="passed2" readonly="readonly" th:checked="*{passed2}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>birthday:</label></td><td width="75%"><input type="text" id="birthday" name="birthday" readonly="readonly"  th:value="*{#dates.format(birthday, 'yyyy-MM-dd HH:mm:ss')}" /></span><label> &nbsp;</label></td></tr>
     
     </table>

@@ -87,10 +87,30 @@ public class [(${serviceName})] {
     }
 
     @Transactional(readOnly = true)
-    public Page<[(${dtoName})]> findByPage([(${dtoName})] [(${dtoKey})], boolean orLike, Pageable pageable) {
+    public Page<[(${dtoName})]> findByPage([(${dtoName})] [(${dtoKey})], Pageable pageable) {
         [(${entityName})] [(${entityKey})] = new [(${entityName})]();
         MyBeanUtil.copyProperties([(${dtoKey})], [(${entityKey})]);
-        Specification<[(${entityName})]> spec = constructSpecification([(${entityKey})], orLike);
+        Specification<[(${entityName})]> spec = new Specification<[(${entityName})]>() {
+            @Override
+            public Predicate toPredicate(Root<[(${entityName})]> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Predicate predicate = null;
+                    [# th:each="attr,attrStat:${entityAttrs}" ]
+                        [# th:if="${attr.get('type') eq 'String'}"]
+                        [# th:if="${attrStat.index eq 0}"]
+                        if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
+                            predicate = cb.or(cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
+                        }
+                        [/]
+                        [# th:if="${attrStat.index neq 0}"]
+                        if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
+                            predicate = cb.or(predicate, cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
+                        }
+                        [/]
+                        [/]
+                    [/]
+                return predicate;
+            }
+        };
 
         Page<[(${entityName})]> page = [(${daoKey})].findAll(spec, pageable);
         Page<[(${dtoName})]> pageDto = page.map((e) -> {
@@ -99,39 +119,6 @@ public class [(${serviceName})] {
             return [(${dtoKey})]Result;
         });
         return pageDto;
-    }
-
-    private Specification<[(${entityName})]> constructSpecification([(${entityName})] [(${entityKey})], boolean orLike) {
-        Specification<[(${entityName})]> spec = new Specification<[(${entityName})]>() {
-            @Override
-            public Predicate toPredicate(Root<[(${entityName})]> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Predicate predicate = null;
-                [# th:each="attr,attrStat:${entityAttrs}" ]
-                    [# th:if="${attr.get('type') eq 'String'}"]
-                    [# th:if="${attrStat.index eq 0}"]
-                    if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
-                        if (orLike) {
-                            predicate = cb.or(cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        } else {
-                            predicate = cb.and(cb.equal(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        }
-                    }
-                    [/]
-                    [# th:if="${attrStat.index neq 0}"]
-                    if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
-                        if (orLike) {
-                            predicate = cb.or(predicate, cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        } else {
-                            predicate = cb.and(predicate, cb.equal(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        }
-                    }
-                    [/]
-                    [/]
-                [/]
-                return predicate;
-            }
-        };
-        return spec;
     }
 
     @Transactional

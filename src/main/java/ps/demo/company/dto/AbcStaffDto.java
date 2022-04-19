@@ -23,6 +23,7 @@ public class AbcStaffDto extends MyBaseDto {
     private Integer age;
     private BigDecimal score;
     private Boolean passed;
+    private String comments;
     private Date birthday;
 
 

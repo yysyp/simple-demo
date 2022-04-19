@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 >
 <head>
-    <title>system-tracking</title>
+    <title>[(${uriName})]</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -18,23 +18,21 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">[List]</a>
 
-<a th:href="@{/api/system/system-tracking}">GoTo List</a>
-<h3>Modify:</h3>
 <div class="content-root">
 
 <div class="content-root">
     <div class="form-container">
-        <form id="modifyform" th:action="@{/api/system/system-tracking/modify}" method="POST"
-              th:object="${systemTrackingModel.systemTrackingDto}">
+        <form id="modifyform" th:action="@{/api/[(${moduleName})]/[(${uriName})]/modify}" method="POST"
+              th:object="${[(${entityKey})]Model.[(${dtoKey})]}">
             <input type="hidden" name="id" th:value="*{id}">
 
     <table>
-<tr><td><label>countSource:</label></td><td width="75%"><input  type="text" maxlength="255" id="countSource" name="countSource"  th:value="*{countSource}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>fetchSourceByPage:</label></td><td width="75%"><input  type="text" maxlength="255" id="fetchSourceByPage" name="fetchSourceByPage"  th:value="*{fetchSourceByPage}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>insertTarget:</label></td><td width="75%"><input  type="text" maxlength="255" id="insertTarget" name="insertTarget"  th:value="*{insertTarget}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>selectTargetMd5List:</label></td><td width="75%"><input  type="text" maxlength="255" id="selectTargetMd5List" name="selectTargetMd5List"  th:value="*{selectTargetMd5List}"    ><label> &nbsp;</label></td></tr>
-<tr><td><label>deleteTargetByMd5:</label></td><td width="75%"><input  type="text" maxlength="255" id="deleteTargetByMd5" name="deleteTargetByMd5"  th:value="*{deleteTargetByMd5}"    ><label> &nbsp;</label></td></tr>
+
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><input [# th:if="${attr.get('type') eq 'Boolean'}"]maxlength="1" range="[0,1]"[/] [# th:if="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="number"[/] [# th:unless="${(attr.get('type') eq 'Boolean') or (attr.get('type') eq 'Integer') or (attr.get('type') eq 'Long') or (attr.get('type') eq 'Float') or (attr.get('type') eq 'Double') or (attr.get('type') eq 'BigDecimal')}"]type="text"[/] [# th:if="${attr.get('nullable') eq 'no'}"]required[/] id="[(${attr.get('name')})]" name="[(${attr.get('name')})]" [# th:if="${attr.get('maxlength') != null}"]maxlength="[(${attr.get('maxlength')})]"[/] [# th:if="${attr.get('type') eq 'Date'}"]th:value="*{#dates.format([(${attr.get('name')})], 'yyyy-MM-dd HH:mm:ss')}"[/] [# th:unless="${attr.get('type') eq 'Date'}"]th:value="*{[(${attr.get('name')})]}"[/] ><label> &nbsp;</label></td></tr>
+[/]
         <tr><td colspan="2" style="text-align: center;"><input type="reset" value="Reset" style="width:150px;">&nbsp;&nbsp;<input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
     </table>
 
@@ -61,12 +59,22 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
+
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    [# th:if="${attr.get('type') eq 'Date'}"]
+        $('#[(${attr.get('name')})]').datetimepicker({
+            dateFormat: "yy-mm-dd",
+            timeFormat: "hh:mm:ss"
+        });
+    [/]
+[/]
 
 $("#modifyform").validate();
 
 });
+
 /*]]>*/
 </script>
 <div th:replace="~{fragments/footer::footer}"></div>

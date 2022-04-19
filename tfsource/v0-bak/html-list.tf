@@ -1,9 +1,7 @@
-
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>abc-staff</title>
+    <title>[(${uriName})]</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -22,7 +20,7 @@
 
 <div class="content-root">
 
-    <form id="queryform" th:action="@{/api/company/abc-staff/list}" method="POST" th:object="${abcstaffModel.abcstaffreq}">
+    <form id="queryform" th:action="@{/api/[(${moduleName})]/[(${uriName})]/list}" method="POST" th:object="${[(${entityKey})]Model.[(${reqKey})]}">
         <div class="query-container">
             <span>Keyword:</span>
             <span>
@@ -32,7 +30,7 @@
                 <input type="submit" value="Query"/>
             </span>
             <span>
-                <input type="hidden" name="createaction" th:value="@{/api/company/abc-staff/form}">
+                <input type="hidden" name="createaction" th:value="@{/api/[(${moduleName})]/[(${uriName})]/form}">
                 <input type="button" name="createbutton" value="Create" />
             </span>
         </div>
@@ -44,57 +42,44 @@
                 <table class="list-table" border="1" cellspacing="0" cellpadding="0">
                     <thead>
                     <tr>
-                        <td width="80px">Operations</td>
                         <td>ID</td>
-                    
-                        <td>firstName</td>
-                        <td>lastName</td>
-                        <td>age</td>
-                        <td>score</td>
-                        <td>passed</td>
-                        <td>comments</td>
-                        <td>birthday</td>
-                    
+                    [# th:each="attr,attrStat:${entityAttrs}" ]
+                        <td>[(${attr.get('name')})]</td>
+                    [/]
+                        <td>Operations</td>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:if="${abcstaffModel.page.list.size()} eq 0">
+                    <tr th:if="${[(${entityKey})]Model.page.list.size()} eq 0">
                         <td th:colspan="${10 + 1}">No data!</td>
                     </tr>
-                    <tr th:each="abcstaffdto:${abcstaffModel.page.list}">
-                        <td style="white-space: nowrap;">
-                            <a th:href="@{'/api/company/abc-staff/'+${abcstaffdto.id}}" title="View Detail">[V]</a>&nbsp;
-                            <a th:href="@{'/api/company/abc-staff/remove/'+${abcstaffdto.id}}" title="Delete">[D]</a>&nbsp;
-                            <a th:href="@{'/api/company/abc-staff/modify/'+${abcstaffdto.id}}" title="Modify">[M]</a>
+                    <tr th:each="[(${dtoKey})]:${[(${entityKey})]Model.page.list}">
+                        <td th:text="${[(${dtoKey})].id}"></td>
+                        [# th:each="attr,attrStat:${entityAttrs}" ]
+                            <td th:text="${[(${dtoKey})].[(${attr.get('name')})]}"></td>
+                        [/]
+                        <td>
+                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/'+${[(${dtoKey})].id}}">View</a>&nbsp;|&nbsp;
+                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/remove/'+${[(${dtoKey})].id}}">Remove</a>&nbsp;|&nbsp;
+                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/modify/'+${[(${dtoKey})].id}}">Modify</a>
                         </td>
-                        <td th:text="${abcstaffdto.id}"></td>
-                        
-                            <td th:text="${abcstaffdto.firstName}"></td>
-                            <td th:text="${abcstaffdto.lastName}"></td>
-                            <td th:text="${abcstaffdto.age}"></td>
-                            <td th:text="${abcstaffdto.score}"></td>
-                            <td th:text="${abcstaffdto.passed}"></td>
-                            <td th:text="${abcstaffdto.comments}"></td>
-                            <td th:text="${abcstaffdto.birthday}"></td>
-                        
-
                     </tr>
                     </tbody>
                 </table>
             </div>
         </form>
 
-        <form id="navigatorform" th:action="@{/api/company/abc-staff/list}" method="POST" th:object="${abcstaffModel.abcstaffreq}">
+        <form id="navigatorform" th:action="@{/api/[(${moduleName})]/[(${uriName})]/list}" method="POST" th:object="${[(${entityKey})]Model.[(${reqKey})]}">
             <div class="list-navigator">
                 <input id="navigatorKey" type="hidden" name="key" value="" />
-                <span th:text="'Total Pages (' + ${abcstaffModel.page.pages} + ')'"></span>&nbsp;&nbsp;
-                <input type="hidden" name="pages" th:value="${abcstaffModel.page.pages}" />&nbsp;
-                <span id="navigateToFirstPage" th:class="${abcstaffModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
-                <span id="navigateToPreviousPage" th:class="${abcstaffModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
-                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${abcstaffModel.page.pages}"/>&nbsp;
+                <span th:text="'Total Pages (' + ${[(${entityKey})]Model.page.pages} + ')'"></span>&nbsp;&nbsp;
+                <input type="hidden" name="pages" th:value="${[(${entityKey})]Model.page.pages}" />&nbsp;
+                <span id="navigateToFirstPage" th:class="${[(${entityKey})]Model.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
+                <span id="navigateToPreviousPage" th:class="${[(${entityKey})]Model.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
+                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${[(${entityKey})]Model.page.pages}"/>&nbsp;
                 <span id="navigateGoto">Go</span>&nbsp;
-                <span id="navigateToNextPage" th:class="${abcstaffModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
-                <span id="navigateToLastPage" th:class="${abcstaffModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
+                <span id="navigateToNextPage" th:class="${[(${entityKey})]Model.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
+                <span id="navigateToLastPage" th:class="${[(${entityKey})]Model.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
             </div>
         </form>
         <!--list-container div end -->
@@ -202,5 +187,3 @@ $(function() {
 <div th:replace="~{fragments/footer::footer}"></div>
 </body>
 </html>
-
-

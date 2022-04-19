@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 >
 <head>
-    <title>[(${uriName})]</title>
+    <title>big-dog</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -18,16 +20,22 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
-<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">[List]</a>
+<a th:href="@{/api/company1/big-dog}">[List]</a>
 
 <div class="content-root">
     <div class="form-container">
-    <form id="viewform" th:object="${[(${entityKey})]Model.[(${dtoKey})]}">
+    <form id="viewform" th:object="${bigdogModel.bigdogdto}">
     <table>
     <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
-    [# th:each="attr,attrStat:${entityAttrs}" ]
-    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%">[(${tfUtil.formItem(attr, true)})]</span><label> &nbsp;</label></td></tr>
-    [/]
+    
+    <tr><td><label>firstName:</label></td><td width="75%"><input type="text" id="firstName" name="firstName" readonly="readonly" required="required" maxlength="25" th:value="*{firstName}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>lastName:</label></td><td width="75%"><input type="text" id="lastName" name="lastName" readonly="readonly"  maxlength="25" th:value="*{lastName}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>age:</label></td><td width="75%"><input type="number" id="age" name="age" readonly="readonly"  maxlength="50" th:value="*{age}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>score:</label></td><td width="75%"><input type="number" id="score" name="score" readonly="readonly"  maxlength="50" th:value="*{score}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>passed:</label></td><td width="75%"><input type="checkbox" id="passed" name="passed" readonly="readonly" th:checked="*{passed}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments" readonly="readonly" rows="10" cols="50"  maxlength="255" th:text="*{comments}" ></textarea></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>birthday:</label></td><td width="75%"><input type="text" id="birthday" name="birthday" readonly="readonly"  th:value="*{#dates.format(birthday, 'yyyy-MM-dd HH:mm:ss')}" /></span><label> &nbsp;</label></td></tr>
+    
     </table>
     </form>
     </div>
@@ -59,3 +67,5 @@ $(function() {
 <div th:replace="~{fragments/footer::footer}"></div>
 </body>
 </html>
+
+

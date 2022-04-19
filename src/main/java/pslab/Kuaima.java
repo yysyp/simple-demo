@@ -49,6 +49,7 @@ public class Kuaima {
         String headerContent = MyReadWriteUtil.readFileContent(header, encoding);
         String footerContent = MyReadWriteUtil.readFileContent(footer, encoding);
         Map propMap = new HashMap(properties);
+        propMap.put("tfUtil", TfUtil.getInstance());
         String entityJson = properties.getProperty("entityJson");
         JSONObject jsonObject = new JSONObject(entityJson);
         propMap.put("entityJson", jsonObject);

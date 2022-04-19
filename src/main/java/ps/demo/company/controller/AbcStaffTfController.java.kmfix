@@ -103,10 +103,13 @@ public class AbcStaffTfController extends MyBaseController {
                 
                 
                 
+                abcStaffDto.setComments(percentWrapKey);
+                
+                
             
         }
         //MyBeanUtil.copyProperties(abcStaffReq, abcStaffDto);
-        Page<AbcStaffDto> abcStaffDtoPage = abcStaffServiceImpl.findByPage(abcStaffDto, true, pageable);
+        Page<AbcStaffDto> abcStaffDtoPage = abcStaffserviceimpl.findByPage(abcStaffDto, pageable);
         MyPageResData<AbcStaffDto> myPageResData = new MyPageResData<>(abcStaffDtoPage,
                 abcStaffReq.getCurrent(), abcStaffReq.getSize());
         model.addAttribute("abcStaffReq", abcStaffReq);
@@ -116,22 +119,21 @@ public class AbcStaffTfController extends MyBaseController {
 
     @GetMapping("/modify/{id}")
     public ModelAndView modify(@PathVariable("id") Long id, Model model) {
-        AbcStaffDto abcStaffDto = abcStaffServiceImpl.findById(id);
+        AbcStaffDto abcStaffDto = abcStaffserviceimpl.findById(id);
         model.addAttribute("abcStaffDto", abcStaffDto);
         return new ModelAndView("company/abc-staff-modify", "abcStaffModel", model);
     }
 
     @PostMapping("/modify")
-    public ModelAndView saveOrUpdate(AbcStaffDto abcStaffDto, HttpServletRequest request) {
+    public ModelAndView saveOrUpdate(AbcStaffDto abcStaffDto) {
         initBaseCreateModifyTs(abcStaffDto);
-        abcStaffDto.setPassed(null != request.getParameter("passed"));
-        AbcStaffDto updatedAbcStaffDto = abcStaffServiceImpl.save(abcStaffDto);
+        AbcStaffDto updatedAbcStaffDto = abcStaffserviceimpl.save(abcStaffDto);
         return new ModelAndView("redirect:/api/company/abc-staff");
     }
 
     @GetMapping("/remove/{id}")
     public ModelAndView remove(@PathVariable("id") Long id) {
-        abcStaffServiceImpl.deleteById(id);
+        abcStaffserviceimpl.deleteById(id);
         return new ModelAndView("redirect:/api/company/abc-staff");
     }
 

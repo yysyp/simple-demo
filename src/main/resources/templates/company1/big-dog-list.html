@@ -1,7 +1,9 @@
+
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>system-tracking</title>
+    <title>big-dog</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -18,10 +20,9 @@
 <body>
 <div th:replace="~{fragments/header::header}"></div>
 
-<h3>list:</h3>
 <div class="content-root">
 
-    <form id="queryform" th:action="@{/api/system/system-tracking/list}" method="POST" th:object="${systemTrackingModel.systemTrackingReq}">
+    <form id="queryform" th:action="@{/api/company1/big-dog/list}" method="POST" th:object="${bigdogModel.bigdogreq}">
         <div class="query-container">
             <span>Keyword:</span>
             <span>
@@ -31,7 +32,7 @@
                 <input type="submit" value="Query"/>
             </span>
             <span>
-                <input type="hidden" name="createaction" th:value="@{/api/system/system-tracking/form}">
+                <input type="hidden" name="createaction" th:value="@{/api/company1/big-dog/form}">
                 <input type="button" name="createbutton" value="Create" />
             </span>
         </div>
@@ -43,40 +44,57 @@
                 <table class="list-table" border="1" cellspacing="0" cellpadding="0">
                     <thead>
                     <tr>
+                        <td width="120px">Operations</td>
                         <td>ID</td>
-                        <td>countSource</td>
-                        <td>Operations</td>
+                    
+                        <td>firstName</td>
+                        <td>lastName</td>
+                        <td>age</td>
+                        <td>score</td>
+                        <td>passed</td>
+                        <td>comments</td>
+                        <td>birthday</td>
+                    
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:if="${systemTrackingModel.page.list.size()} eq 0">
+                    <tr th:if="${bigdogModel.page.list.size()} eq 0">
                         <td th:colspan="${10 + 1}">No data!</td>
                     </tr>
-                    <tr th:each="systemTrackingDto:${systemTrackingModel.page.list}">
-                        <td th:text="${systemTrackingDto.id}"></td>
-                        <td th:text="${systemTrackingDto.countSource}"></td>
-                        <td>
-                            <a th:href="@{'/api/system/system-tracking/'+${systemTrackingDto.id}}">View</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/system/system-tracking/remove/'+${systemTrackingDto.id}}">Remove</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/system/system-tracking/modify/'+${systemTrackingDto.id}}">Modify</a>
+                    <tr th:each="bigdogdto:${bigdogModel.page.list}">
+                        <td style="white-space: nowrap;">
+                            <a th:href="@{'/api/company1/big-dog/'+${bigdogdto.id}}" title="View Detail">[V]</a>&nbsp;
+                            <a th:href="@{'/api/company1/big-dog/remove/'+${bigdogdto.id}}" title="Delete">[D]</a>&nbsp;
+                            <a th:href="@{'/api/company1/big-dog/modify/'+${bigdogdto.id}}" title="Modify">[M]</a>
                         </td>
+                        <td th:text="${bigdogdto.id}"></td>
+                        
+                            <td th:text="${bigdogdto.firstName}"></td>
+                            <td th:text="${bigdogdto.lastName}"></td>
+                            <td th:text="${bigdogdto.age}"></td>
+                            <td th:text="${bigdogdto.score}"></td>
+                            <td th:text="${bigdogdto.passed}"></td>
+                            <td th:text="${bigdogdto.comments}"></td>
+                            <td th:text="${bigdogdto.birthday}"></td>
+                        
+
                     </tr>
                     </tbody>
                 </table>
             </div>
         </form>
 
-        <form id="navigatorform" th:action="@{/api/system/system-tracking/list}" method="POST" th:object="${systemTrackingModel.systemTrackingReq}">
+        <form id="navigatorform" th:action="@{/api/company1/big-dog/list}" method="POST" th:object="${bigdogModel.bigdogreq}">
             <div class="list-navigator">
                 <input id="navigatorKey" type="hidden" name="key" value="" />
-                <span th:text="'Total Pages (' + ${systemTrackingModel.page.pages} + ')'"></span>&nbsp;&nbsp;
-                <input type="hidden" name="pages" th:value="${systemTrackingModel.page.pages}" />&nbsp;
-                <span id="navigateToFirstPage" th:class="${systemTrackingModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
-                <span id="navigateToPreviousPage" th:class="${systemTrackingModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
-                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${systemTrackingModel.page.pages}"/>&nbsp;
+                <span th:text="'Total Pages (' + ${bigdogModel.page.pages} + ')'"></span>&nbsp;&nbsp;
+                <input type="hidden" name="pages" th:value="${bigdogModel.page.pages}" />&nbsp;
+                <span id="navigateToFirstPage" th:class="${bigdogModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
+                <span id="navigateToPreviousPage" th:class="${bigdogModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
+                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${bigdogModel.page.pages}"/>&nbsp;
                 <span id="navigateGoto">Go</span>&nbsp;
-                <span id="navigateToNextPage" th:class="${systemTrackingModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
-                <span id="navigateToLastPage" th:class="${systemTrackingModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
+                <span id="navigateToNextPage" th:class="${bigdogModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
+                <span id="navigateToLastPage" th:class="${bigdogModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
             </div>
         </form>
         <!--list-container div end -->
@@ -102,7 +120,7 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
 
     $("#queryform input[name='key']").keyup(function () {
@@ -184,3 +202,5 @@ $(function() {
 <div th:replace="~{fragments/footer::footer}"></div>
 </body>
 </html>
+
+

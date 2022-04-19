@@ -1,6 +1,4 @@
-
-
-package ps.demo.company.entity;
+package [(${packageName}+'.'+${moduleName}+'.'+${entityFolder})];
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,18 +21,10 @@ import java.math.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "abc_staff")
-public class AbcStaff extends MyBaseEntity {
-
-    private String firstName;
-    private String lastName;
-    private Integer age;
-    private BigDecimal score;
-    private Boolean passed;
-    private String comments;
-    private Date birthday;
-
+@Table(name = "[(${tableName})]")
+public class [(${entityName})] extends MyBaseEntity {
+[# th:each="attr,attrStat:${entityAttrs}" ]
+    private [(${attr.get('type')})] [(${attr.get('name')})];
+[/]
 
 }
-
-

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 >
 <head>
-    <title>system-tracking</title>
+    <title>[(${uriName})]</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -18,26 +18,18 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
+<a th:href="@{/api/[(${moduleName})]/[(${uriName})]}">[List]</a>
 
-<a th:href="@{/api/system/system-tracking}">GoTo List</a>
-<h3>View:</h3>
 <div class="content-root">
-    <div class="data-container">
-<strong>countSource:  </strong>
-<span th:text="${systemTrackingModel.systemTrackingDto.countSource}"></span>
-        <br/><strong>fetchSourceByPage:  </strong>
-<span th:text="${systemTrackingModel.systemTrackingDto.fetchSourceByPage}"></span>
-
-<p><strong>insertTarget:  </strong>
-<span th:text="${systemTrackingModel.systemTrackingDto.insertTarget}"></span>
-</p>
-<p><strong>selectTargetMd5List:  </strong>
-<span th:text="${systemTrackingModel.systemTrackingDto.selectTargetMd5List}"></span>
-</p>
-<p><strong>deleteTargetByMd5:  </strong>
-<span th:text="${systemTrackingModel.systemTrackingDto.deleteTargetByMd5}"></span>
-</p>
-
+    <div class="form-container">
+    <form id="viewform" th:object="${[(${entityKey})]Model.[(${dtoKey})]}">
+    <table>
+    <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
+    [# th:each="attr,attrStat:${entityAttrs}" ]
+    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><span th:text="*{[(${attr.get('name')})]}" ></span><label> &nbsp;</label></td></tr>
+    [/]
+    </table>
+    </form>
     </div>
 </div>
 <script th:inline="javascript">
@@ -58,7 +50,7 @@ $(function() {
         'z-index': 9003
         });
         $('#selft-widow-shadow').focus();
-        setTimeout(function(){$("#selft-widow-shadow").remove();}, 3000);
+        setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
 
 });

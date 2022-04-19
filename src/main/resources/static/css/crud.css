@@ -37,6 +37,8 @@ form {
 
 .list-table {
   width: 100%;
+  table-layout: fixed;
+  word-break: break-all;
 }
 
 .list-navigator {
