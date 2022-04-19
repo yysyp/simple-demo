@@ -26,17 +26,17 @@
 
     <div class="form-container">
         <form id="createform" th:action="@{/mock/save}" method="POST"
-              th:object="${mymockModel.mymockdto}">
+              th:object="${myMockModel.myMockDto}">
 
             <input type="hidden" name="id" th:value="*{id}">
             <table>
 
-    <tr><td><label>uri:</label></td><td width="75%"><input   type="text" required id="uri" name="uri"   th:value="*{uri}" ><label> &nbsp;</label></td></tr>
-    <tr><td><label>regexMatch:</label></td><td width="75%"><input maxlength="1" range="[0,1]" type="number"  required id="regexMatch" name="regexMatch"   th:value="*{regexMatch}" ><label> &nbsp;</label></td></tr>
-    <tr><td><label>method:</label></td><td width="75%"><input   type="text" required id="method" name="method"   th:value="*{method}" ><label> &nbsp;</label></td></tr>
-    <tr><td><label>status:</label></td><td width="75%"><input  type="number"   id="status" name="status"   th:value="*{status}" ><label> &nbsp;</label></td></tr>
-    <tr><td><label>headers:</label></td><td width="75%"><input   type="text"  id="headers" name="headers"   th:value="*{headers}" ><label> &nbsp;</label></td></tr>
-    <tr><td><label>body:</label></td><td width="75%"><input   type="text"  id="body" name="body"   th:value="*{body}" ><label> &nbsp;</label></td></tr>
+    <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri"  required="required" maxlength="50" th:value="*{uri}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>regexMatch:</label></td><td width="75%"><input type="checkbox" id="regexMatch" name="regexMatch"  th:checked="*{regexMatch}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>method:</label></td><td width="75%"><input type="text" id="method" name="method"  required="required" maxlength="50" th:value="*{method}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>status:</label></td><td width="75%"><input type="number" id="status" name="status"   maxlength="50" th:value="*{status}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>headers:</label></td><td width="75%"><textarea type="text" id="headers" name="headers"  rows="10" cols="50"  maxlength="65535" th:text="*{headers}" ></textarea><label> &nbsp;</label></td></tr>
+    <tr><td><label>body:</label></td><td width="75%"><textarea type="text" id="body" name="body"  rows="10" cols="50"  maxlength="65535" th:text="*{body}" ></textarea><label> &nbsp;</label></td></tr>
 
                 <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
             </table>

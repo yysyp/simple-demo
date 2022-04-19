@@ -1,5 +1,7 @@
 
 
+
+
 package ps.demo.mock.controller;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +37,6 @@ import ps.demo.util.MyBeanUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import lombok.*;
 import ps.demo.util.MyJsonUtil;
 import ps.demo.util.MyRegexUtil;
@@ -51,7 +52,7 @@ import java.math.*;
 public class MyMockTfController extends MyBaseController {
 
     @Autowired
-    private MyMockServiceImpl mymockserviceimpl;
+    private MyMockServiceImpl myMockServiceImpl;
 
     @RequestMapping("/api/**")
     public ResponseEntity<String> mockUriTest(HttpServletRequest request) {
@@ -62,12 +63,12 @@ public class MyMockTfController extends MyBaseController {
 
         String method = request.getMethod();
 
-        List<MyMockDto> myMockDtos = mymockserviceimpl.findAll();
+        List<MyMockDto> myMockDtos = myMockServiceImpl.findAll();
         MyMockDto myMockDto = null;
         for (MyMockDto mockDto : myMockDtos) {
             String uri = mockDto.getUri() + "";
             if (mockDto.getMethod().trim().equalsIgnoreCase(method)
-            && (uri.equals(searchTerm) || (mockDto.getRegexMatch() &&
+                    && (uri.equals(searchTerm) || (mockDto.getRegexMatch() &&
                     MyRegexUtil.isMatche(searchTerm, uri)))) {
                 myMockDto = mockDto;
                 break;
@@ -99,16 +100,26 @@ public class MyMockTfController extends MyBaseController {
 
     @GetMapping("/form")
     public ModelAndView createForm(Model model) {
-        model.addAttribute("mymockdto", new MyMockDto());
-        return new ModelAndView("mock/my-mock-form", "mymockModel", model);
+        model.addAttribute("myMockDto", new MyMockDto());
+        return new ModelAndView("mock/my-mock-form", "myMockModel", model);
     }
 
     @PostMapping("/save")
-    public ModelAndView save(MyMockReq mymockreq) {
-        MyMockDto mymockdto = new MyMockDto();
-        MyBeanUtil.copyProperties(mymockreq, mymockdto);
-        initBaseCreateModifyTs(mymockdto);
-        MyMockDto mymockResult = mymockserviceimpl.save(mymockdto);
+    public ModelAndView save(MyMockReq myMockReq, HttpServletRequest request) {
+        MyMockDto myMockDto = new MyMockDto();
+        
+            
+            
+            myMockDto.setRegexMatch(null != request.getParameter("regexMatch"));
+            
+            
+            
+            
+            
+        
+        MyBeanUtil.copyProperties(myMockReq, myMockDto);
+        initBaseCreateModifyTs(myMockDto);
+        MyMockDto myMockResult = myMockServiceImpl.save(myMockDto);
         return new ModelAndView("redirect:/mock");
     }
 
@@ -119,77 +130,89 @@ public class MyMockTfController extends MyBaseController {
 
     @GetMapping
     public ModelAndView query(Model model) {
-        MyMockReq mymockreq = new MyMockReq();
-        model.addAttribute("mymockreq", mymockreq);
-        Pageable pageable = constructPagable(mymockreq);
-        Page<MyMockDto> mymockdtoPage = mymockserviceimpl.findByPage(pageable);
-        MyPageResData<MyMockDto> myPageResData = new MyPageResData<>(mymockdtoPage,
-                mymockreq.getCurrent(), mymockreq.getSize());
-        model.addAttribute("mymockreq", mymockreq);
+        MyMockReq myMockReq = new MyMockReq();
+        model.addAttribute("myMockReq", myMockReq);
+        Pageable pageable = constructPagable(myMockReq);
+        Page<MyMockDto> myMockDtoPage = myMockServiceImpl.findByPage(pageable);
+        MyPageResData<MyMockDto> myPageResData = new MyPageResData<>(myMockDtoPage,
+                myMockReq.getCurrent(), myMockReq.getSize());
+        model.addAttribute("myMockReq", myMockReq);
         model.addAttribute("page", myPageResData);
-        return new ModelAndView("mock/my-mock-list", "mymockModel", model);
+        return new ModelAndView("mock/my-mock-list", "myMockModel", model);
     }
 
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Long id, Model model) {
-        MyMockDto mymockdto = mymockserviceimpl.findById(id);
-        model.addAttribute("mymockdto", mymockdto);
-        return new ModelAndView("mock/my-mock-view", "mymockModel", model);
+        MyMockDto myMockDto = myMockServiceImpl.findById(id);
+        model.addAttribute("myMockDto", myMockDto);
+        return new ModelAndView("mock/my-mock-view", "myMockModel", model);
     }
 
     @PostMapping("/list")
-    public ModelAndView list(Model model, MyMockReq mymockreq) {
-        Pageable pageable = constructPagable(mymockreq);
-        MyMockDto mymockdto = new MyMockDto();
-        String key = mymockreq.getKey();
+    public ModelAndView list(Model model, MyMockReq myMockReq) {
+        Pageable pageable = constructPagable(myMockReq);
+        MyMockDto myMockDto = new MyMockDto();
+        String key = myMockReq.getKey();
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
             
                 
-                mymockdto.setUri(percentWrapKey);
+                myMockDto.setUri(percentWrapKey);
                 
                 
                 
-                mymockdto.setMethod(percentWrapKey);
+                myMockDto.setMethod(percentWrapKey);
                 
                 
                 
-                mymockdto.setHeaders(percentWrapKey);
+                myMockDto.setHeaders(percentWrapKey);
                 
                 
-                mymockdto.setBody(percentWrapKey);
+                myMockDto.setBody(percentWrapKey);
                 
             
         }
-        //MyBeanUtil.copyProperties(mymockreq, mymockdto);
-        Page<MyMockDto> mymockdtoPage = mymockserviceimpl.findByPage(mymockdto, pageable);
-        MyPageResData<MyMockDto> myPageResData = new MyPageResData<>(mymockdtoPage,
-                mymockreq.getCurrent(), mymockreq.getSize());
-        model.addAttribute("mymockreq", mymockreq);
+        //MyBeanUtil.copyProperties(myMockReq, myMockDto);
+        Page<MyMockDto> myMockDtoPage = myMockServiceImpl.findByPage(myMockDto, true, pageable);
+        MyPageResData<MyMockDto> myPageResData = new MyPageResData<>(myMockDtoPage,
+                myMockReq.getCurrent(), myMockReq.getSize());
+        model.addAttribute("myMockReq", myMockReq);
         model.addAttribute("page", myPageResData);
-        return new ModelAndView("mock/my-mock-list", "mymockModel", model);
+        return new ModelAndView("mock/my-mock-list", "myMockModel", model);
     }
 
     @GetMapping("/modify/{id}")
     public ModelAndView modify(@PathVariable("id") Long id, Model model) {
-        MyMockDto mymockdto = mymockserviceimpl.findById(id);
-        model.addAttribute("mymockdto", mymockdto);
-        return new ModelAndView("mock/my-mock-modify", "mymockModel", model);
+        MyMockDto myMockDto = myMockServiceImpl.findById(id);
+        model.addAttribute("myMockDto", myMockDto);
+        return new ModelAndView("mock/my-mock-modify", "myMockModel", model);
     }
 
     @PostMapping("/modify")
-    public ModelAndView saveOrUpdate(MyMockDto mymockdto) {
-        initBaseCreateModifyTs(mymockdto);
-        MyMockDto updatedMyMockDto = mymockserviceimpl.save(mymockdto);
+    public ModelAndView saveOrUpdate(MyMockDto myMockDto, HttpServletRequest request) {
+        initBaseCreateModifyTs(myMockDto);
+        
+            
+            
+            myMockDto.setRegexMatch(null != request.getParameter("regexMatch"));
+            
+            
+            
+            
+            
+        
+        MyMockDto updatedMyMockDto = myMockServiceImpl.save(myMockDto);
         return new ModelAndView("redirect:/mock");
     }
 
     @GetMapping("/remove/{id}")
     public ModelAndView remove(@PathVariable("id") Long id) {
-        mymockserviceimpl.deleteById(id);
+        myMockServiceImpl.deleteById(id);
         return new ModelAndView("redirect:/mock");
     }
 
 }
+
+
 
 

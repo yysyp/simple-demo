@@ -51,7 +51,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${[(${entityKey})]Model.page.list.size()} eq 0">
-                        <td th:colspan="${10 + 1}">No data!</td>
+                        <td th:colspan="[(${entityAttrs.size} + 2)]">No data!</td>
                     </tr>
                     <tr th:each="[(${dtoKey})]:${[(${entityKey})]Model.page.list}">
                         <td style="white-space: nowrap;">

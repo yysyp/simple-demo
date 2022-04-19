@@ -26,13 +26,13 @@
 
     <div class="form-container">
         <form id="createform" th:action="@{/api/qn/questionnaire/save}" method="POST"
-              th:object="${questionnaireModel.questionnairedto}">
+              th:object="${questionnaireModel.questionnaireDto}">
 
             <input type="hidden" name="id" th:value="*{id}">
             <table>
 
-    <tr><td><label>uri:</label></td><td width="75%"><input   type="text" required id="uri" name="uri" maxlength="50"  th:value="*{uri}" ><label> &nbsp;</label></td></tr>
-    <tr><td><label>layoutitContent:</label></td><td width="75%"><textarea  rows="20" cols="50"  id="layoutitContent" name="layoutitContent"   th:text="*{layoutitContent}" ></textarea><label> &nbsp;</label></td></tr>
+    <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri"  required="required" maxlength="50" th:value="*{uri}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>layoutitContent:</label></td><td width="75%"><textarea type="text" id="layoutitContent" name="layoutitContent"  rows="10" cols="50"  maxlength="65535" th:text="*{layoutitContent}" ></textarea><label> &nbsp;</label></td></tr>
 
                 <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
             </table>

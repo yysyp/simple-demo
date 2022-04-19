@@ -24,16 +24,16 @@
 
 <div class="content-root">
     <div class="form-container">
-    <form id="viewform" th:object="${mymockModel.mymockdto}">
+    <form id="viewform" th:object="${myMockModel.myMockDto}">
     <table>
     <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
     
-    <tr><td><label>uri:</label></td><td width="75%"><span th:text="*{uri}" ></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>regexMatch:</label></td><td width="75%"><span th:text="*{regexMatch}" ></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>method:</label></td><td width="75%"><span th:text="*{method}" ></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>status:</label></td><td width="75%"><span th:text="*{status}" ></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>headers:</label></td><td width="75%"><span th:text="*{headers}" ></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>body:</label></td><td width="75%"><span th:text="*{body}" ></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri" readonly="readonly" required="required" maxlength="50" th:value="*{uri}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>regexMatch:</label></td><td width="75%"><input type="checkbox" id="regexMatch" name="regexMatch" readonly="readonly" th:checked="*{regexMatch}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>method:</label></td><td width="75%"><input type="text" id="method" name="method" readonly="readonly" required="required" maxlength="50" th:value="*{method}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>status:</label></td><td width="75%"><input type="number" id="status" name="status" readonly="readonly"  maxlength="50" th:value="*{status}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>headers:</label></td><td width="75%"><textarea type="text" id="headers" name="headers" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{headers}" ></textarea></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>body:</label></td><td width="75%"><textarea type="text" id="body" name="body" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{body}" ></textarea></span><label> &nbsp;</label></td></tr>
     
     </table>
     </form>

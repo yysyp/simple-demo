@@ -24,12 +24,12 @@
 
 <div class="content-root">
     <div class="form-container">
-    <form id="viewform" th:object="${questionnaireresponseModel.questionnaireresponsedto}">
+    <form id="viewform" th:object="${questionnaireResponseModel.questionnaireResponseDto}">
     <table>
     <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
     
-    <tr><td><label>uri:</label></td><td width="75%"><span th:text="*{uri}" ></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>responseContent:</label></td><td width="75%"><span th:text="*{responseContent}" ></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri" readonly="readonly" required="required" maxlength="50" th:value="*{uri}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>responseContent:</label></td><td width="75%"><textarea type="text" id="responseContent" name="responseContent" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{responseContent}" ></textarea></span><label> &nbsp;</label></td></tr>
     
     </table>
     </form>

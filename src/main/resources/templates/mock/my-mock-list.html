@@ -22,7 +22,7 @@
 
 <div class="content-root">
 
-    <form id="queryform" th:action="@{/mock/list}" method="POST" th:object="${mymockModel.mymockreq}">
+    <form id="queryform" th:action="@{/mock/list}" method="POST" th:object="${myMockModel.myMockReq}">
         <div class="query-container">
             <span>Keyword:</span>
             <span>
@@ -44,6 +44,7 @@
                 <table class="list-table" border="1" cellspacing="0" cellpadding="0">
                     <thead>
                     <tr>
+                        <td width="120px">Operations</td>
                         <td>ID</td>
                     
                         <td>uri</td>
@@ -53,45 +54,45 @@
                         <td>headers</td>
                         <td>body</td>
                     
-                        <td>Operations</td>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:if="${mymockModel.page.list.size()} eq 0">
-                        <td th:colspan="${10 + 1}">No data!</td>
+                    <tr th:if="${myMockModel.page.list.size()} eq 0">
+                        <td th:colspan="8">No data!</td>
                     </tr>
-                    <tr th:each="mymockdto:${mymockModel.page.list}">
-                        <td th:text="${mymockdto.id}"></td>
-                        
-                            <td th:text="${mymockdto.uri}"></td>
-                            <td th:text="${mymockdto.regexMatch}"></td>
-                            <td th:text="${mymockdto.method}"></td>
-                            <td th:text="${mymockdto.status}"></td>
-                            <td th:text="${mymockdto.headers}"></td>
-                            <td th:text="${mymockdto.body}"></td>
-                        
-                        <td>
-                            <a th:href="@{'/mock/'+${mymockdto.id}}">View</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/mock/remove/'+${mymockdto.id}}">Remove</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/mock/modify/'+${mymockdto.id}}">Modify</a>
+                    <tr th:each="myMockDto:${myMockModel.page.list}">
+                        <td style="white-space: nowrap;">
+                            <a th:href="@{'/mock/'+${myMockDto.id}}" title="View Detail">[V]</a>&nbsp;
+                            <a th:href="@{'/mock/remove/'+${myMockDto.id}}" title="Delete">[D]</a>&nbsp;
+                            <a th:href="@{'/mock/modify/'+${myMockDto.id}}" title="Modify">[M]</a>
                         </td>
+                        <td th:text="${myMockDto.id}"></td>
+                        
+                            <td th:text="${myMockDto.uri}"></td>
+                            <td th:text="${myMockDto.regexMatch}"></td>
+                            <td th:text="${myMockDto.method}"></td>
+                            <td th:text="${myMockDto.status}"></td>
+                            <td th:text="${myMockDto.headers}"></td>
+                            <td th:text="${myMockDto.body}"></td>
+                        
+
                     </tr>
                     </tbody>
                 </table>
             </div>
         </form>
 
-        <form id="navigatorform" th:action="@{/mock/list}" method="POST" th:object="${mymockModel.mymockreq}">
+        <form id="navigatorform" th:action="@{/mock/list}" method="POST" th:object="${myMockModel.myMockReq}">
             <div class="list-navigator">
                 <input id="navigatorKey" type="hidden" name="key" value="" />
-                <span th:text="'Total Pages (' + ${mymockModel.page.pages} + ')'"></span>&nbsp;&nbsp;
-                <input type="hidden" name="pages" th:value="${mymockModel.page.pages}" />&nbsp;
-                <span id="navigateToFirstPage" th:class="${mymockModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
-                <span id="navigateToPreviousPage" th:class="${mymockModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
-                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${mymockModel.page.pages}"/>&nbsp;
+                <span th:text="'Total Pages (' + ${myMockModel.page.pages} + ')'"></span>&nbsp;&nbsp;
+                <input type="hidden" name="pages" th:value="${myMockModel.page.pages}" />&nbsp;
+                <span id="navigateToFirstPage" th:class="${myMockModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
+                <span id="navigateToPreviousPage" th:class="${myMockModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
+                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${myMockModel.page.pages}"/>&nbsp;
                 <span id="navigateGoto">Go</span>&nbsp;
-                <span id="navigateToNextPage" th:class="${mymockModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
-                <span id="navigateToLastPage" th:class="${mymockModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
+                <span id="navigateToNextPage" th:class="${myMockModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
+                <span id="navigateToLastPage" th:class="${myMockModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
             </div>
         </form>
         <!--list-container div end -->

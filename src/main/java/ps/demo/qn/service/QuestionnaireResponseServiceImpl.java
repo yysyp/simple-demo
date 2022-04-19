@@ -45,91 +45,104 @@ import java.math.*;
 public class QuestionnaireResponseServiceImpl {
 
     @Autowired
-    QuestionnaireResponseDao questionnaireresponsedao;
+    QuestionnaireResponseDao questionnaireResponseDao;
 
     @Transactional
-    public QuestionnaireResponseDto save(QuestionnaireResponseDto questionnaireresponsedto) {
-        QuestionnaireResponse questionnaireresponse = new QuestionnaireResponse();
-        MyBeanUtil.copyProperties(questionnaireresponsedto, questionnaireresponse);
-        QuestionnaireResponse entity = questionnaireresponsedao.save(questionnaireresponse);
-        MyBeanUtil.copyProperties(entity, questionnaireresponsedto);
-        return questionnaireresponsedto;
+    public QuestionnaireResponseDto save(QuestionnaireResponseDto questionnaireResponseDto) {
+        QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse();
+        MyBeanUtil.copyProperties(questionnaireResponseDto, questionnaireResponse);
+        QuestionnaireResponse entity = questionnaireResponseDao.save(questionnaireResponse);
+        MyBeanUtil.copyProperties(entity, questionnaireResponseDto);
+        return questionnaireResponseDto;
     }
 
     @Transactional(readOnly = true)
     public List<QuestionnaireResponseDto> findAll() {
-        List<QuestionnaireResponse> questionnaireresponseList = questionnaireresponsedao.findAll();
-        List<QuestionnaireResponseDto> questionnaireresponsedtoList = new ArrayList<>();
-        for (QuestionnaireResponse questionnaireresponse : questionnaireresponseList) {
-            QuestionnaireResponseDto questionnaireresponsedto = new QuestionnaireResponseDto();
-            MyBeanUtil.copyProperties(questionnaireresponse, questionnaireresponsedto);
-            questionnaireresponsedtoList.add(questionnaireresponsedto);
+        List<QuestionnaireResponse> questionnaireResponseList = questionnaireResponseDao.findAll();
+        List<QuestionnaireResponseDto> questionnaireResponseDtoList = new ArrayList<>();
+        for (QuestionnaireResponse questionnaireResponse : questionnaireResponseList) {
+            QuestionnaireResponseDto questionnaireResponseDto = new QuestionnaireResponseDto();
+            MyBeanUtil.copyProperties(questionnaireResponse, questionnaireResponseDto);
+            questionnaireResponseDtoList.add(questionnaireResponseDto);
         }
-        return questionnaireresponsedtoList;
+        return questionnaireResponseDtoList;
     }
 
     public QuestionnaireResponseDto findById(Long id) {
-        Optional<QuestionnaireResponse> questionnaireresponseOptional = questionnaireresponsedao.findById(id);
-        QuestionnaireResponseDto questionnaireresponsedto = new QuestionnaireResponseDto();
-        questionnaireresponseOptional.ifPresent(e -> {
-            MyBeanUtil.copyProperties(e, questionnaireresponsedto);
+        Optional<QuestionnaireResponse> questionnaireResponseOptional = questionnaireResponseDao.findById(id);
+        QuestionnaireResponseDto questionnaireResponseDto = new QuestionnaireResponseDto();
+        questionnaireResponseOptional.ifPresent(e -> {
+            MyBeanUtil.copyProperties(e, questionnaireResponseDto);
         });
-        return questionnaireresponsedto;
+        return questionnaireResponseDto;
     }
 
     @Transactional(readOnly = true)
     public Page<QuestionnaireResponseDto> findByPage(Pageable pageable) {
-        Page<QuestionnaireResponse> page = questionnaireresponsedao.findAll(pageable);
+        Page<QuestionnaireResponse> page = questionnaireResponseDao.findAll(pageable);
         Page<QuestionnaireResponseDto> pageDto = page.map((e) -> {
-            QuestionnaireResponseDto questionnaireresponsedto = new QuestionnaireResponseDto();
-            MyBeanUtil.copyProperties(e, questionnaireresponsedto);
-            return questionnaireresponsedto;
+            QuestionnaireResponseDto questionnaireResponseDto = new QuestionnaireResponseDto();
+            MyBeanUtil.copyProperties(e, questionnaireResponseDto);
+            return questionnaireResponseDto;
         });
         return pageDto;
     }
 
     @Transactional(readOnly = true)
-    public Page<QuestionnaireResponseDto> findByPage(QuestionnaireResponseDto questionnaireresponsedto, Pageable pageable) {
-        QuestionnaireResponse questionnaireresponse = new QuestionnaireResponse();
-        MyBeanUtil.copyProperties(questionnaireresponsedto, questionnaireresponse);
-        Specification<QuestionnaireResponse> spec = new Specification<QuestionnaireResponse>() {
-            @Override
-            public Predicate toPredicate(Root<QuestionnaireResponse> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Predicate predicate = null;
-                    
-                        
-                        
-                        if (StringUtils.isNotBlank(questionnaireresponse.getUri())) {
-                            predicate = cb.or(cb.like(root.get("uri"), questionnaireresponse.getUri()));
-                        }
-                        
-                        
-                        
-                        
-                        
-                        
-                        if (StringUtils.isNotBlank(questionnaireresponse.getResponseContent())) {
-                            predicate = cb.or(predicate, cb.like(root.get("responseContent"), questionnaireresponse.getResponseContent()));
-                        }
-                        
-                        
-                    
-                return predicate;
-            }
-        };
+    public Page<QuestionnaireResponseDto> findByPage(QuestionnaireResponseDto questionnaireResponseDto, boolean orLike, Pageable pageable) {
+        QuestionnaireResponse questionnaireResponse = new QuestionnaireResponse();
+        MyBeanUtil.copyProperties(questionnaireResponseDto, questionnaireResponse);
+        Specification<QuestionnaireResponse> spec = constructSpecification(questionnaireResponse, orLike);
 
-        Page<QuestionnaireResponse> page = questionnaireresponsedao.findAll(spec, pageable);
+        Page<QuestionnaireResponse> page = questionnaireResponseDao.findAll(spec, pageable);
         Page<QuestionnaireResponseDto> pageDto = page.map((e) -> {
-            QuestionnaireResponseDto questionnaireresponsedtoResult = new QuestionnaireResponseDto();
-            MyBeanUtil.copyProperties(e, questionnaireresponsedtoResult);
-            return questionnaireresponsedtoResult;
+            QuestionnaireResponseDto questionnaireResponseDtoResult = new QuestionnaireResponseDto();
+            MyBeanUtil.copyProperties(e, questionnaireResponseDtoResult);
+            return questionnaireResponseDtoResult;
         });
         return pageDto;
     }
 
+    private Specification<QuestionnaireResponse> constructSpecification(QuestionnaireResponse questionnaireResponse, boolean orLike) {
+        Specification<QuestionnaireResponse> spec = new Specification<QuestionnaireResponse>() {
+            @Override
+            public Predicate toPredicate(Root<QuestionnaireResponse> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Predicate predicate = null;
+                
+                    
+                    
+                    if (StringUtils.isNotBlank(questionnaireResponse.getUri())) {
+                        if (orLike) {
+                            predicate = cb.or(cb.like(root.get("uri"), questionnaireResponse.getUri()));
+                        } else {
+                            predicate = cb.and(cb.equal(root.get("uri"), questionnaireResponse.getUri()));
+                        }
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    if (StringUtils.isNotBlank(questionnaireResponse.getResponseContent())) {
+                        if (orLike) {
+                            predicate = cb.or(predicate, cb.like(root.get("responseContent"), questionnaireResponse.getResponseContent()));
+                        } else {
+                            predicate = cb.and(predicate, cb.equal(root.get("responseContent"), questionnaireResponse.getResponseContent()));
+                        }
+                    }
+                    
+                    
+                
+                return predicate;
+            }
+        };
+        return spec;
+    }
+
     @Transactional
     public void deleteById(Long id) {
-        questionnaireresponsedao.deleteById(id);
+        questionnaireResponseDao.deleteById(id);
     }
 
 

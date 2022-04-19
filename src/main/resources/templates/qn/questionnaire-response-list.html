@@ -22,7 +22,7 @@
 
 <div class="content-root">
 
-    <form id="queryform" th:action="@{/api/qn/questionnaire-response/list}" method="POST" th:object="${questionnaireresponseModel.questionnaireresponsereq}">
+    <form id="queryform" th:action="@{/api/qn/questionnaire-response/list}" method="POST" th:object="${questionnaireResponseModel.questionnaireResponseReq}">
         <div class="query-container">
             <span>Keyword:</span>
             <span>
@@ -44,46 +44,47 @@
                 <table class="list-table" border="1" cellspacing="0" cellpadding="0">
                     <thead>
                     <tr>
+                        <td width="120px">Operations</td>
                         <td>ID</td>
                     
                         <td>uri</td>
                         <td>responseContent</td>
                     
-                        <td>Operations</td>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:if="${questionnaireresponseModel.page.list.size()} eq 0">
-                        <td th:colspan="${10 + 1}">No data!</td>
+                    <tr th:if="${questionnaireResponseModel.page.list.size()} eq 0">
+                        <td th:colspan="4">No data!</td>
                     </tr>
-                    <tr th:each="questionnaireresponsedto:${questionnaireresponseModel.page.list}">
-                        <td th:text="${questionnaireresponsedto.id}"></td>
-                        
-                            <td th:text="${questionnaireresponsedto.uri}"></td>
-                            <td th:text="${questionnaireresponsedto.responseContent}"></td>
-                        
-                        <td>
-                            <a th:href="@{'/api/qn/questionnaire-response/'+${questionnaireresponsedto.id}}">View</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/qn/questionnaire-response/remove/'+${questionnaireresponsedto.id}}">Remove</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/qn/questionnaire-response/modify/'+${questionnaireresponsedto.id}}">Modify</a>
+                    <tr th:each="questionnaireResponseDto:${questionnaireResponseModel.page.list}">
+                        <td style="white-space: nowrap;">
+                            <a th:href="@{'/api/qn/questionnaire-response/'+${questionnaireResponseDto.id}}" title="View Detail">[V]</a>&nbsp;
+                            <a th:href="@{'/api/qn/questionnaire-response/remove/'+${questionnaireResponseDto.id}}" title="Delete">[D]</a>&nbsp;
+                            <a th:href="@{'/api/qn/questionnaire-response/modify/'+${questionnaireResponseDto.id}}" title="Modify">[M]</a>
                         </td>
+                        <td th:text="${questionnaireResponseDto.id}"></td>
+                        
+                            <td th:text="${questionnaireResponseDto.uri}"></td>
+                            <td th:text="${questionnaireResponseDto.responseContent}"></td>
+                        
+
                     </tr>
                     </tbody>
                 </table>
             </div>
         </form>
 
-        <form id="navigatorform" th:action="@{/api/qn/questionnaire-response/list}" method="POST" th:object="${questionnaireresponseModel.questionnaireresponsereq}">
+        <form id="navigatorform" th:action="@{/api/qn/questionnaire-response/list}" method="POST" th:object="${questionnaireResponseModel.questionnaireResponseReq}">
             <div class="list-navigator">
                 <input id="navigatorKey" type="hidden" name="key" value="" />
-                <span th:text="'Total Pages (' + ${questionnaireresponseModel.page.pages} + ')'"></span>&nbsp;&nbsp;
-                <input type="hidden" name="pages" th:value="${questionnaireresponseModel.page.pages}" />&nbsp;
-                <span id="navigateToFirstPage" th:class="${questionnaireresponseModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
-                <span id="navigateToPreviousPage" th:class="${questionnaireresponseModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
-                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${questionnaireresponseModel.page.pages}"/>&nbsp;
+                <span th:text="'Total Pages (' + ${questionnaireResponseModel.page.pages} + ')'"></span>&nbsp;&nbsp;
+                <input type="hidden" name="pages" th:value="${questionnaireResponseModel.page.pages}" />&nbsp;
+                <span id="navigateToFirstPage" th:class="${questionnaireResponseModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
+                <span id="navigateToPreviousPage" th:class="${questionnaireResponseModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
+                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${questionnaireResponseModel.page.pages}"/>&nbsp;
                 <span id="navigateGoto">Go</span>&nbsp;
-                <span id="navigateToNextPage" th:class="${questionnaireresponseModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
-                <span id="navigateToLastPage" th:class="${questionnaireresponseModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
+                <span id="navigateToNextPage" th:class="${questionnaireResponseModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
+                <span id="navigateToLastPage" th:class="${questionnaireResponseModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
             </div>
         </form>
         <!--list-container div end -->

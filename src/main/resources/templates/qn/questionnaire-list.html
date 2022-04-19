@@ -22,7 +22,7 @@
 
 <div class="content-root">
 
-    <form id="queryform" th:action="@{/api/qn/questionnaire/list}" method="POST" th:object="${questionnaireModel.questionnairereq}">
+    <form id="queryform" th:action="@{/api/qn/questionnaire/list}" method="POST" th:object="${questionnaireModel.questionnaireReq}">
         <div class="query-container">
             <span>Keyword:</span>
             <span>
@@ -44,36 +44,37 @@
                 <table class="list-table" border="1" cellspacing="0" cellpadding="0">
                     <thead>
                     <tr>
+                        <td width="120px">Operations</td>
                         <td>ID</td>
                     
                         <td>uri</td>
                         <td>layoutitContent</td>
                     
-                        <td>Operations</td>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:if="${questionnaireModel.page.list.size()} eq 0">
-                        <td th:colspan="${10 + 1}">No data!</td>
+                        <td th:colspan="4">No data!</td>
                     </tr>
-                    <tr th:each="questionnairedto:${questionnaireModel.page.list}">
-                        <td th:text="${questionnairedto.id}"></td>
-                        
-                            <td th:text="${questionnairedto.uri}"></td>
-                            <td th:text="${questionnairedto.layoutitContent}"></td>
-                        
-                        <td>
-                            <a th:href="@{'/api/qn/questionnaire/'+${questionnairedto.id}}">View</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/qn/questionnaire/remove/'+${questionnairedto.id}}">Remove</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/qn/questionnaire/modify/'+${questionnairedto.id}}">Modify</a>
+                    <tr th:each="questionnaireDto:${questionnaireModel.page.list}">
+                        <td style="white-space: nowrap;">
+                            <a th:href="@{'/api/qn/questionnaire/'+${questionnaireDto.id}}" title="View Detail">[V]</a>&nbsp;
+                            <a th:href="@{'/api/qn/questionnaire/remove/'+${questionnaireDto.id}}" title="Delete">[D]</a>&nbsp;
+                            <a th:href="@{'/api/qn/questionnaire/modify/'+${questionnaireDto.id}}" title="Modify">[M]</a>
                         </td>
+                        <td th:text="${questionnaireDto.id}"></td>
+                        
+                            <td th:text="${questionnaireDto.uri}"></td>
+                            <td th:text="${questionnaireDto.layoutitContent}"></td>
+                        
+
                     </tr>
                     </tbody>
                 </table>
             </div>
         </form>
 
-        <form id="navigatorform" th:action="@{/api/qn/questionnaire/list}" method="POST" th:object="${questionnaireModel.questionnairereq}">
+        <form id="navigatorform" th:action="@{/api/qn/questionnaire/list}" method="POST" th:object="${questionnaireModel.questionnaireReq}">
             <div class="list-navigator">
                 <input id="navigatorKey" type="hidden" name="key" value="" />
                 <span th:text="'Total Pages (' + ${questionnaireModel.page.pages} + ')'"></span>&nbsp;&nbsp;

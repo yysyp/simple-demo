@@ -45,108 +45,120 @@ import java.math.*;
 public class QuestionnaireServiceImpl {
 
     @Autowired
-    QuestionnaireDao questionnairedao;
+    QuestionnaireDao questionnaireDao;
 
     @Transactional
-    public QuestionnaireDto save(QuestionnaireDto questionnairedto) {
+    public QuestionnaireDto save(QuestionnaireDto questionnaireDto) {
         Questionnaire questionnaire = new Questionnaire();
-        MyBeanUtil.copyProperties(questionnairedto, questionnaire);
-        Questionnaire entity = questionnairedao.save(questionnaire);
-        MyBeanUtil.copyProperties(entity, questionnairedto);
-        return questionnairedto;
+        MyBeanUtil.copyProperties(questionnaireDto, questionnaire);
+        Questionnaire entity = questionnaireDao.save(questionnaire);
+        MyBeanUtil.copyProperties(entity, questionnaireDto);
+        return questionnaireDto;
     }
 
     @Transactional(readOnly = true)
     public List<QuestionnaireDto> findAll() {
-        List<Questionnaire> questionnaireList = questionnairedao.findAll();
-        List<QuestionnaireDto> questionnairedtoList = new ArrayList<>();
+        List<Questionnaire> questionnaireList = questionnaireDao.findAll();
+        List<QuestionnaireDto> questionnaireDtoList = new ArrayList<>();
         for (Questionnaire questionnaire : questionnaireList) {
-            QuestionnaireDto questionnairedto = new QuestionnaireDto();
-            MyBeanUtil.copyProperties(questionnaire, questionnairedto);
-            questionnairedtoList.add(questionnairedto);
+            QuestionnaireDto questionnaireDto = new QuestionnaireDto();
+            MyBeanUtil.copyProperties(questionnaire, questionnaireDto);
+            questionnaireDtoList.add(questionnaireDto);
         }
-        return questionnairedtoList;
+        return questionnaireDtoList;
     }
 
     public QuestionnaireDto findById(Long id) {
-        Optional<Questionnaire> questionnaireOptional = questionnairedao.findById(id);
-        QuestionnaireDto questionnairedto = new QuestionnaireDto();
+        Optional<Questionnaire> questionnaireOptional = questionnaireDao.findById(id);
+        QuestionnaireDto questionnaireDto = new QuestionnaireDto();
         questionnaireOptional.ifPresent(e -> {
-            MyBeanUtil.copyProperties(e, questionnairedto);
+            MyBeanUtil.copyProperties(e, questionnaireDto);
         });
-        return questionnairedto;
+        return questionnaireDto;
     }
+
+    @Transactional(readOnly = true)
+    public Page<QuestionnaireDto> findByPage(Pageable pageable) {
+        Page<Questionnaire> page = questionnaireDao.findAll(pageable);
+        Page<QuestionnaireDto> pageDto = page.map((e) -> {
+            QuestionnaireDto questionnaireDto = new QuestionnaireDto();
+            MyBeanUtil.copyProperties(e, questionnaireDto);
+            return questionnaireDto;
+        });
+        return pageDto;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<QuestionnaireDto> findByPage(QuestionnaireDto questionnaireDto, boolean orLike, Pageable pageable) {
+        Questionnaire questionnaire = new Questionnaire();
+        MyBeanUtil.copyProperties(questionnaireDto, questionnaire);
+        Specification<Questionnaire> spec = constructSpecification(questionnaire, orLike);
+
+        Page<Questionnaire> page = questionnaireDao.findAll(spec, pageable);
+        Page<QuestionnaireDto> pageDto = page.map((e) -> {
+            QuestionnaireDto questionnaireDtoResult = new QuestionnaireDto();
+            MyBeanUtil.copyProperties(e, questionnaireDtoResult);
+            return questionnaireDtoResult;
+        });
+        return pageDto;
+    }
+
+    private Specification<Questionnaire> constructSpecification(Questionnaire questionnaire, boolean orLike) {
+        Specification<Questionnaire> spec = new Specification<Questionnaire>() {
+            @Override
+            public Predicate toPredicate(Root<Questionnaire> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Predicate predicate = null;
+
+
+
+                if (StringUtils.isNotBlank(questionnaire.getUri())) {
+                    if (orLike) {
+                        predicate = cb.or(cb.like(root.get("uri"), questionnaire.getUri()));
+                    } else {
+                        predicate = cb.and(cb.equal(root.get("uri"), questionnaire.getUri()));
+                    }
+                }
+
+
+
+
+
+
+                if (StringUtils.isNotBlank(questionnaire.getLayoutitContent())) {
+                    if (orLike) {
+                        predicate = cb.or(predicate, cb.like(root.get("layoutitContent"), questionnaire.getLayoutitContent()));
+                    } else {
+                        predicate = cb.and(predicate, cb.equal(root.get("layoutitContent"), questionnaire.getLayoutitContent()));
+                    }
+                }
+
+
+
+                return predicate;
+            }
+        };
+        return spec;
+    }
+
+    @Transactional
+    public void deleteById(Long id) {
+        questionnaireDao.deleteById(id);
+    }
+
 
     public QuestionnaireDto findByURi(String uri) {
         Questionnaire questionnaire = new Questionnaire();
         questionnaire.setUri(uri.trim());
         ExampleMatcher matching = ExampleMatcher.matching()
-        .withMatcher("uri", ExampleMatcher.GenericPropertyMatchers.exact());
+                .withMatcher("uri", ExampleMatcher.GenericPropertyMatchers.exact());
         Example<Questionnaire> example = Example.of(questionnaire, matching);
-        Optional<Questionnaire> questionnaireOptional = questionnairedao.findOne(example);
+        Optional<Questionnaire> questionnaireOptional = questionnaireDao.findOne(example);
         QuestionnaireDto questionnairedto = new QuestionnaireDto();
         questionnaireOptional.ifPresent(e -> {
             MyBeanUtil.copyProperties(e, questionnairedto);
         });
         return questionnairedto;
     }
-
-    @Transactional(readOnly = true)
-    public Page<QuestionnaireDto> findByPage(Pageable pageable) {
-        Page<Questionnaire> page = questionnairedao.findAll(pageable);
-        Page<QuestionnaireDto> pageDto = page.map((e) -> {
-            QuestionnaireDto questionnairedto = new QuestionnaireDto();
-            MyBeanUtil.copyProperties(e, questionnairedto);
-            return questionnairedto;
-        });
-        return pageDto;
-    }
-
-    @Transactional(readOnly = true)
-    public Page<QuestionnaireDto> findByPage(QuestionnaireDto questionnairedto, Pageable pageable) {
-        Questionnaire questionnaire = new Questionnaire();
-        MyBeanUtil.copyProperties(questionnairedto, questionnaire);
-        Specification<Questionnaire> spec = new Specification<Questionnaire>() {
-            @Override
-            public Predicate toPredicate(Root<Questionnaire> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Predicate predicate = null;
-                    
-                        
-                        
-                        if (StringUtils.isNotBlank(questionnaire.getUri())) {
-                            predicate = cb.or(cb.like(root.get("uri"), questionnaire.getUri()));
-                        }
-                        
-                        
-                        
-                        
-                        
-                        
-                        if (StringUtils.isNotBlank(questionnaire.getLayoutitContent())) {
-                            predicate = cb.or(predicate, cb.like(root.get("layoutitContent"), questionnaire.getLayoutitContent()));
-                        }
-                        
-                        
-                    
-                return predicate;
-            }
-        };
-
-        Page<Questionnaire> page = questionnairedao.findAll(spec, pageable);
-        Page<QuestionnaireDto> pageDto = page.map((e) -> {
-            QuestionnaireDto questionnairedtoResult = new QuestionnaireDto();
-            MyBeanUtil.copyProperties(e, questionnairedtoResult);
-            return questionnairedtoResult;
-        });
-        return pageDto;
-    }
-
-    @Transactional
-    public void deleteById(Long id) {
-        questionnairedao.deleteById(id);
-    }
-
-
 }
 
 

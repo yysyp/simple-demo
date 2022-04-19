@@ -1,5 +1,7 @@
 
 
+
+
 package ps.demo.company.controller;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,8 +54,17 @@ public class AbcStaffTfController extends MyBaseController {
     @PostMapping("/save")
     public ModelAndView save(AbcStaffReq abcStaffReq, HttpServletRequest request) {
         AbcStaffDto abcStaffDto = new AbcStaffDto();
-        abcStaffDto.setPassed(null != request.getParameter("passed"));
-
+        
+            
+            
+            
+            
+            
+            abcStaffDto.setPassed(null != request.getParameter("passed"));
+            
+            
+            
+        
         MyBeanUtil.copyProperties(abcStaffReq, abcStaffDto);
         initBaseCreateModifyTs(abcStaffDto);
         AbcStaffDto abcStaffResult = abcStaffServiceImpl.save(abcStaffDto);
@@ -103,6 +114,9 @@ public class AbcStaffTfController extends MyBaseController {
                 
                 
                 
+                abcStaffDto.setComments(percentWrapKey);
+                
+                
             
         }
         //MyBeanUtil.copyProperties(abcStaffReq, abcStaffDto);
@@ -124,7 +138,17 @@ public class AbcStaffTfController extends MyBaseController {
     @PostMapping("/modify")
     public ModelAndView saveOrUpdate(AbcStaffDto abcStaffDto, HttpServletRequest request) {
         initBaseCreateModifyTs(abcStaffDto);
-        abcStaffDto.setPassed(null != request.getParameter("passed"));
+        
+            
+            
+            
+            
+            
+            abcStaffDto.setPassed(null != request.getParameter("passed"));
+            
+            
+            
+        
         AbcStaffDto updatedAbcStaffDto = abcStaffServiceImpl.save(abcStaffDto);
         return new ModelAndView("redirect:/api/company/abc-staff");
     }
@@ -136,5 +160,7 @@ public class AbcStaffTfController extends MyBaseController {
     }
 
 }
+
+
 
 

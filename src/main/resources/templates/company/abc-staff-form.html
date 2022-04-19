@@ -26,18 +26,18 @@
 
     <div class="form-container">
         <form id="createform" th:action="@{/api/company/abc-staff/save}" method="POST"
-              th:object="${abcstaffModel.abcstaffdto}">
+              th:object="${abcStaffModel.abcStaffDto}">
 
             <input type="hidden" name="id" th:value="*{id}">
             <table>
 
-    <tr><td><label>firstName:</label></td><td width="75%"><input type="text" id="firstName" name="firstName" required maxlength="25" th:value="*{firstName}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>lastName:</label></td><td width="75%"><input type="text" id="lastName" name="lastName"  maxlength="25" th:value="*{lastName}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>age:</label></td><td width="75%"><input type="number" id="age" name="age"  maxlength="50" th:value="*{age}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>score:</label></td><td width="75%"><input type="number" id="score" name="score"  maxlength="50" th:value="*{score}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>passed:</label></td><td width="75%"><input type="checkbox" id="passed" name="passed" th:checked="*{passed}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments" rows="10" cols="50"  maxlength="255" th:text="*{comments}" ></textarea><label> &nbsp;</label></td></tr>
-    <tr><td><label>birthday:</label></td><td width="75%"><input type="text" id="birthday" name="birthday"  th:value="*{#dates.format(birthday, 'yyyy-MM-dd HH:mm:ss')}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>firstName:</label></td><td width="75%"><input type="text" id="firstName" name="firstName"  required="required" maxlength="25" th:value="*{firstName}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>lastName:</label></td><td width="75%"><input type="text" id="lastName" name="lastName"   maxlength="25" th:value="*{lastName}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>age:</label></td><td width="75%"><input type="number" id="age" name="age"   maxlength="50" th:value="*{age}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>score:</label></td><td width="75%"><input type="number" id="score" name="score"   maxlength="50" th:value="*{score}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>passed:</label></td><td width="75%"><input type="checkbox" id="passed" name="passed"  th:checked="*{passed}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments"  rows="10" cols="50"  maxlength="255" th:text="*{comments}" ></textarea><label> &nbsp;</label></td></tr>
+    <tr><td><label>birthday:</label></td><td width="75%"><input type="text" id="birthday" name="birthday"   th:value="*{#dates.format(birthday, 'yyyy-MM-dd HH:mm:ss')}" /><label> &nbsp;</label></td></tr>
 
                 <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
             </table>

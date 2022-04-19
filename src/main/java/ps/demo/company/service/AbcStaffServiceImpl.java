@@ -108,22 +108,48 @@ public class AbcStaffServiceImpl {
             @Override
             public Predicate toPredicate(Root<AbcStaff> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Predicate predicate = null;
-
-                        if (StringUtils.isNotBlank(abcStaff.getFirstName())) {
-                            if (orLike) {
-                                predicate = cb.or(cb.like(root.get("firstName"), abcStaff.getFirstName()));
-                            } else {
-                                predicate = cb.and(cb.equal(root.get("firstName"), abcStaff.getFirstName()));
-                            }
+                
+                    
+                    
+                    if (StringUtils.isNotBlank(abcStaff.getFirstName())) {
+                        if (orLike) {
+                            predicate = cb.or(cb.like(root.get("firstName"), abcStaff.getFirstName()));
+                        } else {
+                            predicate = cb.and(cb.equal(root.get("firstName"), abcStaff.getFirstName()));
                         }
-
-                        if (StringUtils.isNotBlank(abcStaff.getLastName())) {
-                            if (orLike) {
-                                predicate = cb.or(predicate, cb.like(root.get("lastName"), abcStaff.getLastName()));
-                            } else {
-                                predicate = cb.and(predicate, cb.equal(root.get("lastName"), abcStaff.getLastName()));
-                            }
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    if (StringUtils.isNotBlank(abcStaff.getLastName())) {
+                        if (orLike) {
+                            predicate = cb.or(predicate, cb.like(root.get("lastName"), abcStaff.getLastName()));
+                        } else {
+                            predicate = cb.and(predicate, cb.equal(root.get("lastName"), abcStaff.getLastName()));
                         }
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    if (StringUtils.isNotBlank(abcStaff.getComments())) {
+                        if (orLike) {
+                            predicate = cb.or(predicate, cb.like(root.get("comments"), abcStaff.getComments()));
+                        } else {
+                            predicate = cb.and(predicate, cb.equal(root.get("comments"), abcStaff.getComments()));
+                        }
+                    }
+                    
+                    
+                    
+                
                 return predicate;
             }
         };

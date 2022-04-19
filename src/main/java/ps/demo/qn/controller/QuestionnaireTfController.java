@@ -51,22 +51,22 @@ public class QuestionnaireTfController extends MyBaseController {
 
     @GetMapping("/form")
     public ModelAndView createForm(Model model) {
-        model.addAttribute("questionnairedto", new QuestionnaireDto());
+        model.addAttribute("questionnaireDto", new QuestionnaireDto());
         return new ModelAndView("qn/questionnaire-form", "questionnaireModel", model);
     }
 
     @PostMapping("/save")
-    public ModelAndView save(QuestionnaireReq questionnairereq) {
-        QuestionnaireDto questionnairedto = new QuestionnaireDto();
-        MyBeanUtil.copyProperties(questionnairereq, questionnairedto);
-        initBaseCreateModifyTs(questionnairedto);
+    public ModelAndView save(QuestionnaireReq questionnaireReq) {
+        QuestionnaireDto questionnaireDto = new QuestionnaireDto();
+        MyBeanUtil.copyProperties(questionnaireReq, questionnaireDto);
+        initBaseCreateModifyTs(questionnaireDto);
 
         String filename = UUID.randomUUID().toString();
         File file = new File(uploadDir, filename);
-        MyReadWriteUtil.writeFileContent(file, questionnairedto.getLayoutitContent(), "UTF-8");
-        questionnairedto.setLayoutitContent(filename);
+        MyReadWriteUtil.writeFileContent(file, questionnaireDto.getLayoutitContent(), "UTF-8");
+        questionnaireDto.setLayoutitContent(filename);
 
-        QuestionnaireDto questionnaireResult = questionnaireserviceimpl.save(questionnairedto);
+        QuestionnaireDto questionnaireResult = questionnaireserviceimpl.save(questionnaireDto);
         return new ModelAndView("redirect:/api/qn/questionnaire");
     }
 
@@ -77,61 +77,61 @@ public class QuestionnaireTfController extends MyBaseController {
 
     @GetMapping
     public ModelAndView query(Model model) {
-        QuestionnaireReq questionnairereq = new QuestionnaireReq();
-        model.addAttribute("questionnairereq", questionnairereq);
-        Pageable pageable = constructPagable(questionnairereq);
-        Page<QuestionnaireDto> questionnairedtoPage = questionnaireserviceimpl.findByPage(pageable);
-        MyPageResData<QuestionnaireDto> myPageResData = new MyPageResData<>(questionnairedtoPage,
-                questionnairereq.getCurrent(), questionnairereq.getSize());
-        model.addAttribute("questionnairereq", questionnairereq);
+        QuestionnaireReq questionnaireReq = new QuestionnaireReq();
+        model.addAttribute("questionnaireReq", questionnaireReq);
+        Pageable pageable = constructPagable(questionnaireReq);
+        Page<QuestionnaireDto> questionnaireDtoPage = questionnaireserviceimpl.findByPage(pageable);
+        MyPageResData<QuestionnaireDto> myPageResData = new MyPageResData<>(questionnaireDtoPage,
+                questionnaireReq.getCurrent(), questionnaireReq.getSize());
+        model.addAttribute("questionnaireReq", questionnaireReq);
         model.addAttribute("page", myPageResData);
         return new ModelAndView("qn/questionnaire-list", "questionnaireModel", model);
     }
 
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Long id, Model model) {
-        QuestionnaireDto questionnairedto = questionnaireserviceimpl.findById(id);
-        model.addAttribute("questionnairedto", questionnairedto);
+        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findById(id);
+        model.addAttribute("questionnaireDto", questionnaireDto);
         return new ModelAndView("qn/questionnaire-view", "questionnaireModel", model);
     }
 
     @PostMapping("/list")
-    public ModelAndView list(Model model, QuestionnaireReq questionnairereq) {
-        Pageable pageable = constructPagable(questionnairereq);
-        QuestionnaireDto questionnairedto = new QuestionnaireDto();
-        String key = questionnairereq.getKey();
+    public ModelAndView list(Model model, QuestionnaireReq questionnaireReq) {
+        Pageable pageable = constructPagable(questionnaireReq);
+        QuestionnaireDto questionnaireDto = new QuestionnaireDto();
+        String key = questionnaireReq.getKey();
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
             
                 
-                questionnairedto.setUri(percentWrapKey);
+                questionnaireDto.setUri(percentWrapKey);
                 
                 
-                questionnairedto.setLayoutitContent(percentWrapKey);
+                questionnaireDto.setLayoutitContent(percentWrapKey);
                 
             
         }
-        //MyBeanUtil.copyProperties(questionnairereq, questionnairedto);
-        Page<QuestionnaireDto> questionnairedtoPage = questionnaireserviceimpl.findByPage(questionnairedto, pageable);
-        MyPageResData<QuestionnaireDto> myPageResData = new MyPageResData<>(questionnairedtoPage,
-                questionnairereq.getCurrent(), questionnairereq.getSize());
-        model.addAttribute("questionnairereq", questionnairereq);
+        //MyBeanUtil.copyProperties(questionnaireReq, questionnaireDto);
+        Page<QuestionnaireDto> questionnaireDtoPage = questionnaireserviceimpl.findByPage(questionnaireDto, true, pageable);
+        MyPageResData<QuestionnaireDto> myPageResData = new MyPageResData<>(questionnaireDtoPage,
+                questionnaireReq.getCurrent(), questionnaireReq.getSize());
+        model.addAttribute("questionnaireReq", questionnaireReq);
         model.addAttribute("page", myPageResData);
         return new ModelAndView("qn/questionnaire-list", "questionnaireModel", model);
     }
 
     @GetMapping("/modify/{id}")
     public ModelAndView modify(@PathVariable("id") Long id, Model model) {
-        QuestionnaireDto questionnairedto = questionnaireserviceimpl.findById(id);
-        model.addAttribute("questionnairedto", questionnairedto);
+        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findById(id);
+        model.addAttribute("questionnaireDto", questionnaireDto);
         return new ModelAndView("qn/questionnaire-modify", "questionnaireModel", model);
     }
 
     @PostMapping("/modify")
-    public ModelAndView saveOrUpdate(QuestionnaireDto questionnairedto) {
-        initBaseCreateModifyTs(questionnairedto);
+    public ModelAndView saveOrUpdate(QuestionnaireDto questionnaireDto) {
+        initBaseCreateModifyTs(questionnaireDto);
         //delete old
-        QuestionnaireDto oldDto = questionnaireserviceimpl.findById(questionnairedto.getId());
+        QuestionnaireDto oldDto = questionnaireserviceimpl.findById(questionnaireDto.getId());
         UUID uuid = UUID.fromString(oldDto.getLayoutitContent());
         File oldFile = new File(uploadDir, uuid.toString());
         if (oldFile.exists() && oldFile.isFile()) {
@@ -140,10 +140,10 @@ public class QuestionnaireTfController extends MyBaseController {
         //save new
         String filename = UUID.randomUUID().toString();
         File file = new File(uploadDir, filename);
-        MyReadWriteUtil.writeFileContent(file, questionnairedto.getLayoutitContent(), "UTF-8");
-        questionnairedto.setLayoutitContent(filename);
+        MyReadWriteUtil.writeFileContent(file, questionnaireDto.getLayoutitContent(), "UTF-8");
+        questionnaireDto.setLayoutitContent(filename);
 
-        QuestionnaireDto updatedQuestionnaireDto = questionnaireserviceimpl.save(questionnairedto);
+        QuestionnaireDto updatedquestionnaireDto = questionnaireserviceimpl.save(questionnaireDto);
         return new ModelAndView("redirect:/api/qn/questionnaire");
     }
 

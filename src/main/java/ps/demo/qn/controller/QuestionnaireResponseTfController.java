@@ -1,5 +1,7 @@
 
 
+
+
 package ps.demo.qn.controller;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import lombok.*;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.math.*;
 
@@ -39,20 +43,24 @@ import java.math.*;
 public class QuestionnaireResponseTfController extends MyBaseController {
 
     @Autowired
-    private QuestionnaireResponseServiceImpl questionnaireresponseserviceimpl;
+    private QuestionnaireResponseServiceImpl questionnaireResponseServiceImpl;
 
     @GetMapping("/form")
     public ModelAndView createForm(Model model) {
-        model.addAttribute("questionnaireresponsedto", new QuestionnaireResponseDto());
-        return new ModelAndView("qn/questionnaire-response-form", "questionnaireresponseModel", model);
+        model.addAttribute("questionnaireResponseDto", new QuestionnaireResponseDto());
+        return new ModelAndView("qn/questionnaire-response-form", "questionnaireResponseModel", model);
     }
 
     @PostMapping("/save")
-    public ModelAndView save(QuestionnaireResponseReq questionnaireresponsereq) {
-        QuestionnaireResponseDto questionnaireresponsedto = new QuestionnaireResponseDto();
-        MyBeanUtil.copyProperties(questionnaireresponsereq, questionnaireresponsedto);
-        initBaseCreateModifyTs(questionnaireresponsedto);
-        QuestionnaireResponseDto questionnaireresponseResult = questionnaireresponseserviceimpl.save(questionnaireresponsedto);
+    public ModelAndView save(QuestionnaireResponseReq questionnaireResponseReq, HttpServletRequest request) {
+        QuestionnaireResponseDto questionnaireResponseDto = new QuestionnaireResponseDto();
+        
+            
+            
+        
+        MyBeanUtil.copyProperties(questionnaireResponseReq, questionnaireResponseDto);
+        initBaseCreateModifyTs(questionnaireResponseDto);
+        QuestionnaireResponseDto questionnaireResponseResult = questionnaireResponseServiceImpl.save(questionnaireResponseDto);
         return new ModelAndView("redirect:/api/qn/questionnaire-response");
     }
 
@@ -63,69 +71,75 @@ public class QuestionnaireResponseTfController extends MyBaseController {
 
     @GetMapping
     public ModelAndView query(Model model) {
-        QuestionnaireResponseReq questionnaireresponsereq = new QuestionnaireResponseReq();
-        model.addAttribute("questionnaireresponsereq", questionnaireresponsereq);
-        Pageable pageable = constructPagable(questionnaireresponsereq);
-        Page<QuestionnaireResponseDto> questionnaireresponsedtoPage = questionnaireresponseserviceimpl.findByPage(pageable);
-        MyPageResData<QuestionnaireResponseDto> myPageResData = new MyPageResData<>(questionnaireresponsedtoPage,
-                questionnaireresponsereq.getCurrent(), questionnaireresponsereq.getSize());
-        model.addAttribute("questionnaireresponsereq", questionnaireresponsereq);
+        QuestionnaireResponseReq questionnaireResponseReq = new QuestionnaireResponseReq();
+        model.addAttribute("questionnaireResponseReq", questionnaireResponseReq);
+        Pageable pageable = constructPagable(questionnaireResponseReq);
+        Page<QuestionnaireResponseDto> questionnaireResponseDtoPage = questionnaireResponseServiceImpl.findByPage(pageable);
+        MyPageResData<QuestionnaireResponseDto> myPageResData = new MyPageResData<>(questionnaireResponseDtoPage,
+                questionnaireResponseReq.getCurrent(), questionnaireResponseReq.getSize());
+        model.addAttribute("questionnaireResponseReq", questionnaireResponseReq);
         model.addAttribute("page", myPageResData);
-        return new ModelAndView("qn/questionnaire-response-list", "questionnaireresponseModel", model);
+        return new ModelAndView("qn/questionnaire-response-list", "questionnaireResponseModel", model);
     }
 
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Long id, Model model) {
-        QuestionnaireResponseDto questionnaireresponsedto = questionnaireresponseserviceimpl.findById(id);
-        model.addAttribute("questionnaireresponsedto", questionnaireresponsedto);
-        return new ModelAndView("qn/questionnaire-response-view", "questionnaireresponseModel", model);
+        QuestionnaireResponseDto questionnaireResponseDto = questionnaireResponseServiceImpl.findById(id);
+        model.addAttribute("questionnaireResponseDto", questionnaireResponseDto);
+        return new ModelAndView("qn/questionnaire-response-view", "questionnaireResponseModel", model);
     }
 
     @PostMapping("/list")
-    public ModelAndView list(Model model, QuestionnaireResponseReq questionnaireresponsereq) {
-        Pageable pageable = constructPagable(questionnaireresponsereq);
-        QuestionnaireResponseDto questionnaireresponsedto = new QuestionnaireResponseDto();
-        String key = questionnaireresponsereq.getKey();
+    public ModelAndView list(Model model, QuestionnaireResponseReq questionnaireResponseReq) {
+        Pageable pageable = constructPagable(questionnaireResponseReq);
+        QuestionnaireResponseDto questionnaireResponseDto = new QuestionnaireResponseDto();
+        String key = questionnaireResponseReq.getKey();
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
             
                 
-                questionnaireresponsedto.setUri(percentWrapKey);
+                questionnaireResponseDto.setUri(percentWrapKey);
                 
                 
-                questionnaireresponsedto.setResponseContent(percentWrapKey);
+                questionnaireResponseDto.setResponseContent(percentWrapKey);
                 
             
         }
-        //MyBeanUtil.copyProperties(questionnaireresponsereq, questionnaireresponsedto);
-        Page<QuestionnaireResponseDto> questionnaireresponsedtoPage = questionnaireresponseserviceimpl.findByPage(questionnaireresponsedto, pageable);
-        MyPageResData<QuestionnaireResponseDto> myPageResData = new MyPageResData<>(questionnaireresponsedtoPage,
-                questionnaireresponsereq.getCurrent(), questionnaireresponsereq.getSize());
-        model.addAttribute("questionnaireresponsereq", questionnaireresponsereq);
+        //MyBeanUtil.copyProperties(questionnaireResponseReq, questionnaireResponseDto);
+        Page<QuestionnaireResponseDto> questionnaireResponseDtoPage = questionnaireResponseServiceImpl.findByPage(questionnaireResponseDto, true, pageable);
+        MyPageResData<QuestionnaireResponseDto> myPageResData = new MyPageResData<>(questionnaireResponseDtoPage,
+                questionnaireResponseReq.getCurrent(), questionnaireResponseReq.getSize());
+        model.addAttribute("questionnaireResponseReq", questionnaireResponseReq);
         model.addAttribute("page", myPageResData);
-        return new ModelAndView("qn/questionnaire-response-list", "questionnaireresponseModel", model);
+        return new ModelAndView("qn/questionnaire-response-list", "questionnaireResponseModel", model);
     }
 
     @GetMapping("/modify/{id}")
     public ModelAndView modify(@PathVariable("id") Long id, Model model) {
-        QuestionnaireResponseDto questionnaireresponsedto = questionnaireresponseserviceimpl.findById(id);
-        model.addAttribute("questionnaireresponsedto", questionnaireresponsedto);
-        return new ModelAndView("qn/questionnaire-response-modify", "questionnaireresponseModel", model);
+        QuestionnaireResponseDto questionnaireResponseDto = questionnaireResponseServiceImpl.findById(id);
+        model.addAttribute("questionnaireResponseDto", questionnaireResponseDto);
+        return new ModelAndView("qn/questionnaire-response-modify", "questionnaireResponseModel", model);
     }
 
     @PostMapping("/modify")
-    public ModelAndView saveOrUpdate(QuestionnaireResponseDto questionnaireresponsedto) {
-        initBaseCreateModifyTs(questionnaireresponsedto);
-        QuestionnaireResponseDto updatedQuestionnaireResponseDto = questionnaireresponseserviceimpl.save(questionnaireresponsedto);
+    public ModelAndView saveOrUpdate(QuestionnaireResponseDto questionnaireResponseDto, HttpServletRequest request) {
+        initBaseCreateModifyTs(questionnaireResponseDto);
+        
+            
+            
+        
+        QuestionnaireResponseDto updatedQuestionnaireResponseDto = questionnaireResponseServiceImpl.save(questionnaireResponseDto);
         return new ModelAndView("redirect:/api/qn/questionnaire-response");
     }
 
     @GetMapping("/remove/{id}")
     public ModelAndView remove(@PathVariable("id") Long id) {
-        questionnaireresponseserviceimpl.deleteById(id);
+        questionnaireResponseServiceImpl.deleteById(id);
         return new ModelAndView("redirect:/api/qn/questionnaire-response");
     }
 
 }
+
+
 
 

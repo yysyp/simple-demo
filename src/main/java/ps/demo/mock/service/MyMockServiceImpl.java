@@ -45,109 +45,130 @@ import java.math.*;
 public class MyMockServiceImpl {
 
     @Autowired
-    MyMockDao mymockdao;
+    MyMockDao myMockDao;
 
     @Transactional
-    public MyMockDto save(MyMockDto mymockdto) {
-        MyMock mymock = new MyMock();
-        MyBeanUtil.copyProperties(mymockdto, mymock);
-        MyMock entity = mymockdao.save(mymock);
-        MyBeanUtil.copyProperties(entity, mymockdto);
-        return mymockdto;
+    public MyMockDto save(MyMockDto myMockDto) {
+        MyMock myMock = new MyMock();
+        MyBeanUtil.copyProperties(myMockDto, myMock);
+        MyMock entity = myMockDao.save(myMock);
+        MyBeanUtil.copyProperties(entity, myMockDto);
+        return myMockDto;
     }
 
     @Transactional(readOnly = true)
     public List<MyMockDto> findAll() {
-        List<MyMock> mymockList = mymockdao.findAll();
-        List<MyMockDto> mymockdtoList = new ArrayList<>();
-        for (MyMock mymock : mymockList) {
-            MyMockDto mymockdto = new MyMockDto();
-            MyBeanUtil.copyProperties(mymock, mymockdto);
-            mymockdtoList.add(mymockdto);
+        List<MyMock> myMockList = myMockDao.findAll();
+        List<MyMockDto> myMockDtoList = new ArrayList<>();
+        for (MyMock myMock : myMockList) {
+            MyMockDto myMockDto = new MyMockDto();
+            MyBeanUtil.copyProperties(myMock, myMockDto);
+            myMockDtoList.add(myMockDto);
         }
-        return mymockdtoList;
+        return myMockDtoList;
     }
 
     public MyMockDto findById(Long id) {
-        Optional<MyMock> mymockOptional = mymockdao.findById(id);
-        MyMockDto mymockdto = new MyMockDto();
-        mymockOptional.ifPresent(e -> {
-            MyBeanUtil.copyProperties(e, mymockdto);
+        Optional<MyMock> myMockOptional = myMockDao.findById(id);
+        MyMockDto myMockDto = new MyMockDto();
+        myMockOptional.ifPresent(e -> {
+            MyBeanUtil.copyProperties(e, myMockDto);
         });
-        return mymockdto;
+        return myMockDto;
     }
 
     @Transactional(readOnly = true)
     public Page<MyMockDto> findByPage(Pageable pageable) {
-        Page<MyMock> page = mymockdao.findAll(pageable);
+        Page<MyMock> page = myMockDao.findAll(pageable);
         Page<MyMockDto> pageDto = page.map((e) -> {
-            MyMockDto mymockdto = new MyMockDto();
-            MyBeanUtil.copyProperties(e, mymockdto);
-            return mymockdto;
+            MyMockDto myMockDto = new MyMockDto();
+            MyBeanUtil.copyProperties(e, myMockDto);
+            return myMockDto;
         });
         return pageDto;
     }
 
     @Transactional(readOnly = true)
-    public Page<MyMockDto> findByPage(MyMockDto mymockdto, Pageable pageable) {
-        MyMock mymock = new MyMock();
-        MyBeanUtil.copyProperties(mymockdto, mymock);
-        Specification<MyMock> spec = new Specification<MyMock>() {
-            @Override
-            public Predicate toPredicate(Root<MyMock> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                Predicate predicate = null;
-                    
-                        
-                        
-                        if (StringUtils.isNotBlank(mymock.getUri())) {
-                            predicate = cb.or(cb.like(root.get("uri"), mymock.getUri()));
-                        }
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        if (StringUtils.isNotBlank(mymock.getMethod())) {
-                            predicate = cb.or(predicate, cb.like(root.get("method"), mymock.getMethod()));
-                        }
-                        
-                        
-                        
-                        
-                        
-                        
-                        if (StringUtils.isNotBlank(mymock.getHeaders())) {
-                            predicate = cb.or(predicate, cb.like(root.get("headers"), mymock.getHeaders()));
-                        }
-                        
-                        
-                        
-                        
-                        
-                        if (StringUtils.isNotBlank(mymock.getBody())) {
-                            predicate = cb.or(predicate, cb.like(root.get("body"), mymock.getBody()));
-                        }
-                        
-                        
-                    
-                return predicate;
-            }
-        };
+    public Page<MyMockDto> findByPage(MyMockDto myMockDto, boolean orLike, Pageable pageable) {
+        MyMock myMock = new MyMock();
+        MyBeanUtil.copyProperties(myMockDto, myMock);
+        Specification<MyMock> spec = constructSpecification(myMock, orLike);
 
-        Page<MyMock> page = mymockdao.findAll(spec, pageable);
+        Page<MyMock> page = myMockDao.findAll(spec, pageable);
         Page<MyMockDto> pageDto = page.map((e) -> {
-            MyMockDto mymockdtoResult = new MyMockDto();
-            MyBeanUtil.copyProperties(e, mymockdtoResult);
-            return mymockdtoResult;
+            MyMockDto myMockDtoResult = new MyMockDto();
+            MyBeanUtil.copyProperties(e, myMockDtoResult);
+            return myMockDtoResult;
         });
         return pageDto;
     }
 
+    private Specification<MyMock> constructSpecification(MyMock myMock, boolean orLike) {
+        Specification<MyMock> spec = new Specification<MyMock>() {
+            @Override
+            public Predicate toPredicate(Root<MyMock> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                Predicate predicate = null;
+                
+                    
+                    
+                    if (StringUtils.isNotBlank(myMock.getUri())) {
+                        if (orLike) {
+                            predicate = cb.or(cb.like(root.get("uri"), myMock.getUri()));
+                        } else {
+                            predicate = cb.and(cb.equal(root.get("uri"), myMock.getUri()));
+                        }
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    if (StringUtils.isNotBlank(myMock.getMethod())) {
+                        if (orLike) {
+                            predicate = cb.or(predicate, cb.like(root.get("method"), myMock.getMethod()));
+                        } else {
+                            predicate = cb.and(predicate, cb.equal(root.get("method"), myMock.getMethod()));
+                        }
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    if (StringUtils.isNotBlank(myMock.getHeaders())) {
+                        if (orLike) {
+                            predicate = cb.or(predicate, cb.like(root.get("headers"), myMock.getHeaders()));
+                        } else {
+                            predicate = cb.and(predicate, cb.equal(root.get("headers"), myMock.getHeaders()));
+                        }
+                    }
+                    
+                    
+                    
+                    
+                    
+                    if (StringUtils.isNotBlank(myMock.getBody())) {
+                        if (orLike) {
+                            predicate = cb.or(predicate, cb.like(root.get("body"), myMock.getBody()));
+                        } else {
+                            predicate = cb.and(predicate, cb.equal(root.get("body"), myMock.getBody()));
+                        }
+                    }
+                    
+                    
+                
+                return predicate;
+            }
+        };
+        return spec;
+    }
+
     @Transactional
     public void deleteById(Long id) {
-        mymockdao.deleteById(id);
+        myMockDao.deleteById(id);
     }
 
 
