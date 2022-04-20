@@ -36,7 +36,9 @@ import ps.demo.company.repository.AbcStaffDao;
 import ps.demo.util.MyBeanUtil;
 
 import javax.persistence.criteria.*;
+
 import lombok.*;
+
 import java.util.*;
 import java.math.*;
 
@@ -56,16 +58,16 @@ public class AbcStaffServiceImpl {
         return abcStaffDto;
     }
 
-    @Transactional(readOnly = true)
-    public List<AbcStaffDto> findAll() {
-        List<AbcStaff> abcStaffList = abcStaffDao.findAll();
-        List<AbcStaffDto> abcStaffDtoList = new ArrayList<>();
-        for (AbcStaff abcStaff : abcStaffList) {
-            AbcStaffDto abcStaffDto = new AbcStaffDto();
-            MyBeanUtil.copyProperties(abcStaff, abcStaffDto);
-            abcStaffDtoList.add(abcStaffDto);
+    @Transactional
+    public List<AbcStaffDto> saveAll(Collection<AbcStaffDto> abcStaffDtoList) {
+        if (CollectionUtils.isEmpty(abcStaffDtoList)) {
+            return new ArrayList<>();
         }
-        return abcStaffDtoList;
+        List<AbcStaffDto> result = new ArrayList<>();
+        for (AbcStaffDto abcStaffDto : abcStaffDtoList) {
+            result.add(save(abcStaffDto));
+        }
+        return result;
     }
 
     public AbcStaffDto findById(Long id) {
@@ -77,8 +79,30 @@ public class AbcStaffServiceImpl {
         return abcStaffDto;
     }
 
-    @Transactional(readOnly = true)
-    public Page<AbcStaffDto> findByPage(Pageable pageable) {
+    public List<AbcStaffDto> findByAttribute(String attributeName, Object attribute) {
+        Specification<AbcStaff> spec = new Specification<AbcStaff>() {
+            @Override
+            public Predicate toPredicate(Root<AbcStaff> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.and(cb.equal(root.get(attributeName), attribute));
+            }
+        };
+        List<AbcStaff> abcStaffList = abcStaffDao.findAll(spec);
+        return MyBeanUtil.copyAndConvertItems(abcStaffList, AbcStaffDto.class);
+    }
+
+    //@Transactional(readOnly = true)
+    public List<AbcStaffDto> findAll() {
+        List<AbcStaff> abcStaffList = abcStaffDao.findAll();
+        List<AbcStaffDto> abcStaffDtoList = new ArrayList<>();
+        for (AbcStaff abcStaff : abcStaffList) {
+            AbcStaffDto abcStaffDto = new AbcStaffDto();
+            MyBeanUtil.copyProperties(abcStaff, abcStaffDto);
+            abcStaffDtoList.add(abcStaffDto);
+        }
+        return abcStaffDtoList;
+    }
+
+    public Page<AbcStaffDto> findInPage(Pageable pageable) {
         Page<AbcStaff> page = abcStaffDao.findAll(pageable);
         Page<AbcStaffDto> pageDto = page.map((e) -> {
             AbcStaffDto abcStaffDto = new AbcStaffDto();
@@ -88,8 +112,15 @@ public class AbcStaffServiceImpl {
         return pageDto;
     }
 
-    @Transactional(readOnly = true)
-    public Page<AbcStaffDto> findByPage(AbcStaffDto abcStaffDto, boolean orLike, Pageable pageable) {
+    public List<AbcStaffDto> findByAttributes(AbcStaffDto abcStaffDto, boolean orLike) {
+        AbcStaff abcStaff = new AbcStaff();
+        MyBeanUtil.copyProperties(abcStaffDto, abcStaff);
+        Specification<AbcStaff> spec = constructSpecification(abcStaff, orLike);
+        List<AbcStaff> abcStaffList = abcStaffDao.findAll(spec);
+        return MyBeanUtil.copyAndConvertItems(abcStaffList, AbcStaffDto.class);
+    }
+
+    public Page<AbcStaffDto> findByAttributesInPage(AbcStaffDto abcStaffDto, boolean orLike, Pageable pageable) {
         AbcStaff abcStaff = new AbcStaff();
         MyBeanUtil.copyProperties(abcStaffDto, abcStaff);
         Specification<AbcStaff> spec = constructSpecification(abcStaff, orLike);
@@ -108,52 +139,43 @@ public class AbcStaffServiceImpl {
             @Override
             public Predicate toPredicate(Root<AbcStaff> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Predicate predicate = null;
-                
-                    
-                    
-                    if (StringUtils.isNotBlank(abcStaff.getFirstName())) {
-                        if (orLike) {
-                            predicate = cb.or(cb.like(root.get("firstName"), abcStaff.getFirstName()));
-                        } else {
-                            predicate = cb.and(cb.equal(root.get("firstName"), abcStaff.getFirstName()));
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
-                    if (StringUtils.isNotBlank(abcStaff.getLastName())) {
-                        if (orLike) {
-                            predicate = cb.or(predicate, cb.like(root.get("lastName"), abcStaff.getLastName()));
-                        } else {
-                            predicate = cb.and(predicate, cb.equal(root.get("lastName"), abcStaff.getLastName()));
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    if (StringUtils.isNotBlank(abcStaff.getComments())) {
-                        if (orLike) {
-                            predicate = cb.or(predicate, cb.like(root.get("comments"), abcStaff.getComments()));
-                        } else {
-                            predicate = cb.and(predicate, cb.equal(root.get("comments"), abcStaff.getComments()));
-                        }
-                    }
-                    
-                    
-                    
-                
+                if (orLike) {
+//                    [# th:if="${attr.get('type') eq 'String'}"]
+//                    predicate = orLike(predicate, cb, root,"firstName", abcStaff.getFirstName());
+//                    [/]
+//                    [# th:unless="${attr.get('type') eq 'String'}"]
+//                    predicate = orEqual(predicate, cb, root,"firstName", abcStaff.getFirstName());
+//                    [/]
+                } else {
+                    predicate = andEqual(predicate, cb, root, "firstName", abcStaff.getFirstName());
+                }
+
                 return predicate;
             }
         };
         return spec;
+    }
+
+    private Predicate andEqual(Predicate predicate, CriteriaBuilder cb, Root<AbcStaff> root, String attributeName, Object attributeValue) {
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orEqual(Predicate predicate, CriteriaBuilder cb, Root<AbcStaff> root, String attributeName, Object attributeValue) {
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orLike(Predicate predicate, CriteriaBuilder cb, Root<AbcStaff> root, String attributeName, String attributeValue) {
+        if (null == predicate) {
+            return cb.or(cb.like(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.like(root.get(attributeName), attributeValue));
+        }
     }
 
     @Transactional
@@ -161,7 +183,15 @@ public class AbcStaffServiceImpl {
         abcStaffDao.deleteById(id);
     }
 
+    @Transactional
+    public void deleteAll(Collection<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return;
+        }
+        for (Long id : idList) {
+            deleteById(id);
+        }
+    }
+
 
 }
-
-

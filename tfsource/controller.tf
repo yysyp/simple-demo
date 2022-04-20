@@ -1,5 +1,3 @@
-
-
 package [(${packageName}+'.'+${moduleName}+'.'+${controllerFolder})];
 
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +71,7 @@ public class [(${controllerName})] extends MyBaseController {
         [(${reqName})] [(${reqKey})] = new [(${reqName})]();
         model.addAttribute("[(${reqKey})]", [(${reqKey})]);
         Pageable pageable = constructPagable([(${reqKey})]);
-        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByPage(pageable);
+        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findInPage(pageable);
         MyPageResData<[(${dtoName})]> myPageResData = new MyPageResData<>([(${dtoKey})]Page,
                 [(${reqKey})].getCurrent(), [(${reqKey})].getSize());
         model.addAttribute("[(${reqKey})]", [(${reqKey})]);
@@ -96,13 +94,13 @@ public class [(${controllerName})] extends MyBaseController {
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
             [# th:each="attr,attrStat:${entityAttrs}" ]
-                [# th:if="${attr.get('type') eq 'String'}"]
-                [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](percentWrapKey);
-                [/]
+            [# th:if="${attr.get('type') eq 'String'}"]
+            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](percentWrapKey);
+            [/]
             [/]
         }
         //MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
-        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByPage([(${dtoKey})], true, pageable);
+        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByAttributesInPage([(${dtoKey})], true, pageable);
         MyPageResData<[(${dtoName})]> myPageResData = new MyPageResData<>([(${dtoKey})]Page,
                 [(${reqKey})].getCurrent(), [(${reqKey})].getSize());
         model.addAttribute("[(${reqKey})]", [(${reqKey})]);
@@ -136,5 +134,3 @@ public class [(${controllerName})] extends MyBaseController {
     }
 
 }
-
-

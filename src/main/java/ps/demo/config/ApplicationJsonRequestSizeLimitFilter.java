@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-@Order(-2147483647) //The second outermost order.
+@Order(-2147483646) //The 3rd outermost order.
 public class ApplicationJsonRequestSizeLimitFilter extends OncePerRequestFilter {
 
     @Value("${json.request-size-limit}")

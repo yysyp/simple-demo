@@ -81,7 +81,7 @@ public class AbcStaffTfController extends MyBaseController {
         AbcStaffReq abcStaffReq = new AbcStaffReq();
         model.addAttribute("abcStaffReq", abcStaffReq);
         Pageable pageable = constructPagable(abcStaffReq);
-        Page<AbcStaffDto> abcStaffDtoPage = abcStaffServiceImpl.findByPage(pageable);
+        Page<AbcStaffDto> abcStaffDtoPage = abcStaffServiceImpl.findInPage(pageable);
         MyPageResData<AbcStaffDto> myPageResData = new MyPageResData<>(abcStaffDtoPage,
                 abcStaffReq.getCurrent(), abcStaffReq.getSize());
         model.addAttribute("abcStaffReq", abcStaffReq);
@@ -120,7 +120,7 @@ public class AbcStaffTfController extends MyBaseController {
             
         }
         //MyBeanUtil.copyProperties(abcStaffReq, abcStaffDto);
-        Page<AbcStaffDto> abcStaffDtoPage = abcStaffServiceImpl.findByPage(abcStaffDto, true, pageable);
+        Page<AbcStaffDto> abcStaffDtoPage = abcStaffServiceImpl.findByAttributesInPage(abcStaffDto, true, pageable);
         MyPageResData<AbcStaffDto> myPageResData = new MyPageResData<>(abcStaffDtoPage,
                 abcStaffReq.getCurrent(), abcStaffReq.getSize());
         model.addAttribute("abcStaffReq", abcStaffReq);

@@ -34,7 +34,9 @@ import [(${packageName}+'.'+${moduleName}+'.'+${daoFolder})].[(${daoName})];
 import ps.demo.util.MyBeanUtil;
 
 import javax.persistence.criteria.*;
+
 import lombok.*;
+
 import java.util.*;
 import java.math.*;
 
@@ -54,16 +56,16 @@ public class [(${serviceName})] {
         return [(${dtoKey})];
     }
 
-    @Transactional(readOnly = true)
-    public List<[(${dtoName})]> findAll() {
-        List<[(${entityName})]> [(${entityKey})]List = [(${daoKey})].findAll();
-        List<[(${dtoName})]> [(${dtoKey})]List = new ArrayList<>();
-        for ([(${entityName})] [(${entityKey})] : [(${entityKey})]List) {
-            [(${dtoName})] [(${dtoKey})] = new [(${dtoName})]();
-            MyBeanUtil.copyProperties([(${entityKey})], [(${dtoKey})]);
-            [(${dtoKey})]List.add([(${dtoKey})]);
+    @Transactional
+    public List<[(${dtoName})]> saveAll(Collection<[(${dtoName})]> [(${dtoKey})]List) {
+        if (CollectionUtils.isEmpty([(${dtoKey})]List)) {
+            return new ArrayList<>();
         }
-        return [(${dtoKey})]List;
+        List<[(${dtoName})]> result = new ArrayList<>();
+        for ([(${dtoName})] [(${dtoKey})] : [(${dtoKey})]List) {
+            result.add(save([(${dtoKey})]));
+        }
+        return result;
     }
 
     public [(${dtoName})] findById(Long id) {
@@ -75,8 +77,30 @@ public class [(${serviceName})] {
         return [(${dtoKey})];
     }
 
-    @Transactional(readOnly = true)
-    public Page<[(${dtoName})]> findByPage(Pageable pageable) {
+    public List<[(${dtoName})]> findByAttribute(String attributeName, Object attribute) {
+        Specification<[(${entityName})]> spec = new Specification<[(${entityName})]>() {
+            @Override
+            public Predicate toPredicate(Root<[(${entityName})]> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.and(cb.equal(root.get(attributeName), attribute));
+            }
+        };
+        List<[(${entityName})]> [(${entityKey})]List = [(${daoKey})].findAll(spec);
+        return MyBeanUtil.copyAndConvertItems([(${entityKey})]List, [(${dtoName})].class);
+    }
+
+    //@Transactional(readOnly = true)
+    public List<[(${dtoName})]> findAll() {
+        List<[(${entityName})]> [(${entityKey})]List = [(${daoKey})].findAll();
+        List<[(${dtoName})]> [(${dtoKey})]List = new ArrayList<>();
+        for ([(${entityName})] [(${entityKey})] : [(${entityKey})]List) {
+            [(${dtoName})] [(${dtoKey})] = new [(${dtoName})]();
+            MyBeanUtil.copyProperties([(${entityKey})], [(${dtoKey})]);
+            [(${dtoKey})]List.add([(${dtoKey})]);
+        }
+        return [(${dtoKey})]List;
+    }
+
+    public Page<[(${dtoName})]> findInPage(Pageable pageable) {
         Page<[(${entityName})]> page = [(${daoKey})].findAll(pageable);
         Page<[(${dtoName})]> pageDto = page.map((e) -> {
             [(${dtoName})] [(${dtoKey})] = new [(${dtoName})]();
@@ -86,8 +110,15 @@ public class [(${serviceName})] {
         return pageDto;
     }
 
-    @Transactional(readOnly = true)
-    public Page<[(${dtoName})]> findByPage([(${dtoName})] [(${dtoKey})], boolean orLike, Pageable pageable) {
+    public List<[(${dtoName})]> findByAttributes([(${dtoName})] [(${dtoKey})], boolean orLike) {
+        [(${entityName})] [(${entityKey})] = new [(${entityName})]();
+        MyBeanUtil.copyProperties([(${dtoKey})], [(${entityKey})]);
+        Specification<[(${entityName})]> spec = constructSpecification([(${entityKey})], orLike);
+        List<[(${entityName})]> [(${entityKey})]List = [(${daoKey})].findAll(spec);
+        return MyBeanUtil.copyAndConvertItems([(${entityKey})]List, [(${dtoName})].class);
+    }
+
+    public Page<[(${dtoName})]> findByAttributesInPage([(${dtoName})] [(${dtoKey})], boolean orLike, Pageable pageable) {
         [(${entityName})] [(${entityKey})] = new [(${entityName})]();
         MyBeanUtil.copyProperties([(${dtoKey})], [(${entityKey})]);
         Specification<[(${entityName})]> spec = constructSpecification([(${entityKey})], orLike);
@@ -106,32 +137,56 @@ public class [(${serviceName})] {
             @Override
             public Predicate toPredicate(Root<[(${entityName})]> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Predicate predicate = null;
+                if (orLike) {
                 [# th:each="attr,attrStat:${entityAttrs}" ]
                     [# th:if="${attr.get('type') eq 'String'}"]
-                    [# th:if="${attrStat.index eq 0}"]
-                    if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
-                        if (orLike) {
-                            predicate = cb.or(cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        } else {
-                            predicate = cb.and(cb.equal(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        }
-                    }
+                    predicate = orLike(predicate, cb, root,"[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());
                     [/]
-                    [# th:if="${attrStat.index neq 0}"]
-                    if (StringUtils.isNotBlank([(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]())) {
-                        if (orLike) {
-                            predicate = cb.or(predicate, cb.like(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        } else {
-                            predicate = cb.and(predicate, cb.equal(root.get("[(${attr.get('name')})]"), [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]()));
-                        }
-                    }
-                    [/]
+                    [# th:unless="${attr.get('type') eq 'String'}"]
+                    predicate = orEqual(predicate, cb, root,"[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());
                     [/]
                 [/]
+                } else {
+                [# th:each="attr,attrStat:${entityAttrs}" ]
+                    predicate = andEqual(predicate, cb, root, "[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());
+                [/]
+                }
+
                 return predicate;
             }
         };
         return spec;
+    }
+
+    private Predicate andEqual(Predicate predicate, CriteriaBuilder cb, Root<[(${entityName})]> root, String attributeName, Object attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orEqual(Predicate predicate, CriteriaBuilder cb, Root<[(${entityName})]> root, String attributeName, Object attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orLike(Predicate predicate, CriteriaBuilder cb, Root<[(${entityName})]> root, String attributeName, String attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.like(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.like(root.get(attributeName), attributeValue));
+        }
     }
 
     @Transactional
@@ -139,5 +194,14 @@ public class [(${serviceName})] {
         [(${daoKey})].deleteById(id);
     }
 
+    @Transactional
+    public void deleteAll(Collection<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return;
+        }
+        for (Long id : idList) {
+            deleteById(id);
+        }
+    }
 
 }

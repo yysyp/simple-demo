@@ -7,6 +7,7 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -91,7 +92,12 @@ public class MyBeanUtil {
 
 
     public static void copyProperties(Object source, Object target) {
-        BeanUtils.copyProperties(source, target);
+        MyMapperUtil.convert(source, target);
+        //BeanUtils.copyProperties(source, target);
+    }
+
+    public static <T> List<T> copyAndConvertItems(Collection srcList, Class<T> targetItemType) {
+        return MyMapperUtil.convert(srcList, targetItemType);
     }
 
 }

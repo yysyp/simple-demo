@@ -30,7 +30,6 @@ import ps.demo.qn.dto.QuestionnaireReq;
 import ps.demo.qn.dto.QuestionnaireResponseDto;
 import ps.demo.qn.service.QuestionnaireResponseServiceImpl;
 import ps.demo.qn.service.QuestionnaireServiceImpl;
-import ps.demo.school.dto.StudentDto;
 import ps.demo.util.MyBeanUtil;
 import ps.demo.util.MyDbUtils;
 import ps.demo.util.MyJsonUtil;
