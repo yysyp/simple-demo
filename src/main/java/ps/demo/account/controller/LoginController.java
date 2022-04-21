@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import ps.demo.account.dto.*;
+import ps.demo.account.helper.MyErrorUtils;
 import ps.demo.account.helper.MyPrincipalUtils;
 import ps.demo.account.model.LoginUserDetail;
 import ps.demo.account.service.LoginServiceImpl;
@@ -50,11 +51,14 @@ public class LoginController extends MyBaseController {
     }
 
     @PostMapping("/")
-    public ModelAndView login(LoginReq loginReq) {
+    public ModelAndView login(LoginReq loginReq, Model model) {
         log.info("Login loginReq={}", loginReq);
+        model.addAttribute("loginReq", loginReq);
         LoginUserDetail loginUserDetail = loginServiceImpl.findUserByUserName(loginReq.getUsername());
         if (loginUserDetail.getDisabled() != null && loginUserDetail.getDisabled()) {
-            throw new BadRequestException(CodeEnum.FORBIDDEN);
+            MyErrorUtils.setLastError(new BadRequestException(CodeEnum.FORBIDDEN), null);
+            return new ModelAndView("login", "loginModel", model);
+            //throw new BadRequestException(CodeEnum.FORBIDDEN);
         }
         if (!MyMD5Util.checkPassword(loginReq.getPassword(), loginUserDetail.getPassword())) {
             Integer failedCount = loginUserDetail.getFailedCount();
@@ -66,14 +70,15 @@ public class LoginController extends MyBaseController {
                 loginUserDetail.setDisabled(true);
             }
             loginUserService.save(loginUserDetail);
-            throw new BadRequestException(CodeEnum.UNAUTHORIZED);
+            MyErrorUtils.setLastError(new BadRequestException(CodeEnum.UNAUTHORIZED), null);
+            return new ModelAndView("login", "loginModel", model);
+            //throw new BadRequestException(CodeEnum.UNAUTHORIZED);
         }
+        loginUserDetail.setPassword("");
         List<UserRoleDto> userRoleDtoList = userRoleService.findByAttribute("userId", loginUserDetail.getId());
         loginUserDetail.setRoles(userRoleDtoList);
-
         MyPrincipalUtils.setCurrentUser(loginUserDetail);
-        String swaggerUi = "/springdoc/swagger-ui/index.html?configUrl=/springdoc/api-docs/swagger-config";
-        return new ModelAndView("redirect:" + swaggerUi);
+        return new ModelAndView("redirect:/api/home/home-tmlf");
     }
 
 

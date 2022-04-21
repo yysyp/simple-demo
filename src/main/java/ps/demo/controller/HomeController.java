@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import ps.demo.account.helper.MyPrincipalUtils;
+import ps.demo.account.model.LoginUserDetail;
 import ps.demo.common.MyBaseController;
 import ps.demo.util.MyTimeUtil;
 
@@ -18,24 +20,28 @@ import java.util.Map;
 @Tag(name = "This is a greeting controller")
 @Slf4j
 @Controller
-@RequestMapping("/api/greeting/greeting-tmlf")
-public class GreetingController extends MyBaseController {
+@RequestMapping("/api/home")
+public class HomeController extends MyBaseController {
 
-    @Operation(summary = "To query and list data")
-    @GetMapping
-    public ModelAndView query(Model model) {
-        model.addAttribute("title", "Query Data:");
+    @Operation(summary = "Home page for login user")
+    @GetMapping("/home-tmlf")
+    public ModelAndView home(Model model) {
         //model.addAttribute("orderTrackingQueryRequest", new OrderTrackingQueryRequest());
         //MyPageResponse<OrderTrackingDto> myPageResponse = new MyPageResponse<>(new ArrayList<>());
 
         Map greeting = new HashMap();
-        greeting.put("name", "GreetingController");
+        greeting.put("name", "HomeController");
         greeting.put("date", MyTimeUtil.getNowStryMdTHmsS());
         model.addAttribute("greeting", greeting);
         //Render templates/greeting.html page
-        return new ModelAndView("greeting", "greeting", greeting);
+        return new ModelAndView("home", "homeModel", greeting);
         //return new ModelAndView("redirect:/api/system/order-tracking-tmlf");
     }
 
+    @GetMapping("/change-password")
+    public ModelAndView changePassword(Model model) {
+        LoginUserDetail loginUserDetail = MyPrincipalUtils.getCurrentUser();
+        return new ModelAndView("account/changepassword", "homeModel", null);
+    }
 
 }

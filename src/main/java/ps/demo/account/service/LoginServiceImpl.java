@@ -47,16 +47,13 @@ public class LoginServiceImpl {
                 .withIgnorePaths("password");//ignore password, what ever the password value passed in will be ignored
         Example<LoginUser> example = Example.of(loginUser, matcher);
         Optional<LoginUser> loginUserOptional = loginUserDao.findOne(example);
+        LoginUserDetail loginUserDetail = new LoginUserDetail();
         if (!loginUserOptional.isPresent()) {
-            throw new BadRequestException(CodeEnum.UNAUTHORIZED);
+            return loginUserDetail;
         }
         LoginUser loginUserResult = loginUserOptional.get();
-        LoginUserDetail loginUserDetail = new LoginUserDetail();
         MyBeanUtil.copyProperties(loginUserResult, loginUserDetail);
-
-
 //        userRoleDao.findAll()
-
         return loginUserDetail;
     }
 
