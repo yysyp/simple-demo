@@ -14,12 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ps.demo.account.dto.LoginUserDto;
 import ps.demo.account.entity.LoginUser;
+import ps.demo.account.entity.UserRole;
+import ps.demo.account.helper.MyPrincipalUtils;
 import ps.demo.account.model.LoginUserDetail;
 import ps.demo.account.repository.LoginUserDao;
 
+import ps.demo.account.repository.UserRoleDao;
 import ps.demo.exception.BadRequestException;
 import ps.demo.exception.CodeEnum;
 import ps.demo.util.MyBeanUtil;
+import ps.demo.util.MyMD5Util;
+import ps.demo.util.MyStringUtil;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -37,6 +42,29 @@ public class LoginServiceImpl {
     LoginUserDao loginUserDao;
 
 
+    @Autowired
+    UserRoleDao userRoleDao;
+
+
+    public String givemethekey() {
+        long c = loginUserDao.count();
+        if (c == 0) {
+            LoginUser loginUser = new LoginUser();
+            loginUser.setUserName(MyPrincipalUtils.ROLE_ADMIN);
+            String random = MyStringUtil.randomAlphabetic(16);
+            loginUser.setPassword(MyMD5Util.getMD5(random));
+            LoginUser admin = loginUserDao.save(loginUser);
+
+            UserRole role = new UserRole();
+            role.setRoleId(0L);
+            role.setUserId(admin.getId());
+            role.setRoleName(MyPrincipalUtils.ROLE_ADMIN);
+            userRoleDao.save(role);
+
+            return random;
+        }
+        return "";
+    }
 
     public LoginUserDetail findUserByUserName(String username) {
         LoginUser loginUser = new LoginUser();
@@ -49,7 +77,7 @@ public class LoginServiceImpl {
         Optional<LoginUser> loginUserOptional = loginUserDao.findOne(example);
         LoginUserDetail loginUserDetail = new LoginUserDetail();
         if (!loginUserOptional.isPresent()) {
-            return loginUserDetail;
+            return null;
         }
         LoginUser loginUserResult = loginUserOptional.get();
         MyBeanUtil.copyProperties(loginUserResult, loginUserDetail);

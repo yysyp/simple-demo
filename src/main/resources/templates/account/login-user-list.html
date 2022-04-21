@@ -48,7 +48,7 @@
                         <td>ID</td>
                     
                         <td>userName</td>
-                        <td>password</td>
+
                         <td>firstName</td>
                         <td>lastName</td>
                         <td>sex</td>
@@ -69,7 +69,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${loginUserModel.page.list.size()} eq 0">
-                        <td th:colspan="19">No data!</td>
+                        <td th:colspan="18">No data!</td>
                     </tr>
                     <tr th:each="loginUserDto:${loginUserModel.page.list}">
                         <td style="white-space: nowrap;">
@@ -80,7 +80,7 @@
                         <td th:text="${loginUserDto.id}"></td>
                         
                             <td th:text="${loginUserDto.userName}"></td>
-                            <td th:text="${loginUserDto.password}"></td>
+
                             <td th:text="${loginUserDto.firstName}"></td>
                             <td th:text="${loginUserDto.lastName}"></td>
                             <td th:text="${loginUserDto.sex}"></td>

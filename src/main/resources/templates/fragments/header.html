@@ -9,6 +9,13 @@
 <div th:fragment="header" class="header-container">
     <h1>simple-demo</h1>
     <div style="text-align: right;">
+        <div
+             th:if="${session['USER_DETAIL_PRINCIPAL_KEY'] != null}"
+             th:with="userName=${session['USER_DETAIL_PRINCIPAL_KEY'].userName}">
+            <span th:text="${userName}"></span>
+            <a href="/api/login/logout" >logout</a>
+        </div>
+
 <!--        <div sec:authorize="isAnonymous()">-->
 <!--            <a th:href="@{/}">Login</a>-->
 <!--        </div>-->

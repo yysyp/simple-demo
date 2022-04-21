@@ -5,8 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<a th:href="@{/api/home/change-password}">[Change password]</a>
-<a href="/api/login/logout" >logout</a> |
+<a href="/" >Index</a><br/>
+<a th:href="@{/api/login/change-password}">[Change password]</a> <br/>
+<a th:href="@{/api/admin/login-user/form}">[Add User]</a> <br/>
+<a href="/api/login/logout" >Logout</a><br/>
 greeting
 Greeting:
 <p th:text="'Hello, ' + ${greeting.name} + '!'" />

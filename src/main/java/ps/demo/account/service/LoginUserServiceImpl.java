@@ -102,6 +102,7 @@ public class LoginUserServiceImpl {
         return loginUserDtoList;
     }
 
+
     public Page<LoginUserDto> findInPage(Pageable pageable) {
         Page<LoginUser> page = loginUserDao.findAll(pageable);
         Page<LoginUserDto> pageDto = page.map((e) -> {

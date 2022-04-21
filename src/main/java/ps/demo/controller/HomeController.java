@@ -38,10 +38,5 @@ public class HomeController extends MyBaseController {
         //return new ModelAndView("redirect:/api/system/order-tracking-tmlf");
     }
 
-    @GetMapping("/change-password")
-    public ModelAndView changePassword(Model model) {
-        LoginUserDetail loginUserDetail = MyPrincipalUtils.getCurrentUser();
-        return new ModelAndView("account/changepassword", "homeModel", null);
-    }
 
 }

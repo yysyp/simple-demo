@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
+import ps.demo.annotation.MyPermission;
 import ps.demo.common.MyBaseController;
 import ps.demo.common.MyPageReq;
 import ps.demo.common.MyPageResData;
@@ -45,12 +46,14 @@ public class UserRoleTfController extends MyBaseController {
     @Autowired
     private UserRoleServiceImpl userRoleServiceImpl;
 
+    @MyPermission(roles="admin")
     @GetMapping("/form")
     public ModelAndView createForm(Model model) {
         model.addAttribute("userRoleDto", new UserRoleDto());
         return new ModelAndView("account/user-role-form", "userRoleModel", model);
     }
 
+    @MyPermission(roles="admin")
     @PostMapping("/save")
     public ModelAndView save(UserRoleReq userRoleReq, HttpServletRequest request) {
         UserRoleDto userRoleDto = new UserRoleDto();
@@ -65,11 +68,13 @@ public class UserRoleTfController extends MyBaseController {
         return new ModelAndView("redirect:/api/account/user-role");
     }
 
+    @MyPermission(roles="admin")
     @GetMapping("/list")
     public ModelAndView navigateToQuery() {
         return new ModelAndView("redirect:/api/account/user-role");
     }
 
+    @MyPermission(roles="admin")
     @GetMapping
     public ModelAndView query(Model model) {
         UserRoleReq userRoleReq = new UserRoleReq();
@@ -83,6 +88,7 @@ public class UserRoleTfController extends MyBaseController {
         return new ModelAndView("account/user-role-list", "userRoleModel", model);
     }
 
+    @MyPermission(roles="admin")
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Long id, Model model) {
         UserRoleDto userRoleDto = userRoleServiceImpl.findById(id);
@@ -90,6 +96,7 @@ public class UserRoleTfController extends MyBaseController {
         return new ModelAndView("account/user-role-view", "userRoleModel", model);
     }
 
+    @MyPermission(roles="admin")
     @PostMapping("/list")
     public ModelAndView list(Model model, UserRoleReq userRoleReq) {
         Pageable pageable = constructPagable(userRoleReq);
@@ -114,6 +121,7 @@ public class UserRoleTfController extends MyBaseController {
         return new ModelAndView("account/user-role-list", "userRoleModel", model);
     }
 
+    @MyPermission(roles="admin")
     @GetMapping("/modify/{id}")
     public ModelAndView modify(@PathVariable("id") Long id, Model model) {
         UserRoleDto userRoleDto = userRoleServiceImpl.findById(id);
@@ -121,6 +129,7 @@ public class UserRoleTfController extends MyBaseController {
         return new ModelAndView("account/user-role-modify", "userRoleModel", model);
     }
 
+    @MyPermission(roles="admin")
     @PostMapping("/modify")
     public ModelAndView saveOrUpdate(UserRoleDto userRoleDto, HttpServletRequest request) {
         initBaseCreateModifyTs(userRoleDto);
@@ -133,6 +142,7 @@ public class UserRoleTfController extends MyBaseController {
         return new ModelAndView("redirect:/api/account/user-role");
     }
 
+    @MyPermission(roles="admin")
     @GetMapping("/remove/{id}")
     public ModelAndView remove(@PathVariable("id") Long id) {
         userRoleServiceImpl.deleteById(id);

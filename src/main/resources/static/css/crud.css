@@ -18,6 +18,28 @@ form {
 .form-container {
   display: inline-block;
 }
+
+.form-container table {
+    table-layout: fixed;
+    word-break: break-all;
+    word-wrap: break-word;
+    width: 100%;
+}
+
+.form-container table td label {
+   margin-bottom: 0.5rem;
+}
+
+.loginForm .toright {
+    text-align: right;
+}
+.loginForm .toleft {
+    text-align: left;
+}
+.loginForm .tocenter {
+    text-align: center;
+}
+
 .query-container {
     margin-bottom: 0.5rem;
 }
@@ -63,6 +85,15 @@ color: #00F;
 color: #000;
 }
 
-tbody, td, tfoot, th, thead, tr {
+td {
     border-width: 1px;
+}
+td.toright {
+    border-width: 0px;
+}
+td.toleft {
+    border-width: 0px;
+}
+td.tocenter {
+    border-width: 0px;
 }

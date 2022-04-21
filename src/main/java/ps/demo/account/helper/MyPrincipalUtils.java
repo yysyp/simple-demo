@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 
 public class MyPrincipalUtils {
 
+    public static final String ROLE_USER = "user";
+    public static final String ROLE_ADMIN = "admin";
+
     public static final String USER_DETAIL_PRINCIPAL_KEY = "USER_DETAIL_PRINCIPAL_KEY";
 
     public static void setCurrentUser(LoginUserDetail loginUserDetail) {
@@ -57,6 +60,10 @@ public class MyPrincipalUtils {
         return -1L;
     }
 
+    public static boolean isAdmin() {
+        return hasRoles(ROLE_ADMIN);
+    }
+
     public static boolean hasRoles(String ... roles) {
         LoginUserDetail curUser = getCurrentUser();
         if (curUser == null) {
@@ -76,7 +83,7 @@ public class MyPrincipalUtils {
                 }
             }
         }
-        return true;
+        return false;
     }
 
 
