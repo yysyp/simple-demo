@@ -26,7 +26,7 @@
     <table>
     <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
     [# th:each="attr,attrStat:${entityAttrs}" ]
-    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%"><span th:text="*{[(${attr.get('name')})]}" ></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>[(${attr.get('name')})]:</label></td><td width="75%">[(${tfUtil.formItem(attr, true)})]</span><label> &nbsp;</label></td></tr>
     [/]
     </table>
     </form>

@@ -1,7 +1,6 @@
 
 
 
-
 package ps.demo.mock.controller;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +28,8 @@ import org.springframework.web.servlet.ModelAndView;
 import ps.demo.common.MyBaseController;
 import ps.demo.common.MyPageReq;
 import ps.demo.common.MyPageResData;
+import ps.demo.exception.BadRequestException;
+import ps.demo.exception.CodeEnum;
 import ps.demo.mock.dto.MyMockDto;
 import ps.demo.mock.dto.MyMockReq;
 import ps.demo.mock.service.MyMockServiceImpl;
@@ -37,6 +38,7 @@ import ps.demo.util.MyBeanUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import lombok.*;
 import ps.demo.util.MyJsonUtil;
 import ps.demo.util.MyRegexUtil;
@@ -107,17 +109,13 @@ public class MyMockTfController extends MyBaseController {
     @PostMapping("/save")
     public ModelAndView save(MyMockReq myMockReq, HttpServletRequest request) {
         MyMockDto myMockDto = new MyMockDto();
-        
-            
-            
-            myMockDto.setRegexMatch(null != request.getParameter("regexMatch"));
-            
-            
-            
-            
-            
-        
+
+        myMockDto.setRegexMatch(null != request.getParameter("regexMatch"));
+
         MyBeanUtil.copyProperties(myMockReq, myMockDto);
+        if(CollectionUtils.isNotEmpty(myMockServiceImpl.findByAttribute("uri", myMockDto.getUri()))) {
+            throw new BadRequestException(CodeEnum.DUPLICATED_KEY);
+        }
         initBaseCreateModifyTs(myMockDto);
         MyMockDto myMockResult = myMockServiceImpl.save(myMockDto);
         return new ModelAndView("redirect:/mock");
@@ -133,7 +131,7 @@ public class MyMockTfController extends MyBaseController {
         MyMockReq myMockReq = new MyMockReq();
         model.addAttribute("myMockReq", myMockReq);
         Pageable pageable = constructPagable(myMockReq);
-        Page<MyMockDto> myMockDtoPage = myMockServiceImpl.findByPage(pageable);
+        Page<MyMockDto> myMockDtoPage = myMockServiceImpl.findInPage(pageable);
         MyPageResData<MyMockDto> myPageResData = new MyPageResData<>(myMockDtoPage,
                 myMockReq.getCurrent(), myMockReq.getSize());
         model.addAttribute("myMockReq", myMockReq);
@@ -155,25 +153,15 @@ public class MyMockTfController extends MyBaseController {
         String key = myMockReq.getKey();
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
-            
-                
-                myMockDto.setUri(percentWrapKey);
-                
-                
-                
-                myMockDto.setMethod(percentWrapKey);
-                
-                
-                
-                myMockDto.setHeaders(percentWrapKey);
-                
-                
-                myMockDto.setBody(percentWrapKey);
-                
-            
+
+            myMockDto.setUri(percentWrapKey);
+            myMockDto.setMethod(percentWrapKey);
+            myMockDto.setHeaders(percentWrapKey);
+            myMockDto.setBody(percentWrapKey);
+
         }
         //MyBeanUtil.copyProperties(myMockReq, myMockDto);
-        Page<MyMockDto> myMockDtoPage = myMockServiceImpl.findByPage(myMockDto, true, pageable);
+        Page<MyMockDto> myMockDtoPage = myMockServiceImpl.findByAttributesInPage(myMockDto, true, pageable);
         MyPageResData<MyMockDto> myPageResData = new MyPageResData<>(myMockDtoPage,
                 myMockReq.getCurrent(), myMockReq.getSize());
         model.addAttribute("myMockReq", myMockReq);
@@ -191,16 +179,11 @@ public class MyMockTfController extends MyBaseController {
     @PostMapping("/modify")
     public ModelAndView saveOrUpdate(MyMockDto myMockDto, HttpServletRequest request) {
         initBaseCreateModifyTs(myMockDto);
-        
-            
-            
-            myMockDto.setRegexMatch(null != request.getParameter("regexMatch"));
-            
-            
-            
-            
-            
-        
+
+        myMockDto.setRegexMatch(null != request.getParameter("regexMatch"));
+        if(CollectionUtils.isNotEmpty(myMockServiceImpl.findByAttribute("uri", myMockDto.getUri()))) {
+            throw new BadRequestException(CodeEnum.DUPLICATED_KEY);
+        }
         MyMockDto updatedMyMockDto = myMockServiceImpl.save(myMockDto);
         return new ModelAndView("redirect:/mock");
     }

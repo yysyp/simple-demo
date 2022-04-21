@@ -48,8 +48,13 @@ public class [(${controllerName})] extends MyBaseController {
     }
 
     @PostMapping("/save")
-    public ModelAndView save([(${reqName})] [(${reqKey})]) {
+    public ModelAndView save([(${reqName})] [(${reqKey})], HttpServletRequest request) {
         [(${dtoName})] [(${dtoKey})] = new [(${dtoName})]();
+        [# th:each="attr,attrStat:${entityAttrs}" ]
+            [# th:if="${attr.get('type') eq 'Boolean'}"]
+            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));
+            [/]
+        [/]
         MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
         initBaseCreateModifyTs([(${dtoKey})]);
         [(${dtoName})] [(${entityKey})]Result = [(${serviceKey})].save([(${dtoKey})]);
@@ -66,7 +71,7 @@ public class [(${controllerName})] extends MyBaseController {
         [(${reqName})] [(${reqKey})] = new [(${reqName})]();
         model.addAttribute("[(${reqKey})]", [(${reqKey})]);
         Pageable pageable = constructPagable([(${reqKey})]);
-        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByPage(pageable);
+        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findInPage(pageable);
         MyPageResData<[(${dtoName})]> myPageResData = new MyPageResData<>([(${dtoKey})]Page,
                 [(${reqKey})].getCurrent(), [(${reqKey})].getSize());
         model.addAttribute("[(${reqKey})]", [(${reqKey})]);
@@ -89,13 +94,13 @@ public class [(${controllerName})] extends MyBaseController {
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
             [# th:each="attr,attrStat:${entityAttrs}" ]
-                [# th:if="${attr.get('type') eq 'String'}"]
-                [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](percentWrapKey);
-                [/]
+            [# th:if="${attr.get('type') eq 'String'}"]
+            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](percentWrapKey);
+            [/]
             [/]
         }
         //MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
-        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByPage([(${dtoKey})], pageable);
+        Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByAttributesInPage([(${dtoKey})], true, pageable);
         MyPageResData<[(${dtoName})]> myPageResData = new MyPageResData<>([(${dtoKey})]Page,
                 [(${reqKey})].getCurrent(), [(${reqKey})].getSize());
         model.addAttribute("[(${reqKey})]", [(${reqKey})]);
@@ -111,8 +116,13 @@ public class [(${controllerName})] extends MyBaseController {
     }
 
     @PostMapping("/modify")
-    public ModelAndView saveOrUpdate([(${dtoName})] [(${dtoKey})]) {
+    public ModelAndView saveOrUpdate([(${dtoName})] [(${dtoKey})], HttpServletRequest request) {
         initBaseCreateModifyTs([(${dtoKey})]);
+        [# th:each="attr,attrStat:${entityAttrs}" ]
+            [# th:if="${attr.get('type') eq 'Boolean'}"]
+            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));
+            [/]
+        [/]
         [(${dtoName})] updated[(${dtoName})] = [(${serviceKey})].save([(${dtoKey})]);
         return new ModelAndView("redirect:/api/[(${moduleName})]/[(${uriName})]");
     }

@@ -1,6 +1,6 @@
 
 
-package ps.demo.qn.controller;
+package ps.demo.qnpoll.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/qn/poll")
+@RequestMapping(value = "/api/qnpoll")
 public class PollController extends MyBaseController {
 
     @Autowired
@@ -83,16 +83,6 @@ public class PollController extends MyBaseController {
         questionnaireresponseserviceimpl.save(questionnaireResponseDto);
 
         return WC_COMPLETED;
-    }
-
-    @GetMapping("/mock/**")
-    public String mockUriTest(HttpServletRequest request) {
-        String pattern = (String)
-                request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-
-        String searchTerm = new AntPathMatcher().extractPathWithinPattern(pattern,
-                request.getServletPath());
-        return searchTerm;
     }
 
     public static final String HTML_BEFORE = "<html>\n" +

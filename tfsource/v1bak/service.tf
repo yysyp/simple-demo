@@ -138,10 +138,14 @@ public class [(${serviceName})] {
             public Predicate toPredicate(Root<[(${entityName})]> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Predicate predicate = null;
                 if (orLike) {
-                [# th:each="attr,attrStat:${entityAttrs}" ][# th:if="${attr.get('type') eq 'String'}"]
-                    predicate = orLike(predicate, cb, root,"[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());[/][# th:unless="${attr.get('type') eq 'String'}"]
-                    predicate = orEqual(predicate, cb, root,"[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());[/][/]
-
+                [# th:each="attr,attrStat:${entityAttrs}" ]
+                    [# th:if="${attr.get('type') eq 'String'}"]
+                    predicate = orLike(predicate, cb, root,"[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());
+                    [/]
+                    [# th:unless="${attr.get('type') eq 'String'}"]
+                    predicate = orEqual(predicate, cb, root,"[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());
+                    [/]
+                [/]
                 } else {
                 [# th:each="attr,attrStat:${entityAttrs}" ]
                     predicate = andEqual(predicate, cb, root, "[(${attr.get('name')})]", [(${entityKey})].get[(${#strings.capitalizeWords(attr.get('name'))})]());

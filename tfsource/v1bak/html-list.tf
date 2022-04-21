@@ -42,27 +42,28 @@
                 <table class="list-table" border="1" cellspacing="0" cellpadding="0">
                     <thead>
                     <tr>
+                        <td width="120px">Operations</td>
                         <td>ID</td>
                     [# th:each="attr,attrStat:${entityAttrs}" ]
                         <td>[(${attr.get('name')})]</td>
                     [/]
-                        <td>Operations</td>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:if="${[(${entityKey})]Model.page.list.size()} eq 0">
-                        <td th:colspan="${10 + 1}">No data!</td>
+                        <td th:colspan="[(${entityAttrs.size} + 2)]">No data!</td>
                     </tr>
                     <tr th:each="[(${dtoKey})]:${[(${entityKey})]Model.page.list}">
+                        <td style="white-space: nowrap;">
+                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/'+${[(${dtoKey})].id}}" title="View Detail">[V]</a>&nbsp;
+                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/remove/'+${[(${dtoKey})].id}}" title="Delete">[D]</a>&nbsp;
+                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/modify/'+${[(${dtoKey})].id}}" title="Modify">[M]</a>
+                        </td>
                         <td th:text="${[(${dtoKey})].id}"></td>
                         [# th:each="attr,attrStat:${entityAttrs}" ]
                             <td th:text="${[(${dtoKey})].[(${attr.get('name')})]}"></td>
                         [/]
-                        <td>
-                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/'+${[(${dtoKey})].id}}">View</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/remove/'+${[(${dtoKey})].id}}">Remove</a>&nbsp;|&nbsp;
-                            <a th:href="@{'/api/[(${moduleName})]/[(${uriName})]/modify/'+${[(${dtoKey})].id}}">Modify</a>
-                        </td>
+
                     </tr>
                     </tbody>
                 </table>

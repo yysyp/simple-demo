@@ -50,11 +50,9 @@ public class [(${controllerName})] extends MyBaseController {
     @PostMapping("/save")
     public ModelAndView save([(${reqName})] [(${reqKey})], HttpServletRequest request) {
         [(${dtoName})] [(${dtoKey})] = new [(${dtoName})]();
-        [# th:each="attr,attrStat:${entityAttrs}" ]
-            [# th:if="${attr.get('type') eq 'Boolean'}"]
-            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));
-            [/]
-        [/]
+        [# th:each="attr,attrStat:${entityAttrs}" ][# th:if="${attr.get('type') eq 'Boolean'}"]
+        [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));[/][/]
+
         MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
         initBaseCreateModifyTs([(${dtoKey})]);
         [(${dtoName})] [(${entityKey})]Result = [(${serviceKey})].save([(${dtoKey})]);
@@ -93,11 +91,9 @@ public class [(${controllerName})] extends MyBaseController {
         String key = [(${reqKey})].getKey();
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
-            [# th:each="attr,attrStat:${entityAttrs}" ]
-            [# th:if="${attr.get('type') eq 'String'}"]
-            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](percentWrapKey);
-            [/]
-            [/]
+            [# th:each="attr,attrStat:${entityAttrs}" ][# th:if="${attr.get('type') eq 'String'}"]
+            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](percentWrapKey);[/][/]
+
         }
         //MyBeanUtil.copyProperties([(${reqKey})], [(${dtoKey})]);
         Page<[(${dtoName})]> [(${dtoKey})]Page = [(${serviceKey})].findByAttributesInPage([(${dtoKey})], true, pageable);
@@ -118,11 +114,9 @@ public class [(${controllerName})] extends MyBaseController {
     @PostMapping("/modify")
     public ModelAndView saveOrUpdate([(${dtoName})] [(${dtoKey})], HttpServletRequest request) {
         initBaseCreateModifyTs([(${dtoKey})]);
-        [# th:each="attr,attrStat:${entityAttrs}" ]
-            [# th:if="${attr.get('type') eq 'Boolean'}"]
-            [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));
-            [/]
-        [/]
+        [# th:each="attr,attrStat:${entityAttrs}" ][# th:if="${attr.get('type') eq 'Boolean'}"]
+        [(${dtoKey})].set[(${#strings.capitalizeWords(attr.get('name'))})](null != request.getParameter("[(${attr.get('name')})]"));[/][/]
+
         [(${dtoName})] updated[(${dtoName})] = [(${serviceKey})].save([(${dtoKey})]);
         return new ModelAndView("redirect:/api/[(${moduleName})]/[(${uriName})]");
     }

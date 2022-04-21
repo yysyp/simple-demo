@@ -9,9 +9,11 @@
 <div th:fragment="header" class="header-container">
     <h1>simple-demo</h1>
     <div style="text-align: right;">
+        <a href="/" >Index</a><br/>
         <div
              th:if="${session['USER_DETAIL_PRINCIPAL_KEY'] != null}"
              th:with="userName=${session['USER_DETAIL_PRINCIPAL_KEY'].userName}">
+            <a href="/api/home/home-tmlf">Home</a>
             <span th:text="${userName}"></span>
             <a href="/api/login/logout" >logout</a>
         </div>

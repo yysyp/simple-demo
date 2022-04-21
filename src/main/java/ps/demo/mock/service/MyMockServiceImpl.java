@@ -36,7 +36,9 @@ import ps.demo.mock.repository.MyMockDao;
 import ps.demo.util.MyBeanUtil;
 
 import javax.persistence.criteria.*;
+
 import lombok.*;
+
 import java.util.*;
 import java.math.*;
 
@@ -56,16 +58,16 @@ public class MyMockServiceImpl {
         return myMockDto;
     }
 
-    @Transactional(readOnly = true)
-    public List<MyMockDto> findAll() {
-        List<MyMock> myMockList = myMockDao.findAll();
-        List<MyMockDto> myMockDtoList = new ArrayList<>();
-        for (MyMock myMock : myMockList) {
-            MyMockDto myMockDto = new MyMockDto();
-            MyBeanUtil.copyProperties(myMock, myMockDto);
-            myMockDtoList.add(myMockDto);
+    @Transactional
+    public List<MyMockDto> saveAll(Collection<MyMockDto> myMockDtoList) {
+        if (CollectionUtils.isEmpty(myMockDtoList)) {
+            return new ArrayList<>();
         }
-        return myMockDtoList;
+        List<MyMockDto> result = new ArrayList<>();
+        for (MyMockDto myMockDto : myMockDtoList) {
+            result.add(save(myMockDto));
+        }
+        return result;
     }
 
     public MyMockDto findById(Long id) {
@@ -77,8 +79,30 @@ public class MyMockServiceImpl {
         return myMockDto;
     }
 
-    @Transactional(readOnly = true)
-    public Page<MyMockDto> findByPage(Pageable pageable) {
+    public List<MyMockDto> findByAttribute(String attributeName, Object attribute) {
+        Specification<MyMock> spec = new Specification<MyMock>() {
+            @Override
+            public Predicate toPredicate(Root<MyMock> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.and(cb.equal(root.get(attributeName), attribute));
+            }
+        };
+        List<MyMock> myMockList = myMockDao.findAll(spec);
+        return MyBeanUtil.copyAndConvertItems(myMockList, MyMockDto.class);
+    }
+
+    //@Transactional(readOnly = true)
+    public List<MyMockDto> findAll() {
+        List<MyMock> myMockList = myMockDao.findAll();
+        List<MyMockDto> myMockDtoList = new ArrayList<>();
+        for (MyMock myMock : myMockList) {
+            MyMockDto myMockDto = new MyMockDto();
+            MyBeanUtil.copyProperties(myMock, myMockDto);
+            myMockDtoList.add(myMockDto);
+        }
+        return myMockDtoList;
+    }
+
+    public Page<MyMockDto> findInPage(Pageable pageable) {
         Page<MyMock> page = myMockDao.findAll(pageable);
         Page<MyMockDto> pageDto = page.map((e) -> {
             MyMockDto myMockDto = new MyMockDto();
@@ -88,8 +112,15 @@ public class MyMockServiceImpl {
         return pageDto;
     }
 
-    @Transactional(readOnly = true)
-    public Page<MyMockDto> findByPage(MyMockDto myMockDto, boolean orLike, Pageable pageable) {
+    public List<MyMockDto> findByAttributes(MyMockDto myMockDto, boolean orLike) {
+        MyMock myMock = new MyMock();
+        MyBeanUtil.copyProperties(myMockDto, myMock);
+        Specification<MyMock> spec = constructSpecification(myMock, orLike);
+        List<MyMock> myMockList = myMockDao.findAll(spec);
+        return MyBeanUtil.copyAndConvertItems(myMockList, MyMockDto.class);
+    }
+
+    public Page<MyMockDto> findByAttributesInPage(MyMockDto myMockDto, boolean orLike, Pageable pageable) {
         MyMock myMock = new MyMock();
         MyBeanUtil.copyProperties(myMockDto, myMock);
         Specification<MyMock> spec = constructSpecification(myMock, orLike);
@@ -108,62 +139,61 @@ public class MyMockServiceImpl {
             @Override
             public Predicate toPredicate(Root<MyMock> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Predicate predicate = null;
+                if (orLike) {
                 
-                    
-                    
-                    if (StringUtils.isNotBlank(myMock.getUri())) {
-                        if (orLike) {
-                            predicate = cb.or(cb.like(root.get("uri"), myMock.getUri()));
-                        } else {
-                            predicate = cb.and(cb.equal(root.get("uri"), myMock.getUri()));
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    if (StringUtils.isNotBlank(myMock.getMethod())) {
-                        if (orLike) {
-                            predicate = cb.or(predicate, cb.like(root.get("method"), myMock.getMethod()));
-                        } else {
-                            predicate = cb.and(predicate, cb.equal(root.get("method"), myMock.getMethod()));
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    
-                    if (StringUtils.isNotBlank(myMock.getHeaders())) {
-                        if (orLike) {
-                            predicate = cb.or(predicate, cb.like(root.get("headers"), myMock.getHeaders()));
-                        } else {
-                            predicate = cb.and(predicate, cb.equal(root.get("headers"), myMock.getHeaders()));
-                        }
-                    }
-                    
-                    
-                    
-                    
-                    
-                    if (StringUtils.isNotBlank(myMock.getBody())) {
-                        if (orLike) {
-                            predicate = cb.or(predicate, cb.like(root.get("body"), myMock.getBody()));
-                        } else {
-                            predicate = cb.and(predicate, cb.equal(root.get("body"), myMock.getBody()));
-                        }
-                    }
-                    
-                    
+                    predicate = orLike(predicate, cb, root,"uri", myMock.getUri());
+                    predicate = orEqual(predicate, cb, root,"regexMatch", myMock.getRegexMatch());
+                    predicate = orLike(predicate, cb, root,"method", myMock.getMethod());
+                    predicate = orEqual(predicate, cb, root,"status", myMock.getStatus());
+                    predicate = orLike(predicate, cb, root,"headers", myMock.getHeaders());
+                    predicate = orLike(predicate, cb, root,"body", myMock.getBody());
+
+                } else {
                 
+                    predicate = andEqual(predicate, cb, root, "uri", myMock.getUri());
+                    predicate = andEqual(predicate, cb, root, "regexMatch", myMock.getRegexMatch());
+                    predicate = andEqual(predicate, cb, root, "method", myMock.getMethod());
+                    predicate = andEqual(predicate, cb, root, "status", myMock.getStatus());
+                    predicate = andEqual(predicate, cb, root, "headers", myMock.getHeaders());
+                    predicate = andEqual(predicate, cb, root, "body", myMock.getBody());
+                
+                }
+
                 return predicate;
             }
         };
         return spec;
+    }
+
+    private Predicate andEqual(Predicate predicate, CriteriaBuilder cb, Root<MyMock> root, String attributeName, Object attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orEqual(Predicate predicate, CriteriaBuilder cb, Root<MyMock> root, String attributeName, Object attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orLike(Predicate predicate, CriteriaBuilder cb, Root<MyMock> root, String attributeName, String attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.like(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.like(root.get(attributeName), attributeValue));
+        }
     }
 
     @Transactional
@@ -171,6 +201,15 @@ public class MyMockServiceImpl {
         myMockDao.deleteById(id);
     }
 
+    @Transactional
+    public void deleteAll(Collection<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return;
+        }
+        for (Long id : idList) {
+            deleteById(id);
+        }
+    }
 
 }
 
