@@ -1,0 +1,4 @@
+
+swagger:
+  try-host: http://localhost:30080
+

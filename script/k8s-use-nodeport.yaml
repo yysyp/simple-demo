@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-demo-web
+  namespace: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-demo-web
+  template:
+    metadata:
+      labels:
+        app: simple-demo-web
+    spec:
+      containers:
+        - name: simple-demo-web
+          image: simple-demo:v1
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          env:
+            - name: APPID
+              valueFrom:
+                secretKeyRef:
+                  name: simple-demo-key
+                  key: appid
+            - name: APPSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: simple-demo-key
+                  key: appsecret
+          volumeMounts:
+            - name: myvolume
+              mountPath: /app/volume
+              readOnly: true
+      volumes:
+        - name: myvolume
+          secret:
+            secretName: simple-demo-key
+#            items:
+#              - key: key.pem
+#                path: key.pem
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-demo-service
+  namespace: app
+  labels:
+    app: simple-demo-web
+spec:
+  ports:
+    - port: 8080 # between containers for service call for K8s
+      targetPort: 8080 # container port
+      nodePort: 30080 # by default >30000 for external call
+  type: NodePort
+  selector:
+    app: simple-demo-web
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: simple-demo-key
+type: Opaque
+data:
+  appid: QVBQMTIzNA==
+  appsecret: UGFzc3dkXzEyMzQ1Ng==
+  key.pem: VGhpcyBpcyB0aGUgZGF0YSBmcm9tIGtleS5wZW0gZmlsZSBmcm9tIHNlY3JldApnb29kIGx1Y2t+Cl9fa3ViZXJuZXRzIHNlY3JldHM=

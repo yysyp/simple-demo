@@ -62,5 +62,5 @@ dir:
   upload-folder: upload-folder
 
 whitelist:
-  uris: /index.html,/css/,/js/,/img/,/vue/,/jqueryui/,/bootstrap-5.1.3/,favicon.ico,/api/login,/login,/mock,/api/qnpoll/
+  uris: /index.html,/healthz,/css/,/js/,/img/,/vue/,/jqueryui/,/bootstrap-5.1.3/,favicon.ico,/api/login,/login,/mock,/api/qnpoll/
   preciseUris: /

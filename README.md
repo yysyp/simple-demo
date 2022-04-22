@@ -22,3 +22,13 @@ sample form snippet:
     </select><br/>
     <input type="submit" name="Submit" />
 </form>
+
+
+---------------------------------------------------------------------------------------------
+#Run & Start: script/buildk8s.bat
+Swagger Doc Visit:
+http://localhost:30080/springdoc/docs.html
+http://localhost:30080/springdoc/api-docs.yaml
+
+#Stop: kubectl delete namespace app
+---------------------------------------------------------------------------------------------
