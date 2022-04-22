@@ -145,6 +145,7 @@ public class QuestionnaireServiceImpl {
                     predicate = orLike(predicate, cb, root,"name", questionnaire.getName());
                     predicate = orEqual(predicate, cb, root,"wholeHtml", questionnaire.getWholeHtml());
                     predicate = orLike(predicate, cb, root,"htmlFile", questionnaire.getHtmlFile());
+                    predicate = orLike(predicate, cb, root,"formItemNames", questionnaire.getFormItemNames());
                     predicate = orLike(predicate, cb, root,"htmlContent", questionnaire.getHtmlContent());
 
                 } else {
@@ -153,6 +154,7 @@ public class QuestionnaireServiceImpl {
                     predicate = andEqual(predicate, cb, root, "name", questionnaire.getName());
                     predicate = andEqual(predicate, cb, root, "wholeHtml", questionnaire.getWholeHtml());
                     predicate = andEqual(predicate, cb, root, "htmlFile", questionnaire.getHtmlFile());
+                    predicate = andEqual(predicate, cb, root, "formItemNames", questionnaire.getFormItemNames());
                     predicate = andEqual(predicate, cb, root, "htmlContent", questionnaire.getHtmlContent());
                 
                 }

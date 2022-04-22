@@ -30,6 +30,7 @@ public class Questionnaire extends MyBaseEntity {
     private String name;
     private Boolean wholeHtml;
     private String htmlFile;
+    private String formItemNames;
     private String htmlContent;
 
 

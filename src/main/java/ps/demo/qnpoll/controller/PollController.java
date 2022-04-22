@@ -42,6 +42,7 @@ import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -86,13 +87,33 @@ public class PollController extends MyBaseController {
         if (CollectionUtils.isEmpty(parameters)) {
             return CW_ERROR;
         }
+        Map<String, String[]> treeMap = new TreeMap<>(parameters);
+
+        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findByAttribute("uri", uri).get(0);
+        String names = questionnaireDto.getFormItemNames();
+        if (StringUtils.isNotBlank(names)) {
+            String[] a = StringUtils.splitByWholeSeparator(names, ",");
+            for (String ai : a) {
+                String key = (ai+"").trim();
+                if (!treeMap.containsKey(key)) {
+                    treeMap.put(key, new String[]{""});
+                }
+            }
+        }
 
         QuestionnaireResultDto questionnaireResultDto = new QuestionnaireResultDto();
         questionnaireResultDto.setUri(uri);
-        questionnaireResultDto.setResponseData(MyJsonUtil.object2Json(parameters));
+        questionnaireResultDto.setResponseData(MyJsonUtil.object2Json(treeMap));
         initBaseCreateModifyTs(questionnaireResultDto);
         questionnaireResultService.save(questionnaireResultDto);
         return WC_COMPLETED;
+    }
+
+    @MyPermission(roles = {"user", "admin"})
+    @GetMapping(value = "/{uri:[a-zA-Z0-9]+}/result-view")
+    public ModelAndView viewQuestionnaire(@PathVariable String uri, HttpServletRequest request,
+                                        HttpServletResponse response) throws IOException {
+        return new ModelAndView("redirect:/api/qn/questionnaire-result");
     }
 
     @MyPermission(roles = {"user", "admin"})

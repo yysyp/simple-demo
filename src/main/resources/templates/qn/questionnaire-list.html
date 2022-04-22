@@ -51,13 +51,14 @@
                         <td>name</td>
                         <td>wholeHtml</td>
                         <td>htmlFile</td>
+                        <td>formItemNames</td>
                         <td>htmlContent</td>
                     
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:if="${questionnaireModel.page.list.size()} eq 0">
-                        <td th:colspan="7">No data!</td>
+                        <td th:colspan="8">No data!</td>
                     </tr>
                     <tr th:each="questionnaireDto:${questionnaireModel.page.list}">
                         <td style="white-space: nowrap;">
@@ -71,6 +72,7 @@
                             <td th:text="${questionnaireDto.name}"></td>
                             <td th:text="${questionnaireDto.wholeHtml}"></td>
                             <td th:text="${questionnaireDto.htmlFile}"></td>
+                            <td th:text="${questionnaireDto.formItemNames}"></td>
                             <td th:text="${questionnaireDto.htmlContent}"></td>
                         
 

@@ -120,6 +120,7 @@ public class QuestionnaireTfController extends MyBaseController {
             questionnaireDto.setUri(percentWrapKey);
             questionnaireDto.setName(percentWrapKey);
             questionnaireDto.setHtmlFile(percentWrapKey);
+            questionnaireDto.setFormItemNames(percentWrapKey);
             questionnaireDto.setHtmlContent(percentWrapKey);
 
         }
@@ -135,6 +136,8 @@ public class QuestionnaireTfController extends MyBaseController {
     @GetMapping("/modify/{id}")
     public ModelAndView modify(@PathVariable("id") Long id, Model model) {
         QuestionnaireDto questionnaireDto = questionnaireServiceImpl.findById(id);
+        File htmlFile = new File(uploadDir, questionnaireDto.getHtmlFile());
+        questionnaireDto.setHtmlContent(MyReadWriteUtil.readFileContent(htmlFile));
         model.addAttribute("questionnaireDto", questionnaireDto);
         return new ModelAndView("qn/questionnaire-modify", "questionnaireModel", model);
     }

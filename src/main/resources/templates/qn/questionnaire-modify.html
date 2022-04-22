@@ -37,6 +37,7 @@
     <tr><td><label>name:</label></td><td width="75%"><input type="text" id="name" name="name"  required="required" maxlength="50" th:value="*{name}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>wholeHtml:</label></td><td width="75%"><input type="checkbox" id="wholeHtml" name="wholeHtml"  th:checked="*{wholeHtml}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>htmlFile:</label></td><td width="75%"><input type="text" id="htmlFile" name="htmlFile"   maxlength="50" th:value="*{htmlFile}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>formItemNames:</label></td><td width="75%"><textarea type="text" id="formItemNames" name="formItemNames"  rows="10" cols="50"  maxlength="255" th:text="*{formItemNames}" ></textarea><label> &nbsp;</label></td></tr>
     <tr><td><label>htmlContent:</label></td><td width="75%"><textarea type="text" id="htmlContent" name="htmlContent"  rows="10" cols="50"  maxlength="65535" th:text="*{htmlContent}" ></textarea><label> &nbsp;</label></td></tr>
 
         <tr><td colspan="2" style="text-align: center;"><input type="reset" value="Reset" style="width:150px;">&nbsp;&nbsp;<input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
@@ -69,6 +70,7 @@ $(function() {
     });
 
 
+    
     
     
     
