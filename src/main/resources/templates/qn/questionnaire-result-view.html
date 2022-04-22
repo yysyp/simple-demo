@@ -4,7 +4,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 >
 <head>
-    <title>questionnaire-response</title>
+    <title>questionnaire-result</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -20,29 +20,22 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
-<a th:href="@{/api/qn/questionnaire-response}">[List]</a>
-
-<div class="content-root">
+<a th:href="@{/api/qn/questionnaire-result}">[List]</a>
 
 <div class="content-root">
     <div class="form-container">
-        <form id="modifyform" th:action="@{/api/qn/questionnaire-response/modify}" method="POST"
-              th:object="${questionnaireResponseModel.questionnaireResponseDto}">
-            <input type="hidden" name="id" th:value="*{id}">
-
+    <form id="viewform" th:object="${questionnaireResultModel.questionnaireResultDto}">
     <table>
-
-
-    <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri"  required="required" maxlength="50" th:value="*{uri}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>responseContent:</label></td><td width="75%"><textarea type="text" id="responseContent" name="responseContent"  rows="10" cols="50"  maxlength="65535" th:text="*{responseContent}" ></textarea><label> &nbsp;</label></td></tr>
-
-        <tr><td colspan="2" style="text-align: center;"><input type="reset" value="Reset" style="width:150px;">&nbsp;&nbsp;<input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
+    <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
+    
+    <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri" readonly="readonly" required="required" maxlength="50" th:value="*{uri}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>name:</label></td><td width="75%"><input type="text" id="name" name="name" readonly="readonly" required="required" maxlength="50" th:value="*{name}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>htmlFile:</label></td><td width="75%"><input type="text" id="htmlFile" name="htmlFile" readonly="readonly"  maxlength="50" th:value="*{htmlFile}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>responseData:</label></td><td width="75%"><textarea type="text" id="responseData" name="responseData" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{responseData}" ></textarea></span><label> &nbsp;</label></td></tr>
+    
     </table>
-
-</form>
+    </form>
     </div>
-</div>
-    <!--content-root div end -->
 </div>
 <script th:inline="javascript">
 /*<![CDATA[*/
@@ -65,15 +58,7 @@ $(function() {
         setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
 
-
-    
-    
-
-
-$("#modifyform").validate();
-
 });
-
 /*]]>*/
 </script>
 <div th:replace="~{fragments/footer::footer}"></div>

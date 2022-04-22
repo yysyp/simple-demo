@@ -27,7 +27,10 @@ import java.math.*;
 public class Questionnaire extends MyBaseEntity {
 
     private String uri;
-    private String layoutitContent;
+    private String name;
+    private Boolean wholeHtml;
+    private String htmlFile;
+    private String htmlContent;
 
 
 }

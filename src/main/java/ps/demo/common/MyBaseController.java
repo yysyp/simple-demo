@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import ps.demo.account.helper.MyPrincipalUtils;
+import ps.demo.account.model.LoginUserDetail;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
@@ -45,14 +47,23 @@ public class MyBaseController {
     }
 
     protected void initBaseCreateModifyTs(MyBaseDto myBaseDto) {
+        LoginUserDetail loginUserDetail = MyPrincipalUtils.getCurrentUser();
         if (myBaseDto.getCreatedOn() == null) {
             myBaseDto.setCreatedOn(Instant.now());
             myBaseDto.setIsActive(true);
             myBaseDto.setIsLogicalDeleted(false);
-            myBaseDto.setCreatedBy("default");
+            if (loginUserDetail != null) {
+                myBaseDto.setCreatedBy(loginUserDetail.getUserName());
+            } else {
+                myBaseDto.setCreatedBy("");
+            }
         }
         myBaseDto.setModifiedOn(Instant.now());
-        myBaseDto.setModifiedBy("default");
+        if (loginUserDetail != null) {
+            myBaseDto.setModifiedBy(loginUserDetail.getUserName());
+        } else {
+            myBaseDto.setModifiedBy("");
+        }
     }
 
 }

@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.sql.OracleJoinFragment;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @desc
@@ -107,7 +104,7 @@ public class MyJsonUtil {
     }
     public static Map<String, Object> json2SimpleMap(String json) {
         if (org.apache.commons.lang3.StringUtils.isBlank(json)) {
-            return new HashMap<String, Object>();
+            return new TreeMap<String, Object>();
         }
         TypeReference typeReference = new TypeReference<Map<String, Object>>() {
         };

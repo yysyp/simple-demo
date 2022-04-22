@@ -29,7 +29,10 @@
     <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
     
     <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri" readonly="readonly" required="required" maxlength="50" th:value="*{uri}" /></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>layoutitContent:</label></td><td width="75%"><textarea type="text" id="layoutitContent" name="layoutitContent" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{layoutitContent}" ></textarea></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>name:</label></td><td width="75%"><input type="text" id="name" name="name" readonly="readonly" required="required" maxlength="50" th:value="*{name}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>wholeHtml:</label></td><td width="75%"><input type="checkbox" id="wholeHtml" name="wholeHtml" readonly="readonly" th:checked="*{wholeHtml}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>htmlFile:</label></td><td width="75%"><input type="text" id="htmlFile" name="htmlFile" readonly="readonly"  maxlength="50" th:value="*{htmlFile}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>htmlContent:</label></td><td width="75%"><textarea type="text" id="htmlContent" name="htmlContent" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{htmlContent}" ></textarea></span><label> &nbsp;</label></td></tr>
     
     </table>
     </form>

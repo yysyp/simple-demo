@@ -36,7 +36,9 @@ import ps.demo.qn.repository.QuestionnaireDao;
 import ps.demo.util.MyBeanUtil;
 
 import javax.persistence.criteria.*;
+
 import lombok.*;
+
 import java.util.*;
 import java.math.*;
 
@@ -56,16 +58,16 @@ public class QuestionnaireServiceImpl {
         return questionnaireDto;
     }
 
-    @Transactional(readOnly = true)
-    public List<QuestionnaireDto> findAll() {
-        List<Questionnaire> questionnaireList = questionnaireDao.findAll();
-        List<QuestionnaireDto> questionnaireDtoList = new ArrayList<>();
-        for (Questionnaire questionnaire : questionnaireList) {
-            QuestionnaireDto questionnaireDto = new QuestionnaireDto();
-            MyBeanUtil.copyProperties(questionnaire, questionnaireDto);
-            questionnaireDtoList.add(questionnaireDto);
+    @Transactional
+    public List<QuestionnaireDto> saveAll(Collection<QuestionnaireDto> questionnaireDtoList) {
+        if (CollectionUtils.isEmpty(questionnaireDtoList)) {
+            return new ArrayList<>();
         }
-        return questionnaireDtoList;
+        List<QuestionnaireDto> result = new ArrayList<>();
+        for (QuestionnaireDto questionnaireDto : questionnaireDtoList) {
+            result.add(save(questionnaireDto));
+        }
+        return result;
     }
 
     public QuestionnaireDto findById(Long id) {
@@ -77,8 +79,30 @@ public class QuestionnaireServiceImpl {
         return questionnaireDto;
     }
 
-    @Transactional(readOnly = true)
-    public Page<QuestionnaireDto> findByPage(Pageable pageable) {
+    public List<QuestionnaireDto> findByAttribute(String attributeName, Object attribute) {
+        Specification<Questionnaire> spec = new Specification<Questionnaire>() {
+            @Override
+            public Predicate toPredicate(Root<Questionnaire> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+                return cb.and(cb.equal(root.get(attributeName), attribute));
+            }
+        };
+        List<Questionnaire> questionnaireList = questionnaireDao.findAll(spec);
+        return MyBeanUtil.copyAndConvertItems(questionnaireList, QuestionnaireDto.class);
+    }
+
+    //@Transactional(readOnly = true)
+    public List<QuestionnaireDto> findAll() {
+        List<Questionnaire> questionnaireList = questionnaireDao.findAll();
+        List<QuestionnaireDto> questionnaireDtoList = new ArrayList<>();
+        for (Questionnaire questionnaire : questionnaireList) {
+            QuestionnaireDto questionnaireDto = new QuestionnaireDto();
+            MyBeanUtil.copyProperties(questionnaire, questionnaireDto);
+            questionnaireDtoList.add(questionnaireDto);
+        }
+        return questionnaireDtoList;
+    }
+
+    public Page<QuestionnaireDto> findInPage(Pageable pageable) {
         Page<Questionnaire> page = questionnaireDao.findAll(pageable);
         Page<QuestionnaireDto> pageDto = page.map((e) -> {
             QuestionnaireDto questionnaireDto = new QuestionnaireDto();
@@ -88,8 +112,15 @@ public class QuestionnaireServiceImpl {
         return pageDto;
     }
 
-    @Transactional(readOnly = true)
-    public Page<QuestionnaireDto> findByPage(QuestionnaireDto questionnaireDto, boolean orLike, Pageable pageable) {
+    public List<QuestionnaireDto> findByAttributes(QuestionnaireDto questionnaireDto, boolean orLike) {
+        Questionnaire questionnaire = new Questionnaire();
+        MyBeanUtil.copyProperties(questionnaireDto, questionnaire);
+        Specification<Questionnaire> spec = constructSpecification(questionnaire, orLike);
+        List<Questionnaire> questionnaireList = questionnaireDao.findAll(spec);
+        return MyBeanUtil.copyAndConvertItems(questionnaireList, QuestionnaireDto.class);
+    }
+
+    public Page<QuestionnaireDto> findByAttributesInPage(QuestionnaireDto questionnaireDto, boolean orLike, Pageable pageable) {
         Questionnaire questionnaire = new Questionnaire();
         MyBeanUtil.copyProperties(questionnaireDto, questionnaire);
         Specification<Questionnaire> spec = constructSpecification(questionnaire, orLike);
@@ -108,31 +139,23 @@ public class QuestionnaireServiceImpl {
             @Override
             public Predicate toPredicate(Root<Questionnaire> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 Predicate predicate = null;
+                if (orLike) {
+                
+                    predicate = orLike(predicate, cb, root,"uri", questionnaire.getUri());
+                    predicate = orLike(predicate, cb, root,"name", questionnaire.getName());
+                    predicate = orEqual(predicate, cb, root,"wholeHtml", questionnaire.getWholeHtml());
+                    predicate = orLike(predicate, cb, root,"htmlFile", questionnaire.getHtmlFile());
+                    predicate = orLike(predicate, cb, root,"htmlContent", questionnaire.getHtmlContent());
 
-
-
-                if (StringUtils.isNotBlank(questionnaire.getUri())) {
-                    if (orLike) {
-                        predicate = cb.or(cb.like(root.get("uri"), questionnaire.getUri()));
-                    } else {
-                        predicate = cb.and(cb.equal(root.get("uri"), questionnaire.getUri()));
-                    }
+                } else {
+                
+                    predicate = andEqual(predicate, cb, root, "uri", questionnaire.getUri());
+                    predicate = andEqual(predicate, cb, root, "name", questionnaire.getName());
+                    predicate = andEqual(predicate, cb, root, "wholeHtml", questionnaire.getWholeHtml());
+                    predicate = andEqual(predicate, cb, root, "htmlFile", questionnaire.getHtmlFile());
+                    predicate = andEqual(predicate, cb, root, "htmlContent", questionnaire.getHtmlContent());
+                
                 }
-
-
-
-
-
-
-                if (StringUtils.isNotBlank(questionnaire.getLayoutitContent())) {
-                    if (orLike) {
-                        predicate = cb.or(predicate, cb.like(root.get("layoutitContent"), questionnaire.getLayoutitContent()));
-                    } else {
-                        predicate = cb.and(predicate, cb.equal(root.get("layoutitContent"), questionnaire.getLayoutitContent()));
-                    }
-                }
-
-
 
                 return predicate;
             }
@@ -140,25 +163,52 @@ public class QuestionnaireServiceImpl {
         return spec;
     }
 
+    private Predicate andEqual(Predicate predicate, CriteriaBuilder cb, Root<Questionnaire> root, String attributeName, Object attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orEqual(Predicate predicate, CriteriaBuilder cb, Root<Questionnaire> root, String attributeName, Object attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.equal(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.equal(root.get(attributeName), attributeValue));
+        }
+    }
+    private Predicate orLike(Predicate predicate, CriteriaBuilder cb, Root<Questionnaire> root, String attributeName, String attributeValue) {
+        if (null == attributeValue) {
+            return predicate;
+        }
+        if (null == predicate) {
+            return cb.or(cb.like(root.get(attributeName), attributeValue));
+        } else {
+            return cb.or(predicate, cb.like(root.get(attributeName), attributeValue));
+        }
+    }
+
     @Transactional
     public void deleteById(Long id) {
         questionnaireDao.deleteById(id);
     }
 
-
-    public QuestionnaireDto findByURi(String uri) {
-        Questionnaire questionnaire = new Questionnaire();
-        questionnaire.setUri(uri.trim());
-        ExampleMatcher matching = ExampleMatcher.matching()
-                .withMatcher("uri", ExampleMatcher.GenericPropertyMatchers.exact());
-        Example<Questionnaire> example = Example.of(questionnaire, matching);
-        Optional<Questionnaire> questionnaireOptional = questionnaireDao.findOne(example);
-        QuestionnaireDto questionnairedto = new QuestionnaireDto();
-        questionnaireOptional.ifPresent(e -> {
-            MyBeanUtil.copyProperties(e, questionnairedto);
-        });
-        return questionnairedto;
+    @Transactional
+    public void deleteAll(Collection<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return;
+        }
+        for (Long id : idList) {
+            deleteById(id);
+        }
     }
+
 }
 
 

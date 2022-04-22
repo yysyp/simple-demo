@@ -15,11 +15,13 @@ import ps.demo.common.MyPageReq;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionnaireResponseReq extends MyPageReq {
+public class QuestionnaireResultReq extends MyPageReq {
     private String key;
 
     private String uri;
-    private String responseContent;
+    private String name;
+    private String htmlFile;
+    private String responseData;
 
 
 }

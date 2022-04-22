@@ -4,7 +4,7 @@
 <html xmlns:th="http://www.thymeleaf.org"
 >
 <head>
-    <title>questionnaire-response</title>
+    <title>questionnaire-result</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/css/jquery-ui-timepicker-addon.min.css}">
@@ -20,31 +20,34 @@
 </head>
 <body>
 <div th:replace="~{fragments/header::header}"></div>
-<a th:href="@{/api/qn/questionnaire-response}">[List]</a>
+<a th:href="@{/api/qn/questionnaire-result}">[List]</a>
 
 <div class="content-root">
 
+<div class="content-root">
     <div class="form-container">
-        <form id="createform" th:action="@{/api/qn/questionnaire-response/save}" method="POST"
-              th:object="${questionnaireResponseModel.questionnaireResponseDto}">
-
+        <form id="modifyform" th:action="@{/api/qn/questionnaire-result/modify}" method="POST"
+              th:object="${questionnaireResultModel.questionnaireResultDto}">
             <input type="hidden" name="id" th:value="*{id}">
-            <table>
+
+    <table>
+
 
     <tr><td><label>uri:</label></td><td width="75%"><input type="text" id="uri" name="uri"  required="required" maxlength="50" th:value="*{uri}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>responseContent:</label></td><td width="75%"><textarea type="text" id="responseContent" name="responseContent"  rows="10" cols="50"  maxlength="65535" th:text="*{responseContent}" ></textarea><label> &nbsp;</label></td></tr>
+    <tr><td><label>name:</label></td><td width="75%"><input type="text" id="name" name="name"  required="required" maxlength="50" th:value="*{name}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>htmlFile:</label></td><td width="75%"><input type="text" id="htmlFile" name="htmlFile"   maxlength="50" th:value="*{htmlFile}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>responseData:</label></td><td width="75%"><textarea type="text" id="responseData" name="responseData"  rows="10" cols="50"  maxlength="65535" th:text="*{responseData}" ></textarea><label> &nbsp;</label></td></tr>
 
-                <tr><td colspan="2" style="text-align: center;"><input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
-            </table>
+        <tr><td colspan="2" style="text-align: center;"><input type="reset" value="Reset" style="width:150px;">&nbsp;&nbsp;<input type="submit" style="width:150px;" value="Save"><label>&nbsp;</label></td></tr>
+    </table>
 
-        </form>
+</form>
     </div>
-
 </div>
-
+    <!--content-root div end -->
+</div>
 <script th:inline="javascript">
 /*<![CDATA[*/
-
 $(function() {
     $("form").submit(function(e) {
         var docHeight = $(document).height();
@@ -64,19 +67,19 @@ $(function() {
         setTimeout(function(){$("#selft-widow-shadow").remove();}, 1000);
     });
 
+
     
-        
-        
+    
+    
     
 
-    $("#createform").validate();
+
+$("#modifyform").validate();
 
 });
 
-
 /*]]>*/
 </script>
-
 <div th:replace="~{fragments/footer::footer}"></div>
 </body>
 </html>

@@ -5,13 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<a href="/" >Index</a><br/>
+<a href="/" >[Index]</a><br/>
 <a th:href="@{/api/login/change-password}">[Change password]</a> <br/>
 <a th:href="@{/api/admin/login-user/form}">[Add User]</a> <br/>
-<a href="/api/login/logout" >Logout</a><br/>
-greeting
-Greeting:
-<p th:text="'Hello, ' + ${greeting.name} + '!'" />
-<p th:text="'Today is ' + ${greeting.date} + '.'"/>
+<a th:href="@{/api/account/user-role}">[User Role]</a> <br/>
+<a href="@{/api/login/logout}" >[Logout]</a><br/>
+
 </body>
 </html>

@@ -181,7 +181,8 @@ public class MyMockTfController extends MyBaseController {
         initBaseCreateModifyTs(myMockDto);
 
         myMockDto.setRegexMatch(null != request.getParameter("regexMatch"));
-        if(CollectionUtils.isNotEmpty(myMockServiceImpl.findByAttribute("uri", myMockDto.getUri()))) {
+        List<MyMockDto> existingCheck = myMockServiceImpl.findByAttribute("uri", myMockDto.getUri());
+        if(CollectionUtils.isNotEmpty(existingCheck) && existingCheck.size() > 1) {
             throw new BadRequestException(CodeEnum.DUPLICATED_KEY);
         }
         MyMockDto updatedMyMockDto = myMockServiceImpl.save(myMockDto);

@@ -9,7 +9,7 @@
 <div th:fragment="header" class="header-container">
     <h1>simple-demo</h1>
     <div style="text-align: right;">
-        <a href="/" >Index</a><br/>
+        <a href="/" >Index</a>
         <div
              th:if="${session['USER_DETAIL_PRINCIPAL_KEY'] != null}"
              th:with="userName=${session['USER_DETAIL_PRINCIPAL_KEY'].userName}">
@@ -18,6 +18,11 @@
             <a href="/api/login/logout" >logout</a>
         </div>
 
+        <div class="error"
+             th:if="${session['LAST_ERROR_KEY'] != null}"
+             th:with="errorMsg=${session['LAST_ERROR_KEY'].message}">
+            <span id="errorSpan" th:text="${errorMsg}"></span>
+        </div>
 <!--        <div sec:authorize="isAnonymous()">-->
 <!--            <a th:href="@{/}">Login</a>-->
 <!--        </div>-->

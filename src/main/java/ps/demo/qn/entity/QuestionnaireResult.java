@@ -23,11 +23,13 @@ import java.math.*;
 @Setter
 @ToString
 @Entity
-@Table(name = "questionnaire_response")
-public class QuestionnaireResponse extends MyBaseEntity {
+@Table(name = "questionnaire_result")
+public class QuestionnaireResult extends MyBaseEntity {
 
     private String uri;
-    private String responseContent;
+    private String name;
+    private String htmlFile;
+    private String responseData;
 
 
 }

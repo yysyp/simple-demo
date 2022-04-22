@@ -19,9 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
+import ps.demo.account.helper.MyErrorUtils;
 import ps.demo.common.MyBaseController;
 import ps.demo.common.MyPageReq;
 import ps.demo.common.MyPageResData;
+import ps.demo.exception.BadRequestException;
+import ps.demo.exception.CodeEnum;
 import ps.demo.qn.dto.QuestionnaireDto;
 import ps.demo.qn.dto.QuestionnaireReq;
 import ps.demo.qn.service.QuestionnaireServiceImpl;
@@ -31,10 +34,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.*;
+
 import ps.demo.util.MyFileUtil;
 import ps.demo.util.MyReadWriteUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.math.*;
 
@@ -47,7 +51,7 @@ public class QuestionnaireTfController extends MyBaseController {
     private String uploadDir;
 
     @Autowired
-    private QuestionnaireServiceImpl questionnaireserviceimpl;
+    private QuestionnaireServiceImpl questionnaireServiceImpl;
 
     @GetMapping("/form")
     public ModelAndView createForm(Model model) {
@@ -56,17 +60,25 @@ public class QuestionnaireTfController extends MyBaseController {
     }
 
     @PostMapping("/save")
-    public ModelAndView save(QuestionnaireReq questionnaireReq) {
+    public ModelAndView save(Model model, QuestionnaireReq questionnaireReq, HttpServletRequest request) {
         QuestionnaireDto questionnaireDto = new QuestionnaireDto();
+        
+        questionnaireDto.setWholeHtml(null != request.getParameter("wholeHtml"));
+
         MyBeanUtil.copyProperties(questionnaireReq, questionnaireDto);
+        if(CollectionUtils.isNotEmpty(questionnaireServiceImpl.findByAttribute("uri", questionnaireDto.getUri()))
+        || CollectionUtils.isNotEmpty(questionnaireServiceImpl.findByAttribute("name", questionnaireDto.getName()))) {
+            MyErrorUtils.setLastError(new BadRequestException(CodeEnum.DUPLICATED_KEY), request);
+            model.addAttribute("questionnaireDto", questionnaireDto);
+            return new ModelAndView("qn/questionnaire-form", "questionnaireModel", model);
+        }
+        String fileName = UUID.randomUUID().toString();
+        questionnaireDto.setHtmlFile(fileName);
+        File htmlFile = new File(uploadDir, fileName);
+        MyReadWriteUtil.writeFileContent(htmlFile, questionnaireDto.getHtmlContent());
+        questionnaireDto.setHtmlContent("");
         initBaseCreateModifyTs(questionnaireDto);
-
-        String filename = UUID.randomUUID().toString();
-        File file = new File(uploadDir, filename);
-        MyReadWriteUtil.writeFileContent(file, questionnaireDto.getLayoutitContent(), "UTF-8");
-        questionnaireDto.setLayoutitContent(filename);
-
-        QuestionnaireDto questionnaireResult = questionnaireserviceimpl.save(questionnaireDto);
+        QuestionnaireDto questionnaireResult = questionnaireServiceImpl.save(questionnaireDto);
         return new ModelAndView("redirect:/api/qn/questionnaire");
     }
 
@@ -80,7 +92,7 @@ public class QuestionnaireTfController extends MyBaseController {
         QuestionnaireReq questionnaireReq = new QuestionnaireReq();
         model.addAttribute("questionnaireReq", questionnaireReq);
         Pageable pageable = constructPagable(questionnaireReq);
-        Page<QuestionnaireDto> questionnaireDtoPage = questionnaireserviceimpl.findByPage(pageable);
+        Page<QuestionnaireDto> questionnaireDtoPage = questionnaireServiceImpl.findInPage(pageable);
         MyPageResData<QuestionnaireDto> myPageResData = new MyPageResData<>(questionnaireDtoPage,
                 questionnaireReq.getCurrent(), questionnaireReq.getSize());
         model.addAttribute("questionnaireReq", questionnaireReq);
@@ -90,7 +102,9 @@ public class QuestionnaireTfController extends MyBaseController {
 
     @GetMapping("/{id}")
     public ModelAndView getById(@PathVariable("id") Long id, Model model) {
-        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findById(id);
+        QuestionnaireDto questionnaireDto = questionnaireServiceImpl.findById(id);
+        File htmlFile = new File(uploadDir, questionnaireDto.getHtmlFile());
+        questionnaireDto.setHtmlContent(MyReadWriteUtil.readFileContent(htmlFile));
         model.addAttribute("questionnaireDto", questionnaireDto);
         return new ModelAndView("qn/questionnaire-view", "questionnaireModel", model);
     }
@@ -103,16 +117,14 @@ public class QuestionnaireTfController extends MyBaseController {
         if (StringUtils.isNotBlank(key)) {
             String percentWrapKey = "%" + key + "%";
             
-                
-                questionnaireDto.setUri(percentWrapKey);
-                
-                
-                questionnaireDto.setLayoutitContent(percentWrapKey);
-                
-            
+            questionnaireDto.setUri(percentWrapKey);
+            questionnaireDto.setName(percentWrapKey);
+            questionnaireDto.setHtmlFile(percentWrapKey);
+            questionnaireDto.setHtmlContent(percentWrapKey);
+
         }
         //MyBeanUtil.copyProperties(questionnaireReq, questionnaireDto);
-        Page<QuestionnaireDto> questionnaireDtoPage = questionnaireserviceimpl.findByPage(questionnaireDto, true, pageable);
+        Page<QuestionnaireDto> questionnaireDtoPage = questionnaireServiceImpl.findByAttributesInPage(questionnaireDto, true, pageable);
         MyPageResData<QuestionnaireDto> myPageResData = new MyPageResData<>(questionnaireDtoPage,
                 questionnaireReq.getCurrent(), questionnaireReq.getSize());
         model.addAttribute("questionnaireReq", questionnaireReq);
@@ -122,34 +134,34 @@ public class QuestionnaireTfController extends MyBaseController {
 
     @GetMapping("/modify/{id}")
     public ModelAndView modify(@PathVariable("id") Long id, Model model) {
-        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findById(id);
+        QuestionnaireDto questionnaireDto = questionnaireServiceImpl.findById(id);
         model.addAttribute("questionnaireDto", questionnaireDto);
         return new ModelAndView("qn/questionnaire-modify", "questionnaireModel", model);
     }
 
     @PostMapping("/modify")
-    public ModelAndView saveOrUpdate(QuestionnaireDto questionnaireDto) {
+    public ModelAndView saveOrUpdate(Model model, QuestionnaireDto questionnaireDto, HttpServletRequest request) {
         initBaseCreateModifyTs(questionnaireDto);
-        //delete old
-        QuestionnaireDto oldDto = questionnaireserviceimpl.findById(questionnaireDto.getId());
-        UUID uuid = UUID.fromString(oldDto.getLayoutitContent());
-        File oldFile = new File(uploadDir, uuid.toString());
-        if (oldFile.exists() && oldFile.isFile()) {
-            oldFile.delete();
+        
+        questionnaireDto.setWholeHtml(null != request.getParameter("wholeHtml"));
+        List<QuestionnaireDto> existingCheck = questionnaireServiceImpl.findByAttribute("uri", questionnaireDto.getUri());
+        List<QuestionnaireDto> existingCheck2 = questionnaireServiceImpl.findByAttribute("name", questionnaireDto.getName());
+        if((CollectionUtils.isNotEmpty(existingCheck) && existingCheck.size() > 1)
+        || (CollectionUtils.isNotEmpty(existingCheck2) && existingCheck2.size() > 1)) {
+            MyErrorUtils.setLastError(new BadRequestException(CodeEnum.DUPLICATED_KEY), request);
+            model.addAttribute("questionnaireDto", questionnaireDto);
+            return new ModelAndView("qn/questionnaire-form", "questionnaireModel", model);
         }
-        //save new
-        String filename = UUID.randomUUID().toString();
-        File file = new File(uploadDir, filename);
-        MyReadWriteUtil.writeFileContent(file, questionnaireDto.getLayoutitContent(), "UTF-8");
-        questionnaireDto.setLayoutitContent(filename);
-
-        QuestionnaireDto updatedquestionnaireDto = questionnaireserviceimpl.save(questionnaireDto);
+        File htmlFile = new File(uploadDir, questionnaireDto.getHtmlFile());
+        MyReadWriteUtil.writeFileContent(htmlFile, questionnaireDto.getHtmlContent());
+        questionnaireDto.setHtmlContent("");
+        QuestionnaireDto updatedQuestionnaireDto = questionnaireServiceImpl.save(questionnaireDto);
         return new ModelAndView("redirect:/api/qn/questionnaire");
     }
 
     @GetMapping("/remove/{id}")
     public ModelAndView remove(@PathVariable("id") Long id) {
-        questionnaireserviceimpl.deleteById(id);
+        questionnaireServiceImpl.deleteById(id);
         return new ModelAndView("redirect:/api/qn/questionnaire");
     }
 

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,24 +22,27 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
+import ps.demo.annotation.MyPermission;
 import ps.demo.annotation.OperLog;
 import ps.demo.common.MyBaseController;
 import ps.demo.common.MyPageResData;
 import ps.demo.order.dto.NewCartRes;
 import ps.demo.qn.dto.QuestionnaireDto;
-import ps.demo.qn.dto.QuestionnaireReq;
-import ps.demo.qn.dto.QuestionnaireResponseDto;
-import ps.demo.qn.service.QuestionnaireResponseServiceImpl;
+import ps.demo.qn.dto.QuestionnaireResultDto;
+import ps.demo.qn.service.QuestionnaireResultServiceImpl;
 import ps.demo.qn.service.QuestionnaireServiceImpl;
-import ps.demo.util.MyBeanUtil;
-import ps.demo.util.MyDbUtils;
-import ps.demo.util.MyJsonUtil;
-import ps.demo.util.MyReadWriteUtil;
+import ps.demo.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -49,7 +53,7 @@ public class PollController extends MyBaseController {
     private QuestionnaireServiceImpl questionnaireserviceimpl;
 
     @Autowired
-    private QuestionnaireResponseServiceImpl questionnaireresponseserviceimpl;
+    private QuestionnaireResultServiceImpl questionnaireResultService;
 
     @Value("${dir.upload-folder}")
     private String uploadDir;
@@ -59,29 +63,64 @@ public class PollController extends MyBaseController {
     public ResponseEntity showQuestionnaire(@PathVariable String uri, HttpServletRequest request,
                                             HttpServletResponse response) {
         //HtmlUtils.htmlEscape(uri);
-        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findByURi(uri);
-        StringBuffer html = new StringBuffer(HTML_BEFORE);
-        File file = new File(uploadDir, questionnaireDto.getLayoutitContent());
-        html.append(MyReadWriteUtil.readFileContent(file, "UTF-8"));
-        html.append(HTML_AFTER);
+        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findByAttribute("uri", uri).get(0);
+        StringBuffer html = new StringBuffer();
+        if (questionnaireDto.getWholeHtml() == null || !questionnaireDto.getWholeHtml()) {
+            html.append(HTML_BEFORE);
+        }
+
+        File file = new File(uploadDir, questionnaireDto.getHtmlFile());
+        html.append(MyReadWriteUtil.readFileContent(file));
+        if (questionnaireDto.getWholeHtml() == null || !questionnaireDto.getWholeHtml()) {
+            html.append(HTML_AFTER);
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_HTML);
         ResponseEntity<String> responseEntity = new ResponseEntity(html, headers, HttpStatus.OK);
         return responseEntity;
     }
 
-    @PostMapping(value = "/{uri:[a-zA-Z0-9]+}/resp")
+    @PostMapping(value = "/{uri:[a-zA-Z0-9]+}/result")
     public String questionnaireResponse(@PathVariable String uri, HttpServletRequest request) {
         Map<String, String[]> parameters = request.getParameterMap();
         if (CollectionUtils.isEmpty(parameters)) {
             return CW_ERROR;
         }
 
-        QuestionnaireResponseDto questionnaireResponseDto = new QuestionnaireResponseDto();
-        questionnaireResponseDto.setUri(uri);
-        questionnaireResponseDto.setResponseContent(MyJsonUtil.object2Json(parameters));
-        questionnaireresponseserviceimpl.save(questionnaireResponseDto);
+        QuestionnaireResultDto questionnaireResultDto = new QuestionnaireResultDto();
+        questionnaireResultDto.setUri(uri);
+        questionnaireResultDto.setResponseData(MyJsonUtil.object2Json(parameters));
+        initBaseCreateModifyTs(questionnaireResultDto);
+        questionnaireResultService.save(questionnaireResultDto);
+        return WC_COMPLETED;
+    }
 
+    @MyPermission(roles = {"user", "admin"})
+    @GetMapping(value = "/{uri:[a-zA-Z0-9]+}/result-excel")
+    public String downloadQuestionnaire(@PathVariable String uri, HttpServletRequest request,
+                                        HttpServletResponse response) throws IOException {
+        QuestionnaireDto questionnaireDto = questionnaireserviceimpl.findByAttribute("uri", uri).get(0);
+
+        Pageable pageable = PageRequest.of(0, 60000);
+        QuestionnaireResultDto param = new QuestionnaireResultDto();
+        param.setUri(uri);
+        List<QuestionnaireResultDto> questionnaireResultDtoList = questionnaireResultService
+                .findByAttributesInPage(param, false, pageable).getContent();
+        List<String> head = questionnaireResultDtoList.get(0).toKeyList();
+        List<List<Object>> data = questionnaireResultDtoList.stream().map(e -> {
+            e.setName(questionnaireDto.getName());
+            return e.toList();
+        }).collect(Collectors.toList());
+
+        //Clean response
+        response.reset();
+        //Set response Header
+        response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(MyFileUtil.toValidFileName(uri) + ".xlsx", "UTF-8"));
+        OutputStream outputStream = response.getOutputStream();
+        MyExcelUtil.writeSimpleBySheet(outputStream, data, head, null);
+        response.setContentType("application/octet-stream");
+        outputStream.flush();
+        outputStream.close();
         return WC_COMPLETED;
     }
 

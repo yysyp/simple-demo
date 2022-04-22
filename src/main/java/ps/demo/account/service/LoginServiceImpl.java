@@ -60,6 +60,11 @@ public class LoginServiceImpl {
             role.setUserId(admin.getId());
             role.setRoleName(MyPrincipalUtils.ROLE_ADMIN);
             userRoleDao.save(role);
+            UserRole role2 = new UserRole();
+            role2.setRoleId(1L);
+            role2.setUserId(admin.getId());
+            role2.setRoleName(MyPrincipalUtils.ROLE_USER);
+            userRoleDao.save(role2);
 
             return random;
         }

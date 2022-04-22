@@ -19,7 +19,10 @@ public class QuestionnaireReq extends MyPageReq {
     private String key;
 
     private String uri;
-    private String layoutitContent;
+    private String name;
+    private Boolean wholeHtml;
+    private String htmlFile;
+    private String htmlContent;
 
 
 }

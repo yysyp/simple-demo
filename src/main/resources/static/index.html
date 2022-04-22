@@ -1,34 +1,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>simple demo home</title>
+  <title>simple demo index</title>
   <link href="/css/bootstrap.css" rel="stylesheet" />
-  <style type="text/css">
-
-  </style>
 </head>
 <body>
 <a href="/api/login/" >login</a> |
-<a href="/api/login/logout" >logout</a> |
 <a href="/api/login/change-password" >change password</a> |
+<a href="/api/login/logout" >logout</a> |
 <a href="/api/admin/login-user/form" >admin</a> |
-<a href="https://www.bootcss.com/p/layoutit/" title="bootcsscomnonedot">bootcss.com</a> |
-<a href="bootcss-p-layoutit.html">bootcss-p-layoutit</a> |
+<a href="bootcss-p-layoutit.html">bootcss-p-layoutit-design</a> |
 <a href="/springdoc/swagger-ui/index.html?configUrl=/springdoc/api-docs/swagger-config" >Swagger URL</a> |
-<a href="/h2-console/login.jsp?url=jdbc:h2:file:./ignorefolder/h2/simpledemo">h2-console</a>
-<br/>
+<a href="/h2-console/login.jsp?url=jdbc:h2:file:./ignorefolder/h2/simpledemo">h2-console</a> |
 <a href="/api/home/home-tmlf">home</a> |
-<a href="/api/system/system-tracking">system-tracking</a> |
-<a href="/api/school/student">student</a> |
+<a href="/api/admin/login-user/form">add user</a> |
+<a href="/api/account/user-role">set user role</a>
+<br/>
+<a href="https://www.bootcss.com/p/layoutit/" title="bootcsscomnonedot">bootcss.com</a> |
 <a href="/api/company/abc-staff">abc-staff</a> |
-<a href="bootstraplayoutittest.html">bootstraplayoutittest.html</a> |
-<a href="/mock">mock</a> |
-<a href="/mock/api">mock/api/{your URI}</a> |
+<br/>
+<a href="/api/qn/questionnaire">create questionnaire</a>
+<a href="/api/qnpoll/YourQuestionnaireUri">fill /api/qnpoll/{YourQuestionnaireUri}</a>
+<a href="/api/qnpoll/YourQuestionnaireUri/result-excel">download questionnaire result-excel</a>
+<br/>
+<a href="/mock">create mock</a> |
+<a href="/mock/api/YourMockUri">call mock/api/{YourMockUri}</a> |
 
 
 <pre>
   Swagger URL: http://localhost:8080/springdoc/swagger-ui/index.html?configUrl=/springdoc/api-docs/swagger-config
-  h2: jdbc:h2:file:./ignorefolder/h2/simpledemo
+  h2: jdbc:h2:file:./ignorefolder/h2/simpledemo  username/password: sa/
   springdoc swagger ui, doesn't support: 1) @Controller, 2)ModelAndView response.
 
     http: 8080
@@ -47,6 +48,24 @@ spring:
 2, run bathsbc-trim.bat
 
 #pslab/Kuaima.java is a thymeleaf based quick code generator.
+#Mock usage:
+1): http://localhost:8080/mock to create mock.
+2): http://localhost:8080/mock/api/{YourMockUri} to call the mock.
+On the "creating mock" page, the headers and body content will be parsed by thymeleaf engine.
+and the "request" variable will be passed to the script context. So basically you can put the
+content as below: {"requestMethod": "[(${request.method})]", "randomStr": "[(${#strings.randomAlphanumeric(8)})]"}
+
+#Questionnaire poll Usage:
+1): <a>http://localhost:8080/api/qn/questionnaire </a> to create questionnaire form.
+2): <a>http://localhost:8080/api/qnpoll/{YourQuestionnaireUri} </a> to fill questionnaire form.
+3): POST <a>http://localhost:8080/api/qnpoll/{YourQuestionnaireUri}/result </a>to submit questionnaire.
+4): <a>http://localhost:8080/api/qnpoll/{YourQuestionnaireUri}/result-excel </a>to download questionnaire result excel (limits to 60000 rows).
+5): <a>http://localhost:8080/api/qn/questionnaire-result </a> view questionnaire result on page.
+6): http://localhost:8080/bootcss-p-layoutit.html for html drag & drop creating HTML form snippet.
+
+#/givemethekey
+If there is no any user in the system, call below url to initiate admin.
+http://localhost:8080/api/login/givemethekey
 
 </pre>
 
