@@ -1,5 +1,6 @@
 package ps.demo.monkey;
 
+import com.fasterxml.jackson.databind.ser.impl.ReadOnlyClassToSerializerMap;
 import com.github.kwhat.jnativehook.NativeInputEvent;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
@@ -11,6 +12,8 @@ import ps.demo.util.MyReadWriteUtil;
 
 import javax.print.attribute.standard.MediaSize;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,49 @@ public class MkRecordPlayMan {
 
     public static List<MkRecord> loadRecords(File file) {
         return MyReadWriteUtil.readObjectsFromFile(file, MkRecord.class);
+    }
+
+    public static void robotCtrlcCtrlv(String str) {
+        StringSelection stringSelection = new StringSelection(str);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+        try {
+            Robot robot = new Robot();
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_V);
+            Thread.sleep(50);
+            robot.keyRelease(KeyEvent.VK_V);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<MkRecord> ctrlcCtrlv(String str) {
+        StringSelection stringSelection = new StringSelection(str);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
+        //ctrl v:
+        List<MkRecord> mkRecordList = new ArrayList<>();
+        MkRecord mkRecord = new MkRecord();
+        mkRecord.key(NativeKeyEvent.NATIVE_KEY_PRESSED, NativeKeyEvent.CTRL_L_MASK, 162, NativeKeyEvent.VC_CONTROL, NativeKeyEvent.CHAR_UNDEFINED, NativeKeyEvent.KEY_LOCATION_STANDARD);
+        mkRecordList.add(mkRecord);
+
+        mkRecord = new MkRecord();
+        mkRecord.key(NativeKeyEvent.NATIVE_KEY_PRESSED, NativeKeyEvent.CTRL_L_MASK, 86, convertToKeyCode('v'), NativeKeyEvent.CHAR_UNDEFINED, NativeKeyEvent.KEY_LOCATION_STANDARD);
+        mkRecordList.add(mkRecord);
+
+        mkRecord = new MkRecord();
+        mkRecord.key(NativeKeyEvent.NATIVE_KEY_TYPED, NativeKeyEvent.CTRL_L_MASK, 86, 0, 'v', NativeKeyEvent.KEY_LOCATION_STANDARD);
+        mkRecordList.add(mkRecord);
+
+        mkRecord = new MkRecord();
+        mkRecord.key(NativeKeyEvent.NATIVE_KEY_RELEASED, NativeKeyEvent.CTRL_L_MASK, 86, convertToKeyCode('v'), NativeKeyEvent.CHAR_UNDEFINED, NativeKeyEvent.KEY_LOCATION_STANDARD);
+        mkRecordList.add(mkRecord);
+
+        mkRecord = new MkRecord();
+        mkRecord.key(NativeKeyEvent.NATIVE_KEY_RELEASED, 0, 162, NativeKeyEvent.VC_CONTROL, NativeKeyEvent.CHAR_UNDEFINED, NativeKeyEvent.KEY_LOCATION_STANDARD);
+        mkRecordList.add(mkRecord);
+
+        return mkRecordList;
     }
 
     public static List<MkRecord> type(String str) {
