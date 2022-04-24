@@ -21,7 +21,7 @@ public class MkRecord implements Serializable {
     private int modifiers;
     private int rawCode;
     private int keyCode;
-    private char keyChar;
+    private int keyChar;
     private int keyLocation;
 
     private int x;

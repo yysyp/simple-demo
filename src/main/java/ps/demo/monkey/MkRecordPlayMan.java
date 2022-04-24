@@ -44,7 +44,7 @@ public class MkRecordPlayMan {
         switch (mkRecord.getEventType()) {
             case MkRecord.KEY_TYPE:
                 return new NativeKeyEvent(mkRecord.getId(), mkRecord.getModifiers(),
-                        mkRecord.getRawCode(), mkRecord.getKeyCode(), mkRecord.getKeyChar(),
+                        mkRecord.getRawCode(), mkRecord.getKeyCode(), (char)mkRecord.getKeyChar(),
                         mkRecord.getKeyLocation());
             case MkRecord.MOUSE_TYPE:
                 return new NativeMouseEvent(mkRecord.getId(), mkRecord.getModifiers(), mkRecord.getX(),

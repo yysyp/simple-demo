@@ -12,6 +12,7 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseMotionListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseWheelEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseWheelListener;
+import org.apache.commons.lang3.StringUtils;
 import ps.demo.monkey.MkRecordPlayMan;
 import ps.demo.monkey.model.MkRecord;
 import ps.demo.util.MyFileUtil;
@@ -31,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,7 +71,6 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
     private final JMenuItem menuItemQuit, menuItemSave, menuItemClear, menuItemExecute;
     private final JCheckBoxMenuItem menuItemEnable, menuItemKeyboardEvents, menuItemButtonEvents, menuItemMotionEvents, menuItemWheelEvents;
 
-    private boolean executingPlay = false;
     /**
      * The text area to display event info.
      */
@@ -221,19 +222,19 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
         } else if (e.getSource() == menuItemSave) {
             File file = MyFileUtil.getFileTsInHomeDir("mkscript.txt");
             MyReadWriteUtil.writeFileContent(file, txtEventInfo.getText());
-            txtMsgInfo.setText("File saved to "+file.getAbsolutePath());
+            txtMsgInfo.setText("File saved to " + file.getAbsolutePath());
         } else if (e.getSource() == menuItemExecute) {
-            if (executingPlay) {
-                executingPlay = false;
-                txtMsgInfo.setText("Assuming execution caused this action, so ignored.");
+            menuItemEnable.setSelected(false);
+//            menuItemKeyboardEvents.setSelected(false);
+//            menuItemButtonEvents.setSelected(false);
+//            menuItemMotionEvents.setSelected(false);
+//            menuItemWheelEvents.setSelected(false);
+
+            if (txtEventInfo.getCaretPosition() > 3) {
+                txtMsgInfo.setText("Select the first line to caret position <= 3 to start execution.");
                 return;
             }
-            executingPlay = true;
 
-            menuItemKeyboardEvents.setSelected(false);
-            menuItemButtonEvents.setSelected(false);
-            menuItemMotionEvents.setSelected(false);
-            menuItemWheelEvents.setSelected(false);
             log.info("Begin to repeat play...");
             int count = txtEventInfo.getLineCount();
             for (int r = 1; r < count; r++) {
@@ -241,8 +242,11 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
                     txtEventInfo.setSelectionStart(txtEventInfo.getLineStartOffset(r));
                     txtEventInfo.setSelectionEnd(txtEventInfo.getLineEndOffset(r));
                     String line = txtEventInfo.getSelectedText();
+                    if (StringUtils.isBlank(line) || line.trim().startsWith("#")) {
+                        continue;
+                    }
                     //log.info("r=["+r+"] line="+line);
-                    txtMsgInfo.setText("["+r+"]: "+line);
+                    txtMsgInfo.setText("[" + r + "]: " + line);
                     MkRecord mkRecord = MyJsonUtil.json2Object(line, MkRecord.class);
                     GlobalScreen.postNativeEvent(MkRecordPlayMan.getAsNativeEvent(mkRecord));
                     Thread.sleep(50);
@@ -250,7 +254,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
                     txtMsgInfo.setText(exception.getMessage());
                 }
             }
-
+            txtMsgInfo.setText("Replay completed!");
         }
     }
 
@@ -417,14 +421,15 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
     public void record(MkRecord mkRecord) {
         MkRecordPlayMan.saveRecord(mkRecord);
     }
+
     /**
      * Write information about the <code>NativeInputEvent</code> to the text window.
-     *
+     * <p>
      * //@param output appended to textEventInfo
      */
     private void appendDisplay(MkRecord mkRecord) {
         String output = MyJsonUtil.object2Json(mkRecord);
-    //private void appendDisplay(final String output) {
+        //private void appendDisplay(final String output) {
         //log.info(output);
         txtEventInfo.append("\n" + output);
 
@@ -549,7 +554,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
                 + "\n"
                 + "You should have received a copy of the GNU Lesser General Public License\n"
                 + "along with this program.  If not, see <http://www.gnu.org/licenses/>.\n";
-        System.out.println(copyright);
+        //System.out.println(copyright);
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
