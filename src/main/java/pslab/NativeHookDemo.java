@@ -78,6 +78,8 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 
     private final JTextArea txtMsgInfo;
 
+    private boolean replaying = false;
+
     /**
      * Logging
      */
@@ -230,10 +232,18 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
 //            menuItemMotionEvents.setSelected(false);
 //            menuItemWheelEvents.setSelected(false);
 
+            if (replaying) {
+                txtMsgInfo.setText("Replaying is in progress.");
+                return;
+            }
+
             if (txtEventInfo.getCaretPosition() > 3) {
                 txtMsgInfo.setText("Select the first line to caret position <= 3 to start execution.");
                 return;
             }
+
+            menuItemEnable.setEnabled(false);
+            replaying = true;
 
             log.info("Begin to repeat play...");
             int count = txtEventInfo.getLineCount();
@@ -255,6 +265,9 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
                 }
             }
             txtMsgInfo.setText("Replay completed!");
+
+            replaying = false;
+            menuItemEnable.setEnabled(true);
         }
     }
 
