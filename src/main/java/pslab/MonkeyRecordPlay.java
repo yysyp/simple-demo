@@ -13,6 +13,7 @@ import ps.demo.util.MyFileUtil;
 import ps.demo.util.MyReadWriteUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +22,9 @@ public class MonkeyRecordPlay {
 
     public static void main(String[] args) throws NativeHookException, InterruptedException {
         Map<String, String> argsMap = MyArgsUtil.assemberArgs(args);
-        //if (argsMap.containsKey(""))
+//        if (argsMap.containsKey("file")) {
+//
+//        }
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
@@ -33,15 +36,27 @@ public class MonkeyRecordPlay {
             }
         }));
         GlobalScreen.registerNativeHook();
+//`1234567890-=   qwertyuiop[]\asdfghjkl;'
+//    zxcvbnm,./[ ]~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?
 
-        File file = MyFileUtil.getFileInHomeDir("2022-04-23_215125-mkrecords.txt");
-        List<MkRecord> mkRecordList = MyReadWriteUtil.readObjectsFromFile(file, MkRecord.class);
+        //File file = MyFileUtil.getFileInHomeDir("2022-04-24_135849-mkscript.txt");
+        List<MkRecord> mkRecordList = new ArrayList<>();//MyReadWriteUtil.readObjectsFromFile(file, MkRecord.class);
+        mkRecordList.addAll(MkRecordPlayMan.type(
+                "`1234567890-=" +
+                "\tqwertyuiop[]\\" +
+                "asdfghjkl;'\n" +
+                        "zxcvbnm,./" +
+                        "[ ]"+
+                "~!@#$%^&*()_+"+
+                "QWERTYUIOP{}|" +
+                        "ASDFGHJKL:\"" +
+                        "ZXCVBNM<>?"));
         long i = 0;
         for (MkRecord mkRecord : mkRecordList) {
             i++;
             log.info("Mk processing line[{}]: {}", i, mkRecord);
             GlobalScreen.postNativeEvent(MkRecordPlayMan.getAsNativeEvent(mkRecord));
-            Thread.sleep(30);
+            Thread.sleep(50);
         }
 
         System.exit(0);
