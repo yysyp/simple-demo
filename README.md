@@ -32,3 +32,7 @@ http://localhost:30080/springdoc/api-docs.yaml
 
 #Stop: kubectl delete namespace app
 ---------------------------------------------------------------------------------------------
+#Copy dependencies from maven:
+1) run command: mvn install dependency:copy-dependencies 
+2) find the jars in: target/dependency
+
