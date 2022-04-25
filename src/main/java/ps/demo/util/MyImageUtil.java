@@ -18,7 +18,9 @@ public class MyImageUtil {
         Robot robot = null;
         try {
             robot = new Robot();
-        } catch (AWTException e) {
+            //Sleep to wait for other actions complete before screenShot.
+            Thread.sleep(500);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         BufferedImage screenImg = robot.createScreenCapture(new Rectangle(x, y,
@@ -32,6 +34,14 @@ public class MyImageUtil {
             ImageIO.write(bufferedImage, "png", fileOutputStream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void save(BufferedImage bi, File file) {
+        try {
+            ImageIO.write(bi, "png", file);
         } catch (IOException e) {
             e.printStackTrace();
         }
