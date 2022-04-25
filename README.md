@@ -36,3 +36,6 @@ http://localhost:30080/springdoc/api-docs.yaml
 1) run command: mvn install dependency:copy-dependencies 
 2) find the jars in: target/dependency
 
+#Del folder and content & Copy folder and content
+rd /S /Q %doc3%\
+xcopy /Y /S /E /H /R /C simple-demo\*.* %doc3-simple-demo%\
