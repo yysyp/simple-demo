@@ -1,9 +1,13 @@
 package ps.demo.util;
 
+import org.apache.commons.lang3.RandomUtils;
+import org.springframework.web.servlet.ModelAndView;
+
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Random;
 
 public class MyRobotUtil {
 
@@ -107,6 +111,38 @@ public class MyRobotUtil {
         robot.mouseMove(-1, -1);
         delay();
         robot.mouseMove((int) (p.x / scalingRatio), (int) (p.y / scalingRatio));
+    }
+
+    public static void cursorRandomMove(int stepSize, double scalingRatio) {
+        Point cp = MouseInfo.getPointerInfo().getLocation();
+        Dimension d = MyImageUtil.getScreenSize();
+        int loopCount = 0;
+        int stepx = RandomUtils.nextInt(1, stepSize);
+        if (RandomUtils.nextBoolean()) {
+            stepx = -stepx;
+        }
+        int x = cp.x + stepx;
+        int stepy = RandomUtils.nextInt(1, stepSize);
+        if (RandomUtils.nextBoolean()) {
+            stepy = -stepy;
+        }
+        int y = cp.y + stepy;
+        while (x < 0 || x > d.width || y < 0 || y > d.height) {
+            if (loopCount++ > 100) {
+                return;
+            }
+            stepx = RandomUtils.nextInt(1, stepSize);
+            if (RandomUtils.nextBoolean()) {
+                stepx = -stepx;
+            }
+            x = cp.x + stepx;
+            stepy = RandomUtils.nextInt(1, stepSize);
+            if (RandomUtils.nextBoolean()) {
+                stepy = -stepy;
+            }
+            y = cp.y + stepy;
+        }
+        robot.mouseMove(x, y);
     }
 
 }

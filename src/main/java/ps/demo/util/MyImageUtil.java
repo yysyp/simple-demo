@@ -3,6 +3,7 @@ package ps.demo.util;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.io.*;
 
 public class MyImageUtil {
@@ -80,14 +81,13 @@ public class MyImageUtil {
     }
 
 
-
     public static Rectangle getQuadrant1(Rectangle fr) {
         Rectangle r1 = new Rectangle();
-        int w = fr.width/2;
+        int w = fr.width / 2;
         r1.x = w;
         r1.y = fr.y;
         r1.width = w;
-        r1.height = fr.height/2;
+        r1.height = fr.height / 2;
         return r1;
     }
 
@@ -100,8 +100,8 @@ public class MyImageUtil {
 
     public static Rectangle getQuadrant2(Rectangle fr) {
         Rectangle r2 = new Rectangle();
-        int w = fr.width/2;
-        int h = fr.height/2;
+        int w = fr.width / 2;
+        int h = fr.height / 2;
         r2.x = w;
         r2.y = h;
         r2.width = w;
@@ -118,8 +118,8 @@ public class MyImageUtil {
 
     public static Rectangle getQuadrant3(Rectangle fr) {
         Rectangle r3 = new Rectangle();
-        int w = fr.width/2;
-        int h = fr.height/2;
+        int w = fr.width / 2;
+        int h = fr.height / 2;
         r3.x = fr.x;
         r3.y = h;
         r3.width = w;
@@ -136,8 +136,8 @@ public class MyImageUtil {
 
     public static Rectangle getQuadrant4(Rectangle fr) {
         Rectangle r4 = new Rectangle();
-        int w = fr.width/2;
-        int h = fr.height/2;
+        int w = fr.width / 2;
+        int h = fr.height / 2;
         r4.x = fr.x;
         r4.y = fr.y;
         r4.width = w;
@@ -209,6 +209,32 @@ public class MyImageUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static float compareImage(BufferedImage biA, BufferedImage biB) {
+        float percentage = 0;
+        try {
+            // take buffer data from both image files //
+            DataBuffer dbA = biA.getData().getDataBuffer();
+            int sizeA = dbA.getSize();
+            DataBuffer dbB = biB.getData().getDataBuffer();
+            int sizeB = dbB.getSize();
+            int count = 0;
+            // compare data-buffer objects //
+            if (sizeA == sizeB) {
+                for (int i = 0; i < sizeA; i++) {
+                    if (dbA.getElem(i) == dbB.getElem(i)) {
+                        count = count + 1;
+                    }
+                }
+                percentage = (count * 100) / sizeA;
+            } else {
+                System.out.println("Both the images are not of same size");
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to compare image files ...");
+        }
+        return percentage;
     }
 
 }
