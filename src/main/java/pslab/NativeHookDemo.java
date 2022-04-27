@@ -18,6 +18,7 @@ import ps.demo.monkey.model.MkRecord;
 import ps.demo.util.MyFileUtil;
 import ps.demo.util.MyJsonUtil;
 import ps.demo.util.MyReadWriteUtil;
+import ps.demo.util.MyTimeUtil;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -441,6 +442,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
      * //@param output appended to textEventInfo
      */
     private void appendDisplay(MkRecord mkRecord) {
+        //log.info("-->mkRecord="+mkRecord+" ts="+MyTimeUtil.getNowStr("yyyyMMdd HH:mm:ss.SSS"));
         String output = MyJsonUtil.object2Json(mkRecord);
         //private void appendDisplay(final String output) {
         //log.info(output);
