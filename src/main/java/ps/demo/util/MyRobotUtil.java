@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -38,6 +39,21 @@ public class MyRobotUtil {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String ctrlcCtrlv() {
+        try {
+            robot.keyPress(KeyEvent.VK_CONTROL);
+            robot.keyPress(KeyEvent.VK_C);
+            delay();
+            robot.keyRelease(KeyEvent.VK_C);
+            robot.keyRelease(KeyEvent.VK_CONTROL);
+            return (String) Toolkit.getDefaultToolkit().getSystemClipboard()
+                    .getData(DataFlavor.stringFlavor);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public static void typeEnter() {
