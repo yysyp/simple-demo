@@ -6,6 +6,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Random;
@@ -159,6 +160,32 @@ public class MyRobotUtil {
             y = cp.y + stepy;
         }
         robot.mouseMove(x, y);
+    }
+
+    public Image getImageFromClipboard() {
+        Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+            try {
+                return (Image) transferable.getTransferData(DataFlavor.imageFlavor);
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public String getTextFromClipboard() {
+        Transferable transferable = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (transferable != null && transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
+                return (String) transferable.getTransferData(DataFlavor.stringFlavor);
+            } catch (Exception e) {
+                return "";
+            }
+        } else {
+            return "";
+        }
     }
 
 }
