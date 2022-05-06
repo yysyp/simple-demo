@@ -39,3 +39,8 @@ http://localhost:30080/springdoc/api-docs.yaml
 #Del folder and content & Copy folder and content
 rd /S /Q %doc3%\
 xcopy /Y /S /E /H /R /C simple-demo\*.* %doc3-simple-demo%\
+
+#Build normal fat jar:
+1, update the <mainClass> value in pom.xml
+2, run mvn clean package -D spring-boot.repackage.skip=true -D fat.jar=true
+3, get the fat jar in: target/simple-demo-1.0.0-jar-with-dependencies.jar
