@@ -233,7 +233,7 @@ public class TcpProxy {
                                     // read all data from in_channel and forward it to out_channel (request)
                                     boolean flag = relay(tmp, out_channel, transfer_buf, true);
                                     if (logRelay) {
-                                        writeToFile(transfer_buf.array(), "request");
+                                        writeToFile(new String(transfer_buf.array()).trim().getBytes(), "request");
                                     }
                                     if (flag == false) {
                                         return;
@@ -251,7 +251,7 @@ public class TcpProxy {
                                             relayMapLog.put(keyCheck, "");
                                         }
                                         logPropertiesFile();
-                                        writeToFile(bytes, "response");
+                                        writeToFile(keyCheck.getBytes(), "response");
                                     }
                                     if (flag == false) {
                                         return;
@@ -578,6 +578,7 @@ public class TcpProxy {
             relayMapLastModified = file.lastModified();
             // Loading properties file from the path (relative path given here)
             iStream = new FileInputStream(file);
+            relayMap.clear();
             relayMap.load(iStream);
         } catch (IOException e) {
             // TODO Auto-generated catch block
