@@ -1,16 +1,18 @@
 package pslab;
 
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import sun.nio.ch.IOUtil;
+
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.*;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,13 +24,15 @@ public class TcpProxy {
     int local_port = 0, remote_port = 0;
     static boolean verbose = false;
     static boolean debug = false;
+    static boolean randomLoss = false;
     String mapping_file = null; // contains a list of src and dest host:port pairs
     final HashMap mappings = new HashMap(); // keys=MyInetSocketAddr (src), values=MyInetSocketAddr (dest)
     Executor executor; // maintains a thread pool
     static final int MIN_THREAD_POOL_SIZE = 2;
     static final int MAX_THREAD_POOL_SIZE = 64; // for processing requests
-    static final int BUFSIZE = 1024; // size of data transfer buffer
+    static final int BUFSIZE = 1024 * 1024; // size of data transfer buffer
 
+    boolean reqMatched = false;
 
     public TcpProxy(InetAddress local, int local_port, InetAddress remote, int remote_port, boolean verbose, boolean debug) {
         this.local = local;
@@ -270,6 +274,10 @@ public class TcpProxy {
      * Returns false if channel was closed
      */
     boolean relay(SocketChannel from, SocketChannel to, ByteBuffer buf) throws Exception {
+        String requestPreMatch = "GET / HTTP/1.1";
+
+        String responsePreMatch = "HTTP/1.1 200";
+
         int num;
         StringBuilder sb;
 
@@ -282,7 +290,33 @@ public class TcpProxy {
                 return true;
             buf.flip();
             if (verbose) {
-                log(printRelayedData(toString(from), toString(to), buf.remaining()));
+                String content = new String(buf.array()).trim();
+                if (!reqMatched && content.startsWith(requestPreMatch)) {
+                    reqMatched = true;
+                }
+                if (reqMatched && content.startsWith(responsePreMatch)) {
+                    reqMatched = false;
+
+                    log("***Hijacked content begin***");
+
+                    File hajackResp = new File("ignorefolder/hijack.txt");
+                    if (hajackResp.exists()) {
+                        byte[] fileBytes = FileUtils.readFileToByteArray(hajackResp);
+                        to.write(ByteBuffer.wrap(fileBytes));
+                    } else {
+                        File hajackLog = new File("ignorefolder/hijack-" + System.currentTimeMillis() + ".txt");
+                        FileChannel channel = new FileOutputStream(hajackLog, false).getChannel();
+                        channel.write(buf);
+                        buf.flip();
+                        to.write(buf);
+                    }
+
+                    buf.flip();
+                    log("***Hijacked content end***");
+                    continue;
+                } else {
+                    log(printRelayedData(toString(from), toString(to), buf.remaining(), content));
+                }
             }
             if (debug) {
                 sb = new StringBuilder();
@@ -320,12 +354,16 @@ public class TcpProxy {
     }
 
 
-    static String printRelayedData(String from, String to, int num_bytes) {
+    static String printRelayedData(String from, String to, int num_bytes, String buf) {
         StringBuilder sb;
         sb = new StringBuilder();
         sb.append("\n[PROXY] ").append(from);
         sb.append(" to ").append(to);
         sb.append(" (").append(num_bytes).append(" bytes)");
+        sb.append("\n");
+        sb.append("##Detail Data##:[");
+        sb.append(buf);
+        sb.append("]");
         // log("Proxy.relay()", sb.toString());
         return sb.toString();
     }
@@ -477,6 +515,10 @@ public class TcpProxy {
                     debug = true;
                     continue;
                 }
+                if ("-random_loss".equals(tmp)) {
+                    randomLoss = true;
+                    continue;
+                }
                 help();
                 return;
             }
@@ -574,7 +616,7 @@ public class TcpProxy {
                         //sb.append("forwarding ").append(num).append(" bytes from ").append(toString(in_sock));
                         //sb.append(" to ").append(toString(out_sock));
                         // log("Proxy.Relayer.run()", sb.toString());
-                        log(printRelayedData(toString(in_sock), toString(out_sock), num));
+                        log(printRelayedData(toString(in_sock), toString(out_sock), num, buf.toString()));
                     }
                     if (debug) {
                         sb = new StringBuilder();
