@@ -1,18 +1,16 @@
 package pslab;
 
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import sun.nio.ch.IOUtil;
-
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.*;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -24,7 +22,10 @@ public class TcpProxy {
     int local_port = 0, remote_port = 0;
     static boolean verbose = false;
     static boolean debug = false;
-    static boolean randomLoss = false;
+    static boolean logRelay = false;
+    static Properties relayMap = new Properties();
+    static Properties relayMapLog = new Properties();
+    static long relayMapLastModified = 0l;
     String mapping_file = null; // contains a list of src and dest host:port pairs
     final HashMap mappings = new HashMap(); // keys=MyInetSocketAddr (src), values=MyInetSocketAddr (dest)
     Executor executor; // maintains a thread pool
@@ -228,15 +229,33 @@ public class TcpProxy {
                             }
                             if (key.isReadable()) { // data is available to be read from tmp
                                 if (tmp == in_channel) {
+
                                     // read all data from in_channel and forward it to out_channel (request)
-                                    if (relay(tmp, out_channel, transfer_buf) == false)
+                                    boolean flag = relay(tmp, out_channel, transfer_buf, true);
+                                    if (logRelay) {
+                                        writeToFile(transfer_buf.array(), "request");
+                                    }
+                                    if (flag == false) {
                                         return;
+                                    }
+
                                 }
                                 if (tmp == out_channel) {
                                     // read all data from out_channel and forward it
                                     // to in_channel (response)
-                                    if (relay(tmp, in_channel, transfer_buf) == false)
+                                    boolean flag = relay(tmp, in_channel, transfer_buf, false);
+                                    if (logRelay) {
+                                        byte[] bytes = transfer_buf.array();
+                                        String keyCheck = new String(bytes).trim();
+                                        if (!relayMapLog.containsKey(keyCheck)) {
+                                            relayMapLog.put(keyCheck, "");
+                                        }
+                                        logPropertiesFile();
+                                        writeToFile(bytes, "response");
+                                    }
+                                    if (flag == false) {
                                         return;
+                                    }
                                 }
                             }
                         }
@@ -273,11 +292,7 @@ public class TcpProxy {
      * Read all data from <code>from</code> and write it to <code>to</code>.
      * Returns false if channel was closed
      */
-    boolean relay(SocketChannel from, SocketChannel to, ByteBuffer buf) throws Exception {
-        String requestPreMatch = "GET / HTTP/1.1";
-
-        String responsePreMatch = "HTTP/1.1 200";
-
+    boolean relay(SocketChannel from, SocketChannel to, ByteBuffer buf, boolean isReq) throws Exception {
         int num;
         StringBuilder sb;
 
@@ -289,34 +304,10 @@ public class TcpProxy {
             else if (num == 0)
                 return true;
             buf.flip();
+
             if (verbose) {
-                String content = new String(buf.array()).trim();
-                if (!reqMatched && content.startsWith(requestPreMatch)) {
-                    reqMatched = true;
-                }
-                if (reqMatched && content.startsWith(responsePreMatch)) {
-                    reqMatched = false;
-
-                    log("***Hijacked content begin***");
-
-                    File hajackResp = new File("ignorefolder/hijack.txt");
-                    if (hajackResp.exists()) {
-                        byte[] fileBytes = FileUtils.readFileToByteArray(hajackResp);
-                        to.write(ByteBuffer.wrap(fileBytes));
-                    } else {
-                        File hajackLog = new File("ignorefolder/hijack-" + System.currentTimeMillis() + ".txt");
-                        FileChannel channel = new FileOutputStream(hajackLog, false).getChannel();
-                        channel.write(buf);
-                        buf.flip();
-                        to.write(buf);
-                    }
-
-                    buf.flip();
-                    log("***Hijacked content end***");
-                    continue;
-                } else {
-                    log(printRelayedData(toString(from), toString(to), buf.remaining(), content));
-                }
+                String content = new String(buf.array());
+                log(printRelayedData(toString(from), toString(to), buf.remaining(), content));
             }
             if (debug) {
                 sb = new StringBuilder();
@@ -324,9 +315,52 @@ public class TcpProxy {
                 sb.append('\n');
                 log(sb.toString());
             }
+
+            if (logRelay && !isReq) {
+                String filename = null;
+                String content = new String(buf.array());
+                if (content != null) {
+                    loadPropertiesFile();
+                    Set<Map.Entry<Object, Object>> entries = relayMap.entrySet();
+                    for (Map.Entry<Object, Object> entry : entries) {
+                        String key = entry.getKey() + "";
+                        if (content.contains(key)) {
+                            filename = entry.getValue() + "";
+                            break;
+                        }
+                    }
+                }
+                if (filename != null && !filename.trim().equals("")) {
+                    log("***Hijacked content begin***");
+                    byte[] fileBytes = readFromFile(filename);
+                    to.write(ByteBuffer.wrap(fileBytes));
+                    buf.flip();
+                    log("***Hijacked content end***");
+                    continue;
+                }
+            }
             to.write(buf);
             buf.flip();
         }
+    }
+
+    private void writeToFile(byte[] buffer, String filePrefix) {
+        try {
+            File file = new File("ignorefolder/" + filePrefix + "-" + System.currentTimeMillis() + ".log");
+            file.createNewFile();
+            Files.write(Paths.get(file.toURI()), buffer, StandardOpenOption.WRITE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] readFromFile(String name) {
+        try {
+            return Files.readAllBytes(Paths.get("ignorefolder/" + name));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     String toString(SocketChannel ch) {
@@ -515,8 +549,9 @@ public class TcpProxy {
                     debug = true;
                     continue;
                 }
-                if ("-random_loss".equals(tmp)) {
-                    randomLoss = true;
+                if ("-log_relay".equals(tmp)) {
+                    logRelay = true;
+                    loadPropertiesFile();
                     continue;
                 }
                 help();
@@ -532,6 +567,71 @@ public class TcpProxy {
             ex.printStackTrace();
         }
     }
+
+    private static void loadPropertiesFile() {
+        InputStream iStream = null;
+        try {
+            File file = new File("ignorefolder/relayMap.properties");
+            if (file.lastModified() == relayMapLastModified) {
+                return;
+            }
+            relayMapLastModified = file.lastModified();
+            // Loading properties file from the path (relative path given here)
+            iStream = new FileInputStream(file);
+            relayMap.load(iStream);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            try {
+                if (iStream != null) {
+                    iStream.close();
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void savePropertiesFile() {
+        OutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream("ignorefolder/relayMap.properties");
+            relayMap.store(outputStream, new Date().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void logPropertiesFile() {
+        OutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream("ignorefolder/relayMapLog.txt");
+            relayMapLog.store(outputStream, new Date().toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     static void help() {
         System.out.println("Proxy [-help] [-local <local address>] [-local_port <port>] "
