@@ -29,7 +29,7 @@ public class MyArgsUtil {
             if (arg.startsWith("-")) {
                 key = arg;
             } else {
-                List<String> val = map.get(arg);
+                List<String> val = map.get(key);
                 if (val == null) {
                     val = new ArrayList<>();
                 }
