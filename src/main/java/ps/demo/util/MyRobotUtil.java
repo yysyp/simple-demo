@@ -19,6 +19,8 @@ public class MyRobotUtil {
     static {
         try {
             robot = new Robot();
+            //robot.setAutoDelay((int) defaultDelay);
+            //robot.setAutoWaitForIdle(true);
         } catch (AWTException e) {
             e.printStackTrace();
         }
@@ -79,6 +81,42 @@ public class MyRobotUtil {
         }
     }
 
+    public static void typeByVk(int vk) {
+        robot.keyPress(vk);
+        delay();
+        robot.keyRelease(vk);
+    }
+
+    public static void typeByVks(int... keycode) {
+        for (int i = 0; i < keycode.length; i++) {
+            robot.keyPress(keycode[i]);
+            robot.delay(50);
+        }
+
+        for (int i = keycode.length - 1; i >= 0; i--) {
+            robot.keyRelease(keycode[i]);
+            robot.delay(50);
+        }
+    }
+
+    public static void sendAlphabeticKeys(String keys) {
+        for (char c : keys.toCharArray()) {
+            int keyCode = KeyEvent.getExtendedKeyCodeForChar(c);
+            if (KeyEvent.CHAR_UNDEFINED == keyCode) {
+                throw new RuntimeException("Key code not found for '" + c + "'");
+            }
+            if (Character.isUpperCase(c)) {
+                robot.keyPress(KeyEvent.VK_SHIFT);
+            }
+            robot.keyPress(keyCode);
+            robot.delay(robot.getAutoDelay());
+            robot.keyRelease(keyCode);
+            if (Character.isUpperCase(c)) {
+                robot.keyRelease(KeyEvent.VK_SHIFT);
+            }
+            robot.delay(robot.getAutoDelay());
+        }
+    }
 
     public static void click() {
         click(InputEvent.BUTTON1_MASK);
