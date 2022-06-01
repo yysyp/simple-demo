@@ -2,10 +2,8 @@ package pslab;
 
 import com.alibaba.excel.metadata.Sheet;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Lists;
+import com.github.houbb.opencc4j.util.ZhConverterUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.ArrayStack;
-import org.checkerframework.checker.units.qual.A;
 import org.codehaus.plexus.util.StringUtils;
 import ps.demo.dto.AddrInfo;
 import ps.demo.util.*;
@@ -16,7 +14,7 @@ import java.util.*;
 @Slf4j
 public class JsonParseTest {
 
-    public static final String EMPTY = "Empty";
+    public static final String EMPTY = "海外";
     private static Map<String, List<String>> areaProvice;
 
     public static void main(String[] args) throws Exception {
@@ -72,8 +70,9 @@ public class JsonParseTest {
             fullName = fullName.trim();
             if (!StringUtils.isBlank(fullName)) {
                 AddrInfo addrInfo = findProvinceAndCityByFullName(provinceCityMap, provinceMap, shortNameFullNameProvinceCityOneLine, fullName);
-                if (addrInfo == null && companyAddrProperties.containsKey(fullName)) {
-                    fullName = companyAddrProperties.getProperty(fullName);
+                String regularName = MyRegexUtil.regularString(fullName);
+                if (addrInfo == null && companyAddrProperties.containsKey(regularName)) {
+                    fullName = companyAddrProperties.getProperty(regularName);
                     addrInfo = findProvinceAndCityByFullName(provinceCityMap, provinceMap, shortNameFullNameProvinceCityOneLine, fullName);
                     if (addrInfo != null) {
                         shortNameFullNameProvinceCityOneLine.add(addrInfo.getProvince());
@@ -105,11 +104,26 @@ public class JsonParseTest {
     }
 
     public static String findMostSimilarMatch(String key, Map<String, String> shortFullNameMap) {
+        key = ZhConverterUtil.toSimple(key).replaceAll("有限公司", "")
+                .replaceAll("科技", "").replaceAll("集团", "")
+                .replaceAll("课题组", "");
+
+                
         double score = 0.0d;
         String toKey = null;
         String toValue = null;
         for (String mk : shortFullNameMap.keySet()) {
-            double cs = MyStringUtil.getSimilarityRatio2(key, mk);
+            mk = ZhConverterUtil.toSimple(mk).replaceAll("有限公司", "")
+                    .replaceAll("科技", "").replaceAll("集团", "")
+                    .replaceAll("课题组", "");
+
+            double cs = MyStringUtil.getSimilarityWith(key, mk);
+            if(key.length() >= 4 && mk.length() >= 4) {
+                boolean contains = MyStringUtil.eitherContains(key, mk);
+                if (contains) {
+                    cs = 0.9d;
+                }
+            }
             if (cs > score) {
                 score = cs;
                 toKey = mk;

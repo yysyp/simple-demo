@@ -1,5 +1,7 @@
 package ps.demo.util;
 
+import com.github.houbb.opencc4j.util.ZhConverterUtil;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,10 +11,27 @@ public class MyRegexUtil {
      * Email
      */
     public static final String REG_EMAIL = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
+    public static final String REG_SYMBOL = "[\\pP\\pS\\pZ\\pM\\n]";
 
     public static final Pattern PATTERN_CHINESE_BY_REG =Pattern.compile("[\\u4E00-\\u9FBF]+");
     public static final Pattern PATTERN_CHINESE =Pattern.compile("[\u4E00-\u9FA5]+");
     public static final Pattern PATTERN_MESSY_CODE =Pattern.compile("\\s*|\t*|\r*|\n*");
+
+    public static String removeSymbols(String s) {
+        if (s == null) {
+            return s;
+        }
+        return s.replaceAll(REG_SYMBOL, "");
+    }
+
+    public static String regularString(String s) {
+        if (s == null) {
+            return null;
+        }
+
+        String s1 = ZhConverterUtil.toSimple(s);
+        return removeSymbols(s1);
+    }
 
     public static String findByRegex(String content, String regex, int groupI) {
         if (groupI < 0) {
