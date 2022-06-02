@@ -2,6 +2,8 @@ package ps.demo.dto;
 
 import lombok.*;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @ToString
@@ -16,4 +18,5 @@ public class AddrInfo {
     private String province;
     private String city;
 
+    private Date createdDate;
 }

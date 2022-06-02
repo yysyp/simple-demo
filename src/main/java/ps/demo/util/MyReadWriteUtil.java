@@ -62,7 +62,7 @@ public class MyReadWriteUtil {
     public static void writeObjectToFile(File file, Object content, Charset charsetName, boolean append) {
         try {
             String lineEnding = System.lineSeparator();
-            FileUtils.writeStringToFile(file, MyJsonUtil.object2Json(content) + lineEnding, charsetName, append);
+            FileUtils.writeStringToFile(file, MyJsonUtil.object2JsonString(content) + lineEnding, charsetName, append);
         } catch (IOException e) {
             throw new RuntimeException("Write to File failed!", e);
         }
@@ -70,7 +70,7 @@ public class MyReadWriteUtil {
 
     public static <T> T readObjectFromFile(File file, Class<T> c) {
         try {
-            return MyJsonUtil.json2Object(FileUtils.readFileToString(file, StandardCharsets.UTF_8), c);
+            return MyJsonUtil.jsonString2Object(FileUtils.readFileToString(file, StandardCharsets.UTF_8), c);
         } catch (IOException e) {
             throw new RuntimeException("Read from File failed!", e);
         }
@@ -96,7 +96,7 @@ public class MyReadWriteUtil {
     public static <T> List<T> readObjectsFromFile(File file, Charset charset, Class<T> c) {
         try {
             List<String> lines = FileUtils.readLines(file, charset);
-            return lines.stream().map(s -> MyJsonUtil.json2Object(s, c)).collect(Collectors.toList());
+            return lines.stream().map(s -> MyJsonUtil.jsonString2Object(s, c)).collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException("Read from File failed!", e);
         }

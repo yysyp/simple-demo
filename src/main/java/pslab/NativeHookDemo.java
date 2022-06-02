@@ -18,7 +18,6 @@ import ps.demo.monkey.model.MkRecord;
 import ps.demo.util.MyFileUtil;
 import ps.demo.util.MyJsonUtil;
 import ps.demo.util.MyReadWriteUtil;
-import ps.demo.util.MyTimeUtil;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,7 +32,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.util.Locale;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -258,7 +256,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
                     }
                     //log.info("r=["+r+"] line="+line);
                     txtMsgInfo.setText("[" + r + "]: " + line);
-                    MkRecord mkRecord = MyJsonUtil.json2Object(line, MkRecord.class);
+                    MkRecord mkRecord = MyJsonUtil.jsonString2Object(line, MkRecord.class);
                     GlobalScreen.postNativeEvent(MkRecordPlayMan.getAsNativeEvent(mkRecord));
                     Thread.sleep(50);
                 } catch (Exception exception) {
@@ -443,7 +441,7 @@ public class NativeHookDemo extends JFrame implements ActionListener, ItemListen
      */
     private void appendDisplay(MkRecord mkRecord) {
         //log.info("-->mkRecord="+mkRecord+" ts="+MyTimeUtil.getNowStr("yyyyMMdd HH:mm:ss.SSS"));
-        String output = MyJsonUtil.object2Json(mkRecord);
+        String output = MyJsonUtil.object2JsonString(mkRecord);
         //private void appendDisplay(final String output) {
         //log.info(output);
         txtEventInfo.append("\n" + output);

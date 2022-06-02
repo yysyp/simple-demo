@@ -28,6 +28,7 @@ public class MyArgsUtil {
             String arg = args[i]+"";
             if (arg.startsWith("-")) {
                 key = arg;
+                map.put(key, null);
             } else {
                 List<String> val = map.get(key);
                 if (val == null) {

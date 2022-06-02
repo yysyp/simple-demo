@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.sql.OracleJoinFragment;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -25,7 +24,7 @@ public class MyJsonUtil {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public static String object2Json(Object o) {
+    public static String object2JsonString(Object o) {
         if (o == null) {
             return null;
         }
@@ -51,7 +50,7 @@ public class MyJsonUtil {
 
         List<String> lists = new ArrayList<String>();
         for (T t : objects) {
-            lists.add(MyJsonUtil.object2Json(t));
+            lists.add(MyJsonUtil.object2JsonString(t));
         }
 
         return lists;
@@ -64,13 +63,13 @@ public class MyJsonUtil {
 
         List<T> ts = new ArrayList<T>();
         for (String j : jsons) {
-            ts.add(MyJsonUtil.json2Object(j, c));
+            ts.add(MyJsonUtil.jsonString2Object(j, c));
         }
 
         return ts;
     }
 
-    public static <T> T json2Object(String json, Class<T> c) {
+    public static <T> T jsonString2Object(String json, Class<T> c) {
         if (StringUtils.hasLength(json) == false) {
             return null;
         }
@@ -85,7 +84,7 @@ public class MyJsonUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T json2Object(String json, TypeReference<T> tr) {
+    public static <T> T jsonString2Object(String json, TypeReference<T> tr) {
         if (StringUtils.hasLength(json) == false) {
             return null;
         }
@@ -99,8 +98,8 @@ public class MyJsonUtil {
         return (T) t;
     }
 
-    public static String simpleMap2json(Map<String, Object> simpleMap) {
-        return object2Json(simpleMap);
+    public static String simpleMap2jsonString(Map<String, Object> simpleMap) {
+        return object2JsonString(simpleMap);
     }
     public static Map<String, Object> json2SimpleMap(String json) {
         if (org.apache.commons.lang3.StringUtils.isBlank(json)) {
@@ -108,6 +107,6 @@ public class MyJsonUtil {
         }
         TypeReference typeReference = new TypeReference<Map<String, Object>>() {
         };
-        return (Map<String, Object>) MyJsonUtil.json2Object(json, typeReference);
+        return (Map<String, Object>) MyJsonUtil.jsonString2Object(json, typeReference);
     }
 }

@@ -1,12 +1,8 @@
 package ps.demo.util;
 
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class MyJsonUtilTest {
 
@@ -17,7 +13,7 @@ public class MyJsonUtilTest {
         map.put("cc", new int[] {123}); //new Object will get error
         map.put("dd", null);
 
-        String s = MyJsonUtil.simpleMap2json(map);
+        String s = MyJsonUtil.simpleMap2jsonString(map);
         System.out.println(s);
         //TypeReference typeReference = new TypeReference<Map<String, Object>>() {};
         //Map<String, Object> mapResult = (Map<String, Object>) MyJsonUtil.json2Object(s, typeReference);

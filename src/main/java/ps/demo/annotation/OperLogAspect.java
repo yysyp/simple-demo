@@ -71,10 +71,10 @@ public class OperLogAspect {
             operlog.setOperMethod(methodName);
 
             Map<String, String> rtnMap = converMap(request.getParameterMap());
-            String params = MyJsonUtil.object2Json(rtnMap);
+            String params = MyJsonUtil.object2JsonString(rtnMap);
 
             operlog.setOperRequParam(params);
-            operlog.setOperRespParam(MyJsonUtil.object2Json(keys));
+            operlog.setOperRespParam(MyJsonUtil.object2JsonString(keys));
             operlog.setOperIp(MyIpUtil.getRealIp(request));
             operlog.setOperUri(request.getRequestURI());
             operlog.setOperCreateTime(new Date());
@@ -103,7 +103,7 @@ public class OperLogAspect {
             String methodName = method.getName();
             methodName = className + "." + methodName;
             Map<String, String> rtnMap = converMap(request.getParameterMap());
-            String params = MyJsonUtil.object2Json(rtnMap);
+            String params = MyJsonUtil.object2JsonString(rtnMap);
             excepLog.setExcRequParam(params);
             excepLog.setOperMethod(methodName);
             excepLog.setExcName(e.getClass().getName());

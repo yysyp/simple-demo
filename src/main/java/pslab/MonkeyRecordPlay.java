@@ -2,18 +2,13 @@ package pslab;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
-import com.github.kwhat.jnativehook.NativeInputEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import ps.demo.monkey.MkRecordPlayMan;
 import ps.demo.monkey.model.MkRecord;
 import ps.demo.util.MyArgsUtil;
-import ps.demo.util.MyFileUtil;
 import ps.demo.util.MyJsonUtil;
-import ps.demo.util.MyReadWriteUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +58,7 @@ public class MonkeyRecordPlay {
                 continue;
             }
             try {
-                MkRecord mkRecord = MyJsonUtil.json2Object(line, MkRecord.class);
+                MkRecord mkRecord = MyJsonUtil.jsonString2Object(line, MkRecord.class);
                 records.add(mkRecord);
             } catch (Exception ex) {
                 ex.printStackTrace();

@@ -185,6 +185,15 @@
             <version>1.7.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.12.6</version>
+        </dependency>
+
+
+
     </dependencies>
 
     <build>
@@ -227,7 +236,7 @@
                                     <archive>
                                         <manifest>
                                             <mainClass>
-                                                pslab.TcpProxy
+                                                pslab.Main
                                             </mainClass>
                                         </manifest>
                                     </archive>

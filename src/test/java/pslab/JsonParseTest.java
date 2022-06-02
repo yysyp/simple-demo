@@ -24,7 +24,7 @@ public class JsonParseTest {
         Map<String, Object> provinceMap = (Map<String, Object>) provinceCityMap.get("00");
         TypeReference<Map<String, List<String>>> typeReference = new TypeReference<Map<String, List<String>>>() {
         };
-        areaProvice = MyJsonUtil.json2Object(
+        areaProvice = MyJsonUtil.jsonString2Object(
                 MyReadWriteUtil.readFileContent(new File("meta/area-province.json")), typeReference);
         log.info("areaProvice={}", areaProvice);
 

@@ -30,7 +30,7 @@ public class QpsCallTemplateTest {
                     reqObj.setFileStr(MyStringUtil.randomAlphabetic(32));
                     String result = null;
                     try {
-                        result = MyRestTemplateUtil.getInstance().postJsonObjectForString("http://localhost:8080/api/upload/hi", MyJsonUtil.object2Json(reqObj));
+                        result = MyRestTemplateUtil.getInstance().postJsonObjectForString("http://localhost:8080/api/upload/hi", MyJsonUtil.object2JsonString(reqObj));
                     } catch (Exception ex) {
                         result = ex.getMessage();
                     }
