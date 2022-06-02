@@ -87,12 +87,40 @@ public class MyStringUtil {
         }
     }
 
+    public static double mixSimilarity(String x, String y) {
+        if (StringUtils.isBlank(x) && StringUtils.isBlank(y)) {
+            return 1.0;
+        }
+        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+            return 0;
+        }
+        x = MyRegexUtil.regularString(x);
+        y = MyRegexUtil.regularString(y);
+        double d = 0;
+        if (x.length() >= 4 && x.length() <= 20
+                && y.length() >= 4 && y.length() <= 20
+        && _eitherContains(x, y)) {
+            d = 0.9;
+        }
+        double d1 = getSimilarityWith(x, y);
+        double d2 = getLevenshteinDistanceRatio(x, y);
+        return new BigDecimal(Math.max(d, (d1+d2)/2.0)).setScale(2, BigDecimal.ROUND_HALF_UP)
+                .doubleValue();
+    }
+
     public static boolean eitherContains(String x, String y) {
         if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
             return false;
         }
-        x = ZhConverterUtil.toSimple(MyRegexUtil.removeSymbols(x));
-        y = ZhConverterUtil.toSimple(MyRegexUtil.removeSymbols(y));
+        x = MyRegexUtil.regularString(x);
+        y = MyRegexUtil.regularString(y);
+        return _eitherContains(x, y);
+    }
+
+    private static boolean _eitherContains(String x, String y) {
+        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+            return false;
+        }
         return x.contains(y) || y.contains(x);
     }
 
@@ -101,11 +129,8 @@ public class MyStringUtil {
             return 0.0d;
         }
 
-        String s1 = ZhConverterUtil.toSimple(MyRegexUtil.removeSymbols(x)).toLowerCase();
-        String s2 = ZhConverterUtil.toSimple(MyRegexUtil.removeSymbols(y)).toLowerCase();
-
-        double r1 = _similarWith(s1, s2);
-        double r2 = _similarWith(s2, s1);
+        double r1 = _similarWith(x, y);
+        double r2 = _similarWith(y, x);
         return new BigDecimal((r1 + r2) / 2)
                 .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }

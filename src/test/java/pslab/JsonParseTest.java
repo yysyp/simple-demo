@@ -105,6 +105,7 @@ public class JsonParseTest {
 
     public static String findMostSimilarMatch(String key, Map<String, String> shortFullNameMap) {
         key = ZhConverterUtil.toSimple(key).replaceAll("有限公司", "")
+                .replaceAll("分公司", "")
                 .replaceAll("科技", "").replaceAll("集团", "")
                 .replaceAll("课题组", "");
 
@@ -114,10 +115,11 @@ public class JsonParseTest {
         String toValue = null;
         for (String mk : shortFullNameMap.keySet()) {
             mk = ZhConverterUtil.toSimple(mk).replaceAll("有限公司", "")
+                    .replaceAll("分公司", "")
                     .replaceAll("科技", "").replaceAll("集团", "")
                     .replaceAll("课题组", "");
 
-            double cs = MyStringUtil.getSimilarityWith(key, mk);
+            double cs = MyStringUtil.mixSimilarity(key, mk);
             if(key.length() >= 4 && mk.length() >= 4) {
                 boolean contains = MyStringUtil.eitherContains(key, mk);
                 if (contains) {
@@ -130,7 +132,7 @@ public class JsonParseTest {
                 toValue = shortFullNameMap.get(mk);
             }
         }
-        if (score < 0.5) {
+        if (score < 0.8) {
             log.warn("===>>Similarity match [{}] ~TO {} score={} !!!", key, toKey, score);
         } else {
             log.info("===>>Similarity match [{}] ~TO {} score={}", key, toKey, score);
