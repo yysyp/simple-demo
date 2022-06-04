@@ -39,7 +39,7 @@ public class JsonParseTest {
 
         List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
                 MyFileUtil.getFileInHomeDir("2021年和2022年1-5月统计表(1).xlsx").getPath(),
-                new Sheet(2)); //sheetNo from 1... NOT 0
+                new Sheet(1)); //sheetNo from 1... NOT 0
 
         int count = 0;
         for (Object line : excelLines) {
@@ -104,32 +104,24 @@ public class JsonParseTest {
     }
 
     public static String findMostSimilarMatch(String key, Map<String, String> shortFullNameMap) {
-        key = ZhConverterUtil.toSimple(key).replaceAll("有限公司", "")
-                .replaceAll("分公司", "")
-                .replaceAll("科技", "").replaceAll("集团", "")
-                .replaceAll("课题组", "");
+        key = ZhConverterUtil.toSimple(key);
 
                 
         double score = 0.0d;
         String toKey = null;
         String toValue = null;
         for (String mk : shortFullNameMap.keySet()) {
-            mk = ZhConverterUtil.toSimple(mk).replaceAll("有限公司", "")
-                    .replaceAll("分公司", "")
-                    .replaceAll("科技", "").replaceAll("集团", "")
-                    .replaceAll("课题组", "");
+            mk = ZhConverterUtil.toSimple(mk);
 
-            double cs = MyStringUtil.mixSimilarity(key, mk);
-            if(key.length() >= 4 && mk.length() >= 4) {
-                boolean contains = MyStringUtil.eitherContains(key, mk);
-                if (contains) {
-                    cs = 0.9d;
-                }
-            }
+            String mv = shortFullNameMap.get(mk);
+
+            double csk = MyStringUtil.getLcsAndContainsRatio(key, mk);
+            double csv = MyStringUtil.getLcsAndContainsRatio(key, mv);
+            double cs = Math.max(csk, csv);
             if (cs > score) {
                 score = cs;
                 toKey = mk;
-                toValue = shortFullNameMap.get(mk);
+                toValue = mv;
             }
         }
         if (score < 0.8) {

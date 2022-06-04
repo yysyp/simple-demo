@@ -2,6 +2,7 @@ package ps.demo.util;
 
 import com.github.houbb.opencc4j.util.ZhConverterUtil;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +30,7 @@ public class MyRegexUtil {
             return null;
         }
 
-        String s1 = ZhConverterUtil.toSimple(s);
+        String s1 = ZhConverterUtil.toSimple(s.toLowerCase(Locale.ROOT));
         return removeSymbols(s1);
     }
 

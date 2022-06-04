@@ -87,27 +87,6 @@ public class MyStringUtil {
         }
     }
 
-    public static double mixSimilarity(String x, String y) {
-        if (StringUtils.isBlank(x) && StringUtils.isBlank(y)) {
-            return 1.0;
-        }
-        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-            return 0;
-        }
-        x = MyRegexUtil.regularString(x);
-        y = MyRegexUtil.regularString(y);
-        double d = 0;
-        if (x.length() >= 4 && x.length() <= 20
-                && y.length() >= 4 && y.length() <= 20
-        && _eitherContains(x, y)) {
-            d = 0.9;
-        }
-        double d1 = getSimilarityWith(x, y);
-        double d2 = getLevenshteinDistanceRatio(x, y);
-        return new BigDecimal(Math.max(d, (d1+d2)/2.0)).setScale(2, BigDecimal.ROUND_HALF_UP)
-                .doubleValue();
-    }
-
     public static boolean eitherContains(String x, String y) {
         if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
             return false;
@@ -117,6 +96,19 @@ public class MyStringUtil {
         return _eitherContains(x, y);
     }
 
+    public static double eitherContainsRatio(String x, String y) {
+        x = MyRegexUtil.regularString(x);
+        y = MyRegexUtil.regularString(y);
+        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+            return 0;
+        }
+        if(!_eitherContains(x, y)) {
+            return 0;
+        }
+        double m = x.length(), n = y.length();
+        return (m < n)? m/n : n/m;
+    }
+
     private static boolean _eitherContains(String x, String y) {
         if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
             return false;
@@ -124,37 +116,37 @@ public class MyStringUtil {
         return x.contains(y) || y.contains(x);
     }
 
-    public static double getSimilarityWith(String x, String y) {
-        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-            return 0.0d;
-        }
-
-        double r1 = _similarWith(x, y);
-        double r2 = _similarWith(y, x);
-        return new BigDecimal((r1 + r2) / 2)
-                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-    }
-
-    private static double _similarWith(String s1, String s2) {
-        int f = 0;
-        int m = 0;
-        for (int i = 0, in = s1.length(); i < in; i++) {
-            char c = s1.charAt(i);
-            boolean found = false;
-            for (int j = 0, jn = s2.length(); j < jn; j++) {
-                if (c == s2.charAt(j)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found) {
-                f++;
-            } else {
-                m++;
-            }
-        }
-        return (double) f / (double) (f + m);
-    }
+//    public static double getSimilarityWith(String x, String y) {
+//        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+//            return 0.0d;
+//        }
+//
+//        double r1 = _similarWith(x, y);
+//        double r2 = _similarWith(y, x);
+//        return new BigDecimal((r1 + r2) / 2)
+//                .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+//    }
+//
+//    private static double _similarWith(String s1, String s2) {
+//        int f = 0;
+//        int m = 0;
+//        for (int i = 0, in = s1.length(); i < in; i++) {
+//            char c = s1.charAt(i);
+//            boolean found = false;
+//            for (int j = 0, jn = s2.length(); j < jn; j++) {
+//                if (c == s2.charAt(j)) {
+//                    found = true;
+//                    break;
+//                }
+//            }
+//            if (found) {
+//                f++;
+//            } else {
+//                m++;
+//            }
+//        }
+//        return (double) f / (double) (f + m);
+//    }
 
     public static int getLevenshteinDistance(String x, String y) {
         int m = x.length();
@@ -182,15 +174,72 @@ public class MyStringUtil {
 
     public static double getLevenshteinDistanceRatio(String x, String y) {
         if (x == null || y == null) {
-            throw new IllegalArgumentException("Strings must not be null");
+            return 0;
         }
+        x = MyRegexUtil.regularString(x);
+        y = MyRegexUtil.regularString(y);
 
         double maxLength = Double.max(x.length(), y.length());
         if (maxLength > 0) {
-            // optionally ignore case if needed
             return (maxLength - getLevenshteinDistance(x, y)) / maxLength;
+            //new BigDecimal(d).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
         }
         return 1.0;
+    }
+
+    public static int getLongestCommonSequence(String x, String y) {
+
+        int m = x.length(), n = y.length();
+
+        int[][] dp = new int[m + 1][n + 1];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                dp[i][j] = 0;
+            }
+        }
+
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (x.charAt(i - 1) == y.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i][j - 1], dp[i - 1][j]);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    public static double getLongestCommonSequenceRatio(String x, String y) {
+        if (x == null || y == null) {
+            return 0;
+        }
+        x = MyRegexUtil.regularString(x);
+        y = MyRegexUtil.regularString(y);
+        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+            return 1.0;
+        }
+
+        double averageLength = (x.length() + y.length()) / 2.0;
+        return getLongestCommonSequence(x, y) / averageLength;
+        //new BigDecimal(d).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+    public static double getLcsAndContainsRatio(String x, String y) {
+        if (x == null || y == null) {
+            return 0;
+        }
+        x = MyRegexUtil.regularString(x);
+        y = MyRegexUtil.regularString(y);
+        if (StringUtils.isBlank(x) && StringUtils.isBlank(y)) {
+            return 1.0;
+        }
+        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+            return 0;
+        }
+        double containsRatio = eitherContainsRatio(x, y);
+        double lcsRatio = getLongestCommonSequenceRatio(x, y);
+        return containsRatio*0.5 + lcsRatio*0.5;
     }
 
 //    public static int getFuzzyDistance(CharSequence term, CharSequence query, Locale locale) {
