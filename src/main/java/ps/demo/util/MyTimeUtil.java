@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class MyTimeUtil {
@@ -53,6 +55,13 @@ public class MyTimeUtil {
         TimeUnit time = TimeUnit.DAYS;
         long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
         return diffrence;
+    }
+
+    public static Date addDays(Date date, int days) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, days);
+        return calendar.getTime();
     }
 
 //    public static Date toDate(String dateStr, String pattern) {

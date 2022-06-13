@@ -44,4 +44,31 @@ class MyTimeUtilTest {
         System.out.println(MyTimeUtil.subtractDays(date1, date2));
     }
 
+    @Test
+    void toDate2() {
+        Date date1 = MyTimeUtil.toDate("12:34", "HH:mm");
+        System.out.println("--->>date1="+date1);
+        //--->>date1=Thu Jan 01 12:34:00 CST 1970
+        String nowStr = MyTimeUtil.getNowStr("HH:mm");
+        System.out.println("--->>nowStr"+nowStr);
+
+
+    }
+
+    @Test
+    void addDays() {
+        Date date = MyTimeUtil.addDays(new Date(), 5);
+        System.out.println("--->date="+date);
+
+        Date date2 = MyTimeUtil.addDays(new Date(), -5);
+        System.out.println("--->date2="+date2);
+
+        Date date3 = MyTimeUtil.toDate("2022-12-31", "yyyy-MM-dd");
+        System.out.println("--->>date3="+MyTimeUtil.addDays(date3, 1));
+
+        Date date4 = MyTimeUtil.toDate("2022-02-28", "yyyy-MM-dd");
+        System.out.println("--->>date4="+MyTimeUtil.addDays(date4, 1));
+
+    }
+
 }

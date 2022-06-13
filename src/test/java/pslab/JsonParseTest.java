@@ -38,8 +38,8 @@ public class JsonParseTest {
         List<List<Object>> shortNameFullNameProvinceCityTable = new ArrayList<>();
 
         List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
-                MyFileUtil.getFileInHomeDir("2021年和2022年1-5月统计表(1).xlsx").getPath(),
-                new Sheet(1)); //sheetNo from 1... NOT 0
+                MyFileUtil.getFileInHomeDir("2021.xlsx").getPath(),
+                new Sheet(2)); //sheetNo from 1... NOT 0
 
         int count = 0;
         for (Object line : excelLines) {
@@ -75,7 +75,7 @@ public class JsonParseTest {
                     fullName = companyAddrProperties.getProperty(regularName);
                     addrInfo = findProvinceAndCityByFullName(provinceCityMap, provinceMap, shortNameFullNameProvinceCityOneLine, fullName);
                     if (addrInfo != null) {
-                        shortNameFullNameProvinceCityOneLine.add(addrInfo.getProvince());
+                        shortNameFullNameProvinceCityOneLine.add(addrInfo.getProvince().replace("省", ""));
                         shortNameFullNameProvinceCityOneLine.add(findAreaByProvinceName(addrInfo.getProvince(), areaProvice));
                     } else {
                         shortNameFullNameProvinceCityOneLine.add(EMPTY);
@@ -87,7 +87,7 @@ public class JsonParseTest {
                         shortNameFullNameProvinceCityOneLine.add(EMPTY);
                         shortNameFullNameProvinceCityOneLine.add(EMPTY);
                     } else {
-                        shortNameFullNameProvinceCityOneLine.add(addrInfo.getProvince());
+                        shortNameFullNameProvinceCityOneLine.add(addrInfo.getProvince().replace("省", ""));
                         shortNameFullNameProvinceCityOneLine.add(findAreaByProvinceName(addrInfo.getProvince(), areaProvice));
                     }
                 }
