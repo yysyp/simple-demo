@@ -30,7 +30,7 @@ public class Main {
             }
         });
 
-        if (argsMap.containsKey("-at") && argsMap.containsKey("-c")) {
+        if (argsMap.containsKey("-at") && (argsMap.containsKey("-c")) || argsMap.containsKey("-shutdown")) {
             atCommand(argsMap);
         }
 
@@ -38,7 +38,10 @@ public class Main {
 
     private static void atCommand(Map<String, List<String>> argsMap) {
         String command = argsMap.get("-c").get(0);
-        MyCmdRun myCmdRun = new MyCmdRun(command);
+        if (argsMap.containsKey("-shutdown")) {
+            command = "shutdown -s -t ";
+        }
+        final String cmd = command;
         String atHhmm = argsMap.get("-at").get(0);
         String beforeHhmm = "05:00";
 
@@ -51,8 +54,11 @@ public class Main {
                 Date atDate = MyTimeUtil.toDate(atHhmm, "HH:mm");
                 Date beforeDate = MyTimeUtil.addDays(MyTimeUtil.toDate(beforeHhmm, "HH:mm"), 1);
                 Date nowDate = MyTimeUtil.toDate(nowHhmm, "HH:mm");
+                int wait = 60 - (int) (MyTimeUtil.subtractMinutes(nowDate, atDate));
+                wait = Math.max(wait, 0);
                 if (nowDate.after(atDate) && nowDate.before(beforeDate)) {
                     timer.cancel();
+                    MyCmdRun myCmdRun = new MyCmdRun(cmd + wait);
                     myCmdRun.run();
                 }
             }

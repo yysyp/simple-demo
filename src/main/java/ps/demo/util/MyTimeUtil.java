@@ -57,6 +57,20 @@ public class MyTimeUtil {
         return diffrence;
     }
 
+    public static long subtractHours(Date date1, Date data2) {
+        long diff = date1.getTime() - data2.getTime();
+        TimeUnit time = TimeUnit.HOURS;
+        long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
+        return diffrence;
+    }
+
+    public static long subtractMinutes(Date date1, Date data2) {
+        long diff = date1.getTime() - data2.getTime();
+        TimeUnit time = TimeUnit.MINUTES;
+        long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
+        return diffrence;
+    }
+
     public static Date addDays(Date date, int days) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
