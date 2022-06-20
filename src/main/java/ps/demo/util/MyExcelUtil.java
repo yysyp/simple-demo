@@ -6,6 +6,7 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.util.StringUtils;
 import lombok.Data;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 public class MyExcelUtil {
@@ -29,6 +31,7 @@ public class MyExcelUtil {
         initSheet.setAutoWidth(Boolean.TRUE);
     }
 
+    //List<String> row = (List<String>) table.get(i);
     public static List<Object> readLessThan1000Row(String filePath) {
         return readLessThan1000RowBySheet(filePath, null);
     }
@@ -106,17 +109,45 @@ public class MyExcelUtil {
         return excelListener.getDatas();
     }
 
+    public static <T> List<T> readMoreThan1000Row(File file, int sheetNo, int headLineNum, Class klass) {
+        Sheet sheet = new Sheet(sheetNo, headLineNum, klass);
+        List<Object> objectList = MyExcelUtil.readMoreThan1000RowBySheet(file.getPath(), sheet);
+        List<T> result = MyConvertUtil.convertToTList(objectList);
+        return result;
+    }
+
 
     public static void writeBySimple(String filePath, List<List<Object>> data) {
         List<String> head = new ArrayList<>();
         for (int i = 0, len = data.get(0).size(); i < len; i++) {
-            head.add(""+i);
+            head.add("" + i);
         }
         writeSimpleBySheet(filePath, data, head, null);
     }
 
     public static void writeBySimple(String filePath, List<List<Object>> data, List<String> head) {
         writeSimpleBySheet(filePath, data, head, null);
+    }
+
+    public static void writeBySimple(String filePath, List<List<Object>> data, String... heads) {
+        List<String> listHead = new ArrayList<>();
+        for (String h : heads) {
+            listHead.add(h);
+        }
+        writeBySimple(filePath, data, listHead);
+    }
+
+    public static void writeBySimple(File file, List<? extends BaseRowModel> data) {
+        try (OutputStream out = new FileOutputStream(file);) {
+            ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX);
+            Class modeKlass = data.get(0).getClass();
+            Sheet sheet = new Sheet(1, 0, modeKlass);
+            //sheet.setSheetName("sheet1");
+            writer.write(data, sheet);
+            writer.finish();
+        } catch (Exception e) {
+            log.info("Read file failed, file：{}", file);
+        }
     }
 
 
@@ -233,7 +264,6 @@ public class MyExcelUtil {
         }
 
     }
-
 
 
 }
