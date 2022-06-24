@@ -26,6 +26,7 @@ public class Bio {
                     PrintStream printStream = new PrintStream(socket.getOutputStream());
                     while (!stop) {
                         String s = scanner.next().trim();
+                        System.out.println("Receive msg from client, s="+s);
                         printStream.println("BIO-ECHO:" + s);
                     }
                 } catch (Exception ex) {
@@ -34,7 +35,9 @@ public class Bio {
             });
             connectionNum++;
         }
+        System.out.println("To shutdown service");
         service.shutdown();
+        System.out.println("To close socket");
         serverSocket.close();
     }
 }

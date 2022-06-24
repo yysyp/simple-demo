@@ -22,6 +22,14 @@ public class MyTimeUtil {
         return getNowStr("yyyy-MM-dd_HHmmss");
     }
 
+    public static String getNowDateOnly() {
+        return getNowStr("yyyy-MM-dd");
+    }
+
+    public static String getNowTimeOnly() {
+        return getNowStr("HH:mm:ss");
+    }
+
     public static String getNowStryMdTHmsS() {
         return getNowStr(DATE_FORMAT_STR_DATETTIMESSS);
     }

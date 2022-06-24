@@ -48,6 +48,7 @@ public class Nio {
                             sc.close();
                         }
                         String result = new String(buf.array()).trim();
+                        System.out.println("--->>server get info from client: "+ result);
                         ByteBuffer wrap = ByteBuffer.wrap(("NIO-ECHO:" + result).getBytes());
                         sc.write(wrap);
                     } catch (Exception ex) {

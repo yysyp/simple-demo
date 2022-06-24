@@ -400,4 +400,19 @@ public class MyFileUtil {
         }
     }
 
+    public static File getAppPath() {
+        String path = MyFileUtil.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+        if (path.toLowerCase(Locale.ROOT).trim().endsWith(".jar")) {
+            File jar = new File(path);
+            return jar.getParentFile();
+        } else {
+            return new File(path);
+        }
+    }
+
+    public static File getFileInAppPath(String fileName) {
+        File path = getAppPath();
+        return new File(path.getAbsolutePath() + File.separator + fileName);
+    }
+
 }

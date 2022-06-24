@@ -20,6 +20,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**<code>
+List<MyExcelModel> data = new ArrayList<>();
+for (int i = 0; i < 10; i++) {
+    MyExcelModel row = new MyExcelModel.MyExcelModelBuilder()
+    .name("haha-name" + i)
+    .age(new Random().nextInt(100))
+    .score(new Random().nextDouble() * 100).build();
+    data.add(row);
+}
+MyExcelUtil.writeBySimple(MyFileUtil.getFileTsInHomeDir("myexcel.xlsx"), data);
+
+
+System.out.println("--->>Excel read from myExcelFile=" + myExcelFile);
+List<MyExcelModel> list3 =  MyExcelUtil.readMoreThan1000Row(myExcelFile, 1, 1, MyExcelModel.class);
+int j = 0;
+for (MyExcelModel myExcelModel : list3) {
+    j++;
+    System.out.println("[" + j + "] " + myExcelModel);
+}</code>
+*/
 @Slf4j
 public class MyExcelUtil {
 

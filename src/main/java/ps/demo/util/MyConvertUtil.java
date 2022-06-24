@@ -79,6 +79,22 @@ public class MyConvertUtil {
         }
     }
 
+    public static Long getAsLong(List<String> line, int i) {
+        if (line == null || i >= line.size()) {
+            return 0L;
+        }
+        String var = line.get(i);
+        if (var == null) {
+            return 0L;
+        }
+        try {
+            return Long.parseLong(var.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+
     public static Boolean getAsBoolean(List<String> line, int i) {
         if (line == null || i >= line.size()) {
             return false;
@@ -111,6 +127,38 @@ public class MyConvertUtil {
         }
     }
 
+    public static Float getAsFloat(List<String> line, int i) {
+        if (line == null || i >= line.size()) {
+            return new Float("0");
+        }
+        String var = line.get(i);
+        if (var == null) {
+            return new Float("0");
+        }
+        try {
+            return new Float(var.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Float("0");
+        }
+    }
+
+    public static Double getAsDouble(List<String> line, int i) {
+        if (line == null || i >= line.size()) {
+            return new Double("0");
+        }
+        String var = line.get(i);
+        if (var == null) {
+            return new Double("0");
+        }
+        try {
+            return new Double(var.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Double("0");
+        }
+    }
+
     public static Date getAsDate(List<String> line, int i, String fmt) {
         if (line == null || i >= line.size()) {
             return null;
@@ -133,5 +181,24 @@ public class MyConvertUtil {
         decimal.setScale(2, BigDecimal.ROUND_HALF_UP);
         return decimal.toString();
     }
+
+    public static String floatToString(Float f) {
+        //return String.format("%,.2f", f);
+        return String.format("%.2f", f);
+
+    }
+
+    public static String doubleToString(Double d) {
+        return String.format("%.2f", d);
+    }
+
+//    DecimalFormat df=new DecimalFormat("#.##");
+//    df.setRoundingMode(RoundingMode.UP);
+//    double d = 2.456534;
+//    System.out.println("Double upto 2 decimal places: "+df.format(d))
+
+//    NumberFormat nf= NumberFormat.getInstance();
+//    nf.setMaximumFractionDigits(2);
+//    System.out.println("Double d1 upto 2 decimal places: " +nf.format(d1));
 
 }

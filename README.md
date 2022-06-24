@@ -23,6 +23,13 @@ sample form snippet:
     <input type="submit" name="Submit" />
 </form>
 
+---------------------------------------------------------------------------------------------
+#Run ps.demo.WebServerApplication
+health: http://localhost:8080/healthz
+http://localhost:8080/
+Swagger Doc Visit:
+http://localhost:8080/springdoc/docs.html
+http://localhost:8080/springdoc/api-docs.yaml
 
 ---------------------------------------------------------------------------------------------
 #Run & Start: script/buildk8s.bat

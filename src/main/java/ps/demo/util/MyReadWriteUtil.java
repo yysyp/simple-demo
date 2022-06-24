@@ -133,6 +133,7 @@ public class MyReadWriteUtil {
     public static String readFileContent(File file) {
         return readFileContent(file, "UTF-8");
     }
+
     public static String readFileContent(File file, String encoding) {
         BufferedReader bf = null;
         try {
@@ -157,6 +158,7 @@ public class MyReadWriteUtil {
         }
         return null;
     }
+
     public static void writeFileContent(File file, String content) {
         writeFileContent(file, content, "UTF-8");
     }
@@ -180,6 +182,18 @@ public class MyReadWriteUtil {
     }
 
 
+    public static void closeAll(Closeable... closeables) {
+        for (Closeable closeable : closeables) {
+            if (closeable != null) {
+                try {
+                    closeable.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
 
 
 }

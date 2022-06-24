@@ -22,13 +22,35 @@ public class MyExcelExample {
 
         File myExcelFile = MyFileUtil.getFileTsInHomeDir("myexcel.xlsx");
 
+        //Write XLSX2-----------------------------------------------------------------------
+        System.out.println("--->>Excel write2 to myExcelFile=" + myExcelFile);
+        List<MyExcelModel> data = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            MyExcelModel row = new MyExcelModel.MyExcelModelBuilder()
+                    .name("haha-name" + i)
+                    .age(new Random().nextInt(100))
+                    .score(new Random().nextDouble() * 100).build();
+            data.add(row);
+        }
+        MyExcelUtil.writeBySimple(MyFileUtil.getFileTsInHomeDir("myexcel.xlsx"), data);
+
+        //Read XLSX 3-----------------------------------------------------------------------
+        System.out.println("--->>3 Excel read from myExcelFile=" + myExcelFile);
+        List<MyExcelModel> list3 =  MyExcelUtil.readMoreThan1000Row(myExcelFile, 1, 1, MyExcelModel.class);
+        int j = 0;
+        for (MyExcelModel myExcelModel : list3) {
+            j++;
+            System.out.println("[" + j + "] " + myExcelModel);
+        }
+
+
         //Write XLSX1-----------------------------------------------------------------------
         System.out.println("--->>Excel write1 to myExcelFile=" + myExcelFile);
         try (OutputStream out = new FileOutputStream(myExcelFile);) {
             ExcelWriter writer = new ExcelWriter(out, ExcelTypeEnum.XLSX);
             Sheet sheet = new Sheet(1, 0, MyExcelModel.class);
             sheet.setSheetName("sheet1");
-            List<MyExcelModel> data = new ArrayList<>();
+            data = new ArrayList<>();
             for (int i = 0; i < 100; i++) {
                 MyExcelModel row = new MyExcelModel.MyExcelModelBuilder()
                         .name("name" + i)
@@ -43,17 +65,7 @@ public class MyExcelExample {
         }
 
 
-        //Write XLSX2-----------------------------------------------------------------------
-        System.out.println("--->>Excel write2 to myExcelFile=" + myExcelFile);
-        List<MyExcelModel> data = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            MyExcelModel row = new MyExcelModel.MyExcelModelBuilder()
-                    .name("haha-name" + i)
-                    .age(new Random().nextInt(100))
-                    .score(new Random().nextDouble() * 100).build();
-            data.add(row);
-        }
-        MyExcelUtil.writeBySimple(MyFileUtil.getFileTsInHomeDir("myexcel.xlsx"), data);
+
 
 
         //Read XLSX 1-----------------------------------------------------------------------
@@ -89,14 +101,6 @@ public class MyExcelExample {
             e.printStackTrace();
         }
 
-        //Read XLSX 3-----------------------------------------------------------------------
-        System.out.println("--->>3 Excel read from myExcelFile=" + myExcelFile);
-        List<MyExcelModel> list3 =  MyExcelUtil.readMoreThan1000Row(myexcelFile1, 1, 1, MyExcelModel.class);
-        i = 0;
-        for (MyExcelModel myExcelModel : list3) {
-            i++;
-            System.out.println("[" + i + "] " + myExcelModel);
-        }
 
 
     }

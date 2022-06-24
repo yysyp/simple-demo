@@ -16,6 +16,10 @@ import java.util.*;
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        File appDir = MyFileUtil.getAppPath();
+        log.info("Main app dir={}", appDir);
+        //File mainLog = MyFileUtil.getFileInAppPath("main.log");
+        //log.info("Main log={}", mainLog);
         Map<String, List<String>> argsMap = MyArgsUtil.argsToMap(args);
         if (argsMap.containsKey("--help") || argsMap.containsKey("-h")) {
             printUsage();

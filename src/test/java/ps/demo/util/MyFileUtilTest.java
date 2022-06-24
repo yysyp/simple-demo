@@ -32,6 +32,14 @@ public class MyFileUtilTest {
 
     }
 
+    @Test
+    void createFileInAppPath() {
+        File file = MyFileUtil.getAppPath();
+        System.out.println("app root="+file);
+        File file1 = MyFileUtil.getFileInAppPath("aaa.log");
+        System.out.println("aaa.log="+file1);
+    }
+
 
 //    public static void loopDir(File file) {
 //        if (file.isDirectory()) {
