@@ -168,6 +168,7 @@ public class SimpleForwarding {
                     int size = is.read(buf);
                     if (size > -1) {
                         os.write(buf, 0, size);
+                        log.info("--->>data write: buf={}", new String(buf));
                     }
 
                 }
