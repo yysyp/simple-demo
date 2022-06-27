@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: simple-demo-web
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       containers:
         - name: simple-demo-web

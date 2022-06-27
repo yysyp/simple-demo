@@ -33,6 +33,8 @@ http://localhost:8080/springdoc/api-docs.yaml
 
 ---------------------------------------------------------------------------------------------
 #Run & Start: script/buildk8s.bat
+cd script
+buildk8s.bat
 Swagger Doc Visit:
 http://localhost:30080/springdoc/docs.html
 http://localhost:30080/springdoc/api-docs.yaml
