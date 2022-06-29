@@ -3,12 +3,17 @@ package pslab;
 import lombok.extern.slf4j.Slf4j;
 import ps.demo.util.MyArgsUtil;
 import ps.demo.util.MyFileUtil;
+import ps.demo.util.MyKeyStoreUtil;
 import ps.demo.util.MyReadWriteUtil;
 
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyStore;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -27,19 +32,41 @@ public class SimpleForwardingTls {
         Map<String, List<String>> argsMap = MyArgsUtil.argsToMap(args);
         if (argsMap.isEmpty() || argsMap.containsKey("-h") || argsMap.containsKey("--help")) {
             usage();
-            return;
+            System.exit(0);
         }
 
         String listenHost = argsMap.get("-listenHost").get(0);
         int listenPort = Integer.parseInt(argsMap.get("-listenPort").get(0));
         String remoteHost = argsMap.get("-remoteHost").get(0);
         int remotePort = Integer.parseInt(argsMap.get("-remotePort").get(0));
+        //String cerFile = argsMap.get("-cerFile").get(0);
+        String ksFile = argsMap.get("-ksFile").get(0);
 
         log.info("Listening on {}:{} and --> forwarding to {}:{}", listenHost, listenPort, remoteHost, remotePort);
 
+        //SSLServerSocket serverSocket = null;
         ServerSocket serverSocket = null;
         ExecutorService service = Executors.newFixedThreadPool(MAXCONN);
         try {
+            //System.getProperties().setProperty("javax.net.debug", "ssl");
+            //System.getProperties().setProperty("https.cipherSuites", "TLS_RSA_WITH_AES_256_CBC_SHA");
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+//            //KeyStore ks = MyKeyStoreUtil.getKeyStoreFromCer(new File(cerFile), "cer");
+//            KeyStore ks = MyKeyStoreUtil.getKeyStore(new File(ksFile), null);
+//            //KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+//            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+//            tmf.init(ks);
+//            //kmf.init(ks, null);
+//            TrustManager[] trustAllCerts = genTrustAllTM();
+//            sslContext.init(null, trustAllCerts, new SecureRandom());
+//            SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
+//            serverSocket = (SSLServerSocket) serverSocketFactory.createServerSocket(
+//                    listenPort, MAXCONN, InetAddress.getByName(listenHost));
+//            serverSocket.setUseClientMode(false);
+//            String[] pwdsuits = serverSocket.getSupportedCipherSuites();
+//            serverSocket.setEnabledCipherSuites(pwdsuits);
+
             serverSocket = new ServerSocket(listenPort, MAXCONN, InetAddress.getByName(listenHost));
 
             while (true) {
@@ -47,11 +74,31 @@ public class SimpleForwardingTls {
                     Socket socket1 = serverSocket.accept();
                     log.info("Client connected, client={}:{} --> {}:{}", socket1.getInetAddress(), socket1.getPort(),
                             socket1.getLocalAddress(), socket1.getLocalPort());
-                    Socket socket2 = new Socket(remoteHost, remotePort);
+
+//                    SSLContext sslContext2 = SSLContext.getInstance("TLS");//SSLContext.getInstance("TLSv1.2");
+//                    KeyManagerFactory kmf2 = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+//                    TrustManagerFactory tmf2 = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+//                    tmf2.init(ks);
+//                    sslContext2.init(kmf2.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
+
+                    SSLContext context = SSLContext.getInstance("TLS");
+                    TrustManager[] trustAllCerts2 = genTrustAllTM();
+                    context.init(null, trustAllCerts2, new SecureRandom());
+                    SSLSocketFactory socketFactory = context.getSocketFactory();
+
+//                    SSLSocketFactory socketFactory = sslContext.getSocketFactory();
+                    SSLSocket socket2 = (SSLSocket) socketFactory.createSocket(remoteHost, remotePort);
+//                    socket2.setNeedClientAuth(false);
+//                    String[] pwdsuits2 = socket2.getSupportedCipherSuites();
+//                    socket2.setEnabledCipherSuites(pwdsuits2);
+
+//                    Socket socket2 = new Socket(remoteHost, remotePort);
+
                     log.info("Connected to remote server, {}:{} --> {}:{}", socket2.getLocalAddress(), socket2.getLocalPort(),
                             socket2.getInetAddress(), socket2.getPort());
                     Thread proxy = new ConnProxy(socket1, socket2);
                     service.submit(proxy);
+
                     /* new ConnProxy(() -> {
                         Thread proxy = new ConnProxy(socket1, socket2);
                         proxy.start();
@@ -79,6 +126,15 @@ public class SimpleForwardingTls {
         }
 
         log.info("End.");
+    }
+
+    private static TrustManager[] genTrustAllTM() {
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() { return null; }
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+        }};
+        return trustAllCerts;
     }
 
     private static void runningCheck() {
@@ -109,10 +165,11 @@ public class SimpleForwardingTls {
 
     public static void usage() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(" -listenHost=HOST");
-        stringBuffer.append(" -listenPort=PORT");
-        stringBuffer.append(" -remoteHost=HOST");
-        stringBuffer.append(" -remotePort=PORT");
+        stringBuffer.append(" -listenHost HOST");
+        stringBuffer.append(" -listenPort PORT");
+        stringBuffer.append(" -remoteHost HOST");
+        stringBuffer.append(" -remotePort PORT");
+        stringBuffer.append(" -ksFile xxx.keystore");
 
         log.info(stringBuffer.toString());
     }

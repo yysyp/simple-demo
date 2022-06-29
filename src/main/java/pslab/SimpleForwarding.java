@@ -29,7 +29,7 @@ public class SimpleForwarding {
         Map<String, List<String>> argsMap = MyArgsUtil.argsToMap(args);
         if (argsMap.isEmpty() || argsMap.containsKey("-h") || argsMap.containsKey("--help")) {
             usage();
-            return;
+            System.exit(0);
         }
 
         String listenHost = argsMap.get("-listenHost").get(0);
@@ -111,10 +111,10 @@ public class SimpleForwarding {
 
     public static void usage() {
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append(" -listenHost=HOST");
-        stringBuffer.append(" -listenPort=PORT");
-        stringBuffer.append(" -remoteHost=HOST");
-        stringBuffer.append(" -remotePort=PORT");
+        stringBuffer.append(" -listenHost HOST");
+        stringBuffer.append(" -listenPort PORT");
+        stringBuffer.append(" -remoteHost HOST");
+        stringBuffer.append(" -remotePort PORT");
 
         log.info(stringBuffer.toString());
     }

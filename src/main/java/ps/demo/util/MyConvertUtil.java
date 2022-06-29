@@ -52,6 +52,22 @@ public class MyConvertUtil {
         return result;
     }
 
+    public static List<List<Object>> castListToObject(List<List<String>> lists) {
+        List<List<Object>> listObj = new ArrayList<>();
+        for (List<?> list : lists) {
+            listObj.add(castList(list, Object.class));
+        }
+        return listObj;
+    }
+
+    public static <T> List<List<T>> castListToT(List<List<?>> lists, Class tklass) {
+        List<List<T>> listObj = new ArrayList<>();
+        for (List<?> list : lists) {
+            listObj.add(castList(list, tklass));
+        }
+        return listObj;
+    }
+
     public static String getAsString(List<String> line, int i) {
         if (line == null || i >= line.size()) {
             return "";
