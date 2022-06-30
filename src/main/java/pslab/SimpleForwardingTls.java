@@ -44,8 +44,8 @@ public class SimpleForwardingTls {
 
         log.info("Listening on {}:{} and --> forwarding to {}:{}", listenHost, listenPort, remoteHost, remotePort);
 
-        //SSLServerSocket serverSocket = null;
-        ServerSocket serverSocket = null;
+        SSLServerSocket serverSocket = null;
+        //ServerSocket serverSocket = null;
         ExecutorService service = Executors.newFixedThreadPool(MAXCONN);
         try {
             //System.getProperties().setProperty("javax.net.debug", "ssl");
@@ -53,21 +53,21 @@ public class SimpleForwardingTls {
 
             SSLContext sslContext = SSLContext.getInstance("TLS");
 //            //KeyStore ks = MyKeyStoreUtil.getKeyStoreFromCer(new File(cerFile), "cer");
-//            KeyStore ks = MyKeyStoreUtil.getKeyStore(new File(ksFile), null);
-//            //KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            KeyStore ks = MyKeyStoreUtil.getKeyStore(new File(ksFile), "changeit");
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(ks, "changeit".toCharArray());
 //            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 //            tmf.init(ks);
-//            //kmf.init(ks, null);
-//            TrustManager[] trustAllCerts = genTrustAllTM();
-//            sslContext.init(null, trustAllCerts, new SecureRandom());
-//            SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
-//            serverSocket = (SSLServerSocket) serverSocketFactory.createServerSocket(
-//                    listenPort, MAXCONN, InetAddress.getByName(listenHost));
-//            serverSocket.setUseClientMode(false);
-//            String[] pwdsuits = serverSocket.getSupportedCipherSuites();
-//            serverSocket.setEnabledCipherSuites(pwdsuits);
+            TrustManager[] trustAllCerts = genTrustAllTM();
+            sslContext.init(kmf.getKeyManagers(), trustAllCerts, new SecureRandom());
+            SSLServerSocketFactory serverSocketFactory = sslContext.getServerSocketFactory();
+            serverSocket = (SSLServerSocket) serverSocketFactory.createServerSocket(
+                    listenPort, MAXCONN, InetAddress.getByName(listenHost));
 
-            serverSocket = new ServerSocket(listenPort, MAXCONN, InetAddress.getByName(listenHost));
+            serverSocket.setUseClientMode(false);
+            String[] pwdsuits = serverSocket.getSupportedCipherSuites();
+            serverSocket.setEnabledCipherSuites(pwdsuits);
+//            serverSocket = new ServerSocket(listenPort, MAXCONN, InetAddress.getByName(listenHost));
 
             while (true) {
                 try {
