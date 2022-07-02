@@ -1,0 +1,41 @@
+#kubectl -n app logs -f $(kubectl -n app get pods --field-selector status.phase=Running --no-headers -o custom-columns=":metadata.name" | grep simple-demo-web | head -1)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-demo-web
+  namespace: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: simple-demo-web
+  template:
+    metadata:
+      labels:
+        app: simple-demo-web
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      containers:
+        - name: simple-demo-web
+          image: gcr.io/xxx/simple-demo:v1
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 180
+            periodSeconds: 60
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp-volume
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+      restartPolicy: Always
+
+
+
+

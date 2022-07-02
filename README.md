@@ -67,3 +67,4 @@ src/main/java/pslab/Kuaima.java
     1.c) entityJson for defining the table structure.
 2, Run Kuaima.main method.
 
+##"deployable" folder content is copy from target, conf & script folders and Dockerfile.
