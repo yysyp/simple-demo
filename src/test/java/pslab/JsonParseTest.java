@@ -31,15 +31,15 @@ public class JsonParseTest {
         Properties companyAddrProperties = MyReadWriteUtil.readProperties(MyFileUtil.getFileInHomeDir("company-address.properties"));
 
         List<Object> shortFullNameExcelSheet = MyExcelUtil.readMoreThan1000RowBySheet(
-                MyFileUtil.getFileInHomeDir("2021年和2022年1-5月统计表(1).xlsx").getPath(),
+                MyFileUtil.getFileInHomeDir("种子数据-简称-全称-地区表.xlsx").getPath(),
                 new Sheet(3));
         Map<String, String> shortFullNameMap = constructShortFullName(shortFullNameExcelSheet);
 
         List<List<Object>> shortNameFullNameProvinceCityTable = new ArrayList<>();
 
         List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
-                MyFileUtil.getFileInHomeDir("2021.xlsx").getPath(),
-                new Sheet(2)); //sheetNo from 1... NOT 0
+                MyFileUtil.getFileInHomeDir("21-22年6月统计最终.xlsx").getPath(),
+                new Sheet(1)); //sheetNo from 1... NOT 0
 
         int count = 0;
         for (Object line : excelLines) {

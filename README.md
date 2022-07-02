@@ -32,12 +32,17 @@ http://localhost:8080/springdoc/docs.html
 http://localhost:8080/springdoc/api-docs.yaml
 
 ---------------------------------------------------------------------------------------------
-#Run & Start: script/buildk8s.bat
+#Method1: Run & Start: script/buildk8s.bat 
+#OR Git Bash at script folder & run: ./buildk8s.sh
 cd script
-buildk8s.bat
+buildk8s.bat / ./buildk8s.sh
 Swagger Doc Visit:
 http://localhost:30080/springdoc/docs.html
 http://localhost:30080/springdoc/api-docs.yaml
+
+#Method2: 
+2.a) build-deployable: copy jar & script etc. to deployable.
+2.b) deploy-deployable: create image from jar and deploy image.
 
 #Stop: kubectl delete namespace app
 ---------------------------------------------------------------------------------------------
@@ -53,3 +58,12 @@ xcopy /Y /S /E /H /R /C simple-demo\*.* %doc3-simple-demo%\
 1, update the <mainClass> value in pom.xml
 2, run mvn clean package -D spring-boot.repackage.skip=true -D fat.jar=true
 3, get the fat jar in: target/simple-demo-1.0.0-jar-with-dependencies.jar
+
+##pslab/Kuaima.java is a thymeleaf based quick code generator.
+src/main/java/pslab/Kuaima.java
+1, Modify tfsource/tf.properties
+    1.a) packageName is the target package name
+    1.b) moduleName is the target module name
+    1.c) entityJson for defining the table structure.
+2, Run Kuaima.main method.
+

@@ -12,6 +12,8 @@ public class HealthzResponse extends BasicOkResponse {
 
     private Health data;
 
+    private String db;
+
     @NoArgsConstructor
     @AllArgsConstructor
     @Getter

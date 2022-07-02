@@ -1,12 +1,10 @@
-#kubectl -n app logs -f $(kubectl -n app get pods --field-selector status.phase=Running --no-headers -o custom-columns=":metadata.name" | grep simple-demo-web | head -1)
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: simple-demo-web
   namespace: app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: simple-demo-web
@@ -14,8 +12,6 @@ spec:
     metadata:
       labels:
         app: simple-demo-web
-      annotations:
-        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
       containers:
         - name: simple-demo-web
@@ -26,8 +22,8 @@ spec:
             httpGet:
               path: /healthz
               port: 8080
-            initialDelaySeconds: 180
-            periodSeconds: 60
+            initialDelaySeconds: 3
+            periodSeconds: 3
           volumeMounts:
             - mountPath: /tmp
               name: tmp-volume
@@ -41,17 +37,33 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: simple-demo-service
+  name: simple-demo-web
   namespace: app
-  labels:
-    app: simple-demo-web
 spec:
-  ports:
-    - port: 8080 # between containers for service call for K8s
-      targetPort: 8080 # container port
-      nodePort: 30080 # by default >30000 for external call
-  type: NodePort
   selector:
     app: simple-demo-web
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
 
-
+---
+#Have to deploy ingress Nginx first. It will act as an Ingress-Controller:
+#kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.41.2/deploy/static/provider/cloud/deploy.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nodeport-ingress
+  namespace: app
+spec:
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: simple-demo-web
+            port:
+              number: 8080
