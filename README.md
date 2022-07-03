@@ -66,5 +66,5 @@ src/main/java/pslab/Kuaima.java
     1.b) moduleName is the target module name
     1.c) entityJson for defining the table structure.
 2, Run Kuaima.main method.
-
+3, Start springboot & visit: http://localhost:8080/api/{moduleName}/{table-name}
 ##"deployable" folder content is copy from target, conf & script folders and Dockerfile.

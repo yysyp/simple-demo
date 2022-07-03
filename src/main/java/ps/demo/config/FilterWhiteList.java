@@ -26,6 +26,8 @@ import java.util.Locale;
 @Order(-2147483647)
 public class FilterWhiteList extends OncePerRequestFilter {
 
+    @Value("${whitelist.enabled:true}")
+    private boolean enabled;
 
     @Value("${whitelist.uris}")
     private List<String> uris;
@@ -35,6 +37,10 @@ public class FilterWhiteList extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (!enabled) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String uri = request.getRequestURI();
         boolean reject = true;
         if (null == MyPrincipalUtils.getCurrentUser(request)) {
