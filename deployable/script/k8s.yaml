@@ -17,6 +17,10 @@ spec:
       annotations:
         cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
     spec:
+      securityContext:
+        runAsUser: 8888
+        runAsGroup: 9999
+        fsGroup: 9999
       containers:
         - name: simple-demo-web
           image: simple-demo:v1
@@ -31,8 +35,24 @@ spec:
           volumeMounts:
             - mountPath: /tmp
               name: tmp-volume
+            - mountPath: /app/conf
+              name: conf-volume
+            - mountPath: /app/log
+              name: log-volume
+            - mountPath: /app/ignorefolder/h2
+              name: h2-volume
+            - mountPath: /app/upload-folder
+              name: upload-volume
       volumes:
         - name: tmp-volume
+          emptyDir: {}
+        - name: conf-volume
+          emptyDir: {}
+        - name: log-volume
+          emptyDir: {}
+        - name: h2-volume
+          emptyDir: {}
+        - name: upload-volume
           emptyDir: {}
       restartPolicy: Always
 

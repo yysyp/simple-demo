@@ -1,5 +1,8 @@
 #! /bin/bash
 ##sed -i 's/\r$//' *.sh
+set -o nounset
+set -o errexit
+
 
 curDir=$PWD
 imgName=simple-demo

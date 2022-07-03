@@ -1,0 +1,58 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: my-persistent-volume
+  labels:
+    type: local
+spec:
+  storageClassName: pv-demo
+  capacity:
+    storage: 10Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /run/desktop/mnt/host/d/tmp/k8jobmq
+    type: DirectoryOrCreate
+
+
+---
+
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: my-persistent-volumeclaim
+spec:
+  storageClassName: pv-demo
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Mi
+
+
+---
+
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: myjob
+spec:
+  parallelism: 1
+  template:
+    spec:
+      containers:
+        - name: myjob
+          image: alpine
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', 'source /k8jobmq/jobconsumer.sh /k8jobmq/']
+          volumeMounts:
+            - mountPath: "/k8jobmq"
+              name: my-persistent-volumeclaim-name
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 0
+      volumes:
+        - name: my-persistent-volumeclaim-name
+          persistentVolumeClaim:
+            claimName: my-persistent-volumeclaim
