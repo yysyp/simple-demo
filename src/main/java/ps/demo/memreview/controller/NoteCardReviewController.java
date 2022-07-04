@@ -118,11 +118,10 @@ public class NoteCardReviewController extends MyBaseController {
             noteCardDto.setNextReviewDate(new Date());
         }
 
-        Integer curReviewCount = noteCardDto.getReviewCount();
+        Integer reviewCount = 1;
+        noteCardDto.setReviewCount(reviewCount);
         Integer size = noteReviewSettings.getReviewAtMinutes().size();
-        Integer gapMinutes = noteReviewSettings.getReviewAtMinutes().get(curReviewCount);
-        Double d = gapMinutes * noteReviewSettings.getFailMinus();
-        gapMinutes = d.intValue();
+        Integer gapMinutes = noteReviewSettings.getReviewAtMinutes().get(reviewCount);
         Date now = new Date();
         Date nextReview = MyTimeUtil.addMinutes(noteCardDto.getNextReviewDate(), gapMinutes);
         noteCardDto.setNextReviewDate(nextReview);
