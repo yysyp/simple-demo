@@ -64,3 +64,18 @@ dir:
 whitelist:
   uris: /index.html,/healthz,/css/,/js/,/img/,/vue/,/jqueryui/,/bootstrap-5.1.3/,/favicon.ico,/api/login,/login,/mock,/api/qnpoll/
   preciseUris: /
+
+note-card:
+  fontSize: 64
+  pageSize: 5
+  failMinus: 0.1
+  okMinus: 0.5
+  reviewAtMinutes:
+    - 5
+    - 30
+    - 720
+    - 1440
+    - 2880
+    - 5760
+    - 10080
+    - 21600

@@ -40,6 +40,16 @@ Swagger Doc Visit:
 http://localhost:30080/springdoc/docs.html
 http://localhost:30080/springdoc/api-docs.yaml
 
+##"deployable" folder content is copy from target, conf & script folders and Dockerfile.
+##Quick deploy to cloud for test:
+1) Mvn clean package to build jar in target folder
+2) Update script/deployJar.sh and script/k8s-gcr.yaml set correct "image ver"
+3) run script/build-deployable script to generate the deployable folder
+4) Winscp or scp to copy deployable folder to server
+5) run deployJar.sh
+6) check by kubectl logs:
+kubectl -n app logs $(kubectl -n app get pods --field-selector status.phase=Running --no-headers -o custom-columns=":metadata.name" | grep simple-demo-web | head -1)
+   
 #Method2: 
 2.a) build-deployable: copy jar & script etc. to deployable.
 2.b) deploy-deployable: create image from jar and deploy image.
@@ -67,4 +77,4 @@ src/main/java/pslab/Kuaima.java
     1.c) entityJson for defining the table structure.
 2, Run Kuaima.main method.
 3, Start springboot & visit: http://localhost:8080/api/{moduleName}/{table-name}
-##"deployable" folder content is copy from target, conf & script folders and Dockerfile.
+

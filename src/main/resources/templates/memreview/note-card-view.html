@@ -21,7 +21,7 @@
 <body>
 <div th:replace="~{fragments/header::header}"></div>
 <a th:href="@{/api/memreview/note-card}">[List]</a>
-
+<a th:href="@{/api/memreview/note-card/review}">[Review]</a>
 <div class="content-root">
     <div class="form-container">
     <form id="viewform" th:object="${noteCardModel.noteCardDto}">
@@ -29,11 +29,11 @@
     <tr><td><label>id:</label></td><td width="75%"><span th:text="*{id}" ></span><label> &nbsp;</label></td></tr>
     
     <tr><td><label>file:</label></td><td width="75%"><input type="text" id="file" name="file" readonly="readonly"  maxlength="50" th:value="*{file}" /></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>question:</label></td><td width="75%"><textarea type="text" id="question" name="question" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{question}" ></textarea></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>question:</label></td><td width="75%"><textarea type="text" id="question" name="question" readonly="readonly" rows="10" cols="50" required="required" maxlength="65535" th:text="*{question}" ></textarea></span><label> &nbsp;</label></td></tr>
     <tr><td><label>pic:</label></td><td width="75%"><input type="text" id="pic" name="pic" readonly="readonly"  maxlength="50" th:value="*{pic}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>answer:</label></td><td width="75%"><textarea type="text" id="answer" name="answer" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{answer}" ></textarea></span><label> &nbsp;</label></td></tr>
     <tr><td><label>isPic:</label></td><td width="75%"><input type="checkbox" id="isPic" name="isPic" readonly="readonly" th:checked="*{isPic}" /></span><label> &nbsp;</label></td></tr>
-    <tr><td><label>reviewCount:</label></td><td width="75%"><input type="number" id="reviewCount" name="reviewCount" readonly="readonly" required="required" maxlength="50" th:value="*{reviewCount}" /></span><label> &nbsp;</label></td></tr>
+    <tr><td><label>reviewCount:</label></td><td width="75%"><input type="number" id="reviewCount" name="reviewCount" readonly="readonly"  maxlength="50" th:value="*{reviewCount}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>nextReviewDate:</label></td><td width="75%"><input type="text" id="nextReviewDate" name="nextReviewDate" readonly="readonly"  th:value="*{#dates.format(nextReviewDate, 'yyyy-MM-dd HH:mm:ss')}" /></span><label> &nbsp;</label></td></tr>
     <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments" readonly="readonly" rows="10" cols="50"  maxlength="65535" th:text="*{comments}" ></textarea></span><label> &nbsp;</label></td></tr>
     

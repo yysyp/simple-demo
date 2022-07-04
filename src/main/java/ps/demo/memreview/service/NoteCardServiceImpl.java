@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import org.springframework.transaction.annotation.Transactional;
+import ps.demo.memreview.config.NoteReviewSettings;
 import ps.demo.order.repository.NewCartRepository;
 import ps.demo.memreview.dto.NoteCardDto;
 import ps.demo.memreview.dto.NoteCardReq;
@@ -45,6 +47,9 @@ import java.math.*;
 @Slf4j
 @Service
 public class NoteCardServiceImpl {
+
+    @Autowired
+    NoteReviewSettings noteReviewSettings;
 
     @Autowired
     NoteCardDao noteCardDao;
@@ -104,6 +109,20 @@ public class NoteCardServiceImpl {
 
     public Page<NoteCardDto> findInPage(Pageable pageable) {
         Page<NoteCard> page = noteCardDao.findAll(pageable);
+        Page<NoteCardDto> pageDto = page.map((e) -> {
+            NoteCardDto noteCardDto = new NoteCardDto();
+            MyBeanUtil.copyProperties(e, noteCardDto);
+            return noteCardDto;
+        });
+        return pageDto;
+    }
+
+    public Page<NoteCardDto> findInPageNotDeleted(Pageable pageable) {
+        NoteCard noteCard = new NoteCard();
+        noteCard.setIsLogicalDeleted(false);
+        Example<NoteCard> example = Example.of(noteCard);
+
+        Page<NoteCard> page = noteCardDao.findAll(example, pageable);
         Page<NoteCardDto> pageDto = page.map((e) -> {
             NoteCardDto noteCardDto = new NoteCardDto();
             MyBeanUtil.copyProperties(e, noteCardDto);

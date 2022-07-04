@@ -21,7 +21,7 @@
 <body>
 <div th:replace="~{fragments/header::header}"></div>
 <a th:href="@{/api/memreview/note-card}">[List]</a>
-
+<a th:href="@{/api/memreview/note-card/review}">[Review]</a>
 <div class="content-root">
 
 <div class="content-root">
@@ -34,11 +34,11 @@
 
 
     <tr><td><label>file:</label></td><td width="75%"><input type="text" id="file" name="file"   maxlength="50" th:value="*{file}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>question:</label></td><td width="75%"><textarea type="text" id="question" name="question"  rows="10" cols="50"  maxlength="65535" th:text="*{question}" ></textarea><label> &nbsp;</label></td></tr>
+    <tr><td><label>question:</label></td><td width="75%"><textarea type="text" id="question" name="question"  rows="10" cols="50" required="required" maxlength="65535" th:text="*{question}" ></textarea><label> &nbsp;</label></td></tr>
     <tr><td><label>pic:</label></td><td width="75%"><input type="text" id="pic" name="pic"   maxlength="50" th:value="*{pic}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>answer:</label></td><td width="75%"><textarea type="text" id="answer" name="answer"  rows="10" cols="50"  maxlength="65535" th:text="*{answer}" ></textarea><label> &nbsp;</label></td></tr>
     <tr><td><label>isPic:</label></td><td width="75%"><input type="checkbox" id="isPic" name="isPic"  th:checked="*{isPic}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>reviewCount:</label></td><td width="75%"><input type="number" id="reviewCount" name="reviewCount"  required="required" maxlength="50" th:value="*{reviewCount}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>reviewCount:</label></td><td width="75%"><input type="number" id="reviewCount" name="reviewCount"   maxlength="50" th:value="*{reviewCount}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>nextReviewDate:</label></td><td width="75%"><input type="text" id="nextReviewDate" name="nextReviewDate"   th:value="*{#dates.format(nextReviewDate, 'yyyy-MM-dd HH:mm:ss')}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments"  rows="10" cols="50"  maxlength="65535" th:text="*{comments}" ></textarea><label> &nbsp;</label></td></tr>
 

@@ -18,9 +18,80 @@
     <!--<script th:src="@{/js/localization/messages_zh.js}" type="text/javascript"></script>-->
 </head>
 <body>
-<div th:replace="~{fragments/header::header}"></div>
-<a th:href="@{/api/memreview/note-card/review}">[Review]</a>
+
 <div class="content-root">
+
+    <div class="list-container">
+
+            <div class="list">
+                <table class="list-table" border="1" cellspacing="0" cellpadding="0">
+                    <thead>
+                    <tr>
+                        <td width="120px">Info</td>
+                        <td colspan="3">Question</td>
+                        <td>OPS</td>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${noteCardModel.page.list.size()} eq 0">
+                        <td th:colspan="10">No data!</td>
+                    </tr>
+                    <tr th:each="noteCardDto:${noteCardModel.page.list}">
+                        <td>
+                            <!--
+                            <a th:href="@{'/api/memreview/note-card/'+${noteCardDto.id}}" title="View Detail">[V]</a>&nbsp;
+                            <a th:href="@{'/api/memreview/note-card/modify/'+${noteCardDto.id}}" title="Modify">[M]</a>
+                            -->
+                            <span th:text="'['+${noteCardDto.reviewCount}+'] '"></span>
+                            <span th:text="${#dates.format(noteCardDto.nextReviewDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                        </td>
+                        <td th:text="${noteCardDto.question}" colspan="3" style="font-size: 400px;"></td>
+                        <td>
+                            <form th:action="@{/api/memreview/note-card/review/pass}" method="post">
+                                <input type="hidden" name="id" th:value="${noteCardDto.id}"/>
+                                <input type="submit" name="submit" value=" 记 得 " style="background-color: green;"/>
+                            </form>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <form th:action="@{/api/memreview/note-card/review/ok}" method="post">
+                                <input type="hidden" name="id" th:value="${noteCardDto.id}"/>
+                                <input type="submit" name="submit" value=" 模 糊 " style="background-color: yellow;"/>
+                            </form>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <form th:action="@{/api/memreview/note-card/review/fail}" method="post">
+                                <input type="hidden" name="id" th:value="${noteCardDto.id}"/>
+                                <input type="submit" name="submit" value=" 忘 记 " style="background-color: red;"/>
+                            </form>
+                        </td>
+
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+        <form id="navigatorform" th:action="@{/api/memreview/note-card/list}" method="POST" th:object="${noteCardModel.noteCardReq}">
+            <div class="list-navigator">
+                <input id="navigatorKey" type="hidden" name="key" value="" />
+                <span th:text="'Total Pages (' + ${noteCardModel.page.pages} + ')'"></span>&nbsp;&nbsp;
+                <input type="hidden" name="pages" th:value="${noteCardModel.page.pages}" />&nbsp;
+                <span id="navigateToFirstPage" th:class="${noteCardModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
+                <span id="navigateToPreviousPage" th:class="${noteCardModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
+                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${noteCardModel.page.pages}"/>&nbsp;
+                <span id="navigateGoto">Go</span>&nbsp;
+                <span id="navigateToNextPage" th:class="${noteCardModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
+                <span id="navigateToLastPage" th:class="${noteCardModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
+            </div>
+        </form>
+        <!--list-container div end -->
+    </div>
 
     <form id="queryform" th:action="@{/api/memreview/note-card/list}" method="POST" th:object="${noteCardModel.noteCardReq}">
         <div class="query-container">
@@ -38,69 +109,6 @@
         </div>
     </form>
 
-    <div class="list-container">
-        <form id="listform">
-            <div class="list">
-                <table class="list-table" border="1" cellspacing="0" cellpadding="0">
-                    <thead>
-                    <tr>
-                        <td width="120px">Operations</td>
-                        <td>ID</td>
-                    
-                        <td>file</td>
-                        <td>question</td>
-                        <td>pic</td>
-                        <td>answer</td>
-                        <td>isPic</td>
-                        <td>reviewCount</td>
-                        <td>nextReviewDate</td>
-                        <td>comments</td>
-                    
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:if="${noteCardModel.page.list.size()} eq 0">
-                        <td th:colspan="10">No data!</td>
-                    </tr>
-                    <tr th:each="noteCardDto:${noteCardModel.page.list}">
-                        <td style="white-space: nowrap;">
-                            <a th:href="@{'/api/memreview/note-card/'+${noteCardDto.id}}" title="View Detail">[V]</a>&nbsp;
-                            <a th:href="@{'/api/memreview/note-card/remove/'+${noteCardDto.id}}" title="Delete">[D]</a>&nbsp;
-                            <a th:href="@{'/api/memreview/note-card/modify/'+${noteCardDto.id}}" title="Modify">[M]</a>
-                        </td>
-                        <td th:text="${noteCardDto.id}"></td>
-                        
-                            <td th:text="${noteCardDto.file}"></td>
-                            <td th:text="${noteCardDto.question}"></td>
-                            <td th:text="${noteCardDto.pic}"></td>
-                            <td th:text="${noteCardDto.answer}"></td>
-                            <td th:text="${noteCardDto.isPic}"></td>
-                            <td th:text="${noteCardDto.reviewCount}"></td>
-                            <td th:text="${noteCardDto.nextReviewDate}"></td>
-                            <td th:text="${noteCardDto.comments}"></td>
-                        
-
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </form>
-
-        <form id="navigatorform" th:action="@{/api/memreview/note-card/list}" method="POST" th:object="${noteCardModel.noteCardReq}">
-            <div class="list-navigator">
-                <input id="navigatorKey" type="hidden" name="key" value="" />
-                <span th:text="'Total Pages (' + ${noteCardModel.page.pages} + ')'"></span>&nbsp;&nbsp;
-                <input type="hidden" name="pages" th:value="${noteCardModel.page.pages}" />&nbsp;
-                <span id="navigateToFirstPage" th:class="${noteCardModel.page.isFirst}? 'disabled':'enabled'">&lt;&lt;</span>&nbsp;
-                <span id="navigateToPreviousPage" th:class="${noteCardModel.page.isFirst}? 'disabled':'enabled'">&lt;</span>&nbsp;
-                <input type="number" name="current" style="width: 50px;" th:value="*{current}" min="1" th:max="${noteCardModel.page.pages}"/>&nbsp;
-                <span id="navigateGoto">Go</span>&nbsp;
-                <span id="navigateToNextPage" th:class="${noteCardModel.page.isLast}? 'disabled':'enabled'">&gt;</span>&nbsp;
-                <span id="navigateToLastPage" th:class="${noteCardModel.page.isLast}? 'disabled':'enabled'">&gt;&gt;</span>
-            </div>
-        </form>
-        <!--list-container div end -->
-    </div>
     <!--content-root div end -->
 </div>
 
@@ -201,7 +209,6 @@ $(function() {
 /*]]>*/
 </script>
 
-<div th:replace="~{fragments/footer::footer}"></div>
 </body>
 </html>
 

@@ -86,6 +86,13 @@ public class MyTimeUtil {
         return calendar.getTime();
     }
 
+    public static Date addMinutes(Date date, int minutes) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MINUTE, minutes);
+        return calendar.getTime();
+    }
+
 //    public static Date toDate(String dateStr, String pattern) {
 //        java.time.format.DateTimeFormatter dateTimeFormatter =
 //                java.time.format.DateTimeFormatter.ofPattern(pattern);
