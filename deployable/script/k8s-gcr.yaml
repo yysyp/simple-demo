@@ -23,7 +23,7 @@ spec:
         fsGroup: 9999
       containers:
         - name: simple-demo-web
-          image: gcr.io/xxx/simple-demo:v1
+          image: gcr.io/xxx/simple-demo:versionplaceholder
           ports:
             - containerPort: 8080
           livenessProbe:

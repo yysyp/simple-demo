@@ -1,5 +1,8 @@
 package ps.demo.util;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -7,8 +10,51 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyKeyStoreUtil {
+
+    public static List<X509Certificate> getRootDefaultCaCertificates() {
+        List<X509Certificate> certificateList = new ArrayList<>();
+        try {
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init((KeyStore) null);
+            for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
+                if (trustManager instanceof X509TrustManager) {
+                    for (X509Certificate cer : ((X509TrustManager) trustManager).getAcceptedIssuers()) {
+                        certificateList.add(cer);
+                    }
+                }
+            }
+        } catch (NoSuchAlgorithmException | KeyStoreException e) {
+            e.printStackTrace();
+        }
+        return certificateList;
+    }
+
+    public static KeyStore createKeyStoreWithDefaultCa() {
+        try {
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null, null);
+            //
+            List<X509Certificate> certificateList = getRootDefaultCaCertificates();
+            for (X509Certificate certificate : certificateList) {
+                keyStore.setCertificateEntry(certificate.getSubjectDN().getName(), certificate);
+            }
+            return keyStore;
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     public static KeyStore getKeyStoreFromCer(File cerFile, String alias) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());

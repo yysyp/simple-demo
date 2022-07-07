@@ -1,12 +1,13 @@
 #! /bin/bash
 ##sed -i 's/\r$//' *.sh
 set -o nounset
-set -o errexit
+#set -o errexit
 
 echo '-----------------Initializing...-----------------'
+DateTimeVer=$(date +"%Y%m%d%H%M")
 curDir=$PWD
 imgName=simple-demo
-ver=v1
+ver="v$DateTimeVer"
 ns=app
 
 cd ..
@@ -20,6 +21,8 @@ cp Dockerfile deployable/
 cd deployable/
 
 echo '-----------------Docker build...-----------------'
+#gcloud auth configure-docker
+#echo 'password123' | docker login --username user123 --password-stdin https://xxx.bbb.ccc:12345
 docker build -t $imgName:$ver .
 if [ $? -ne 0 ]; then exit 1; fi
 
@@ -37,6 +40,7 @@ fi
 
 kubectl create namespace $ns
 if [ $? -ne 0 ]; then exit 1; fi
+sed -i "s/simple-demo:versionplaceholder/simple-demo:$ver/g" script/k8s.yaml
 kubectl apply -f script/k8s.yaml
 if [ $? -ne 0 ]; then exit 1; fi
 cd $curDir
