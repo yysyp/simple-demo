@@ -32,19 +32,17 @@ http://localhost:8080/springdoc/docs.html
 http://localhost:8080/springdoc/api-docs.yaml
 
 ---------------------------------------------------------------------------------------------
-#Method1: Run & Start: script/buildk8s.bat 
-#OR Git Bash at script folder & run: ./buildk8s.sh
-cd script
-buildk8s.bat / ./buildk8s.sh
-Swagger Doc Visit:
-http://localhost:30080/springdoc/docs.html
-http://localhost:30080/springdoc/api-docs.yaml
+#Method1: Run & Start: 
+    1) cd to script folder. 
+    2) run "buildk8s.sh" (Can use Git Bash to run) or "buildk8s.bat"
+    3) visit swagger:
+        http://localhost:30080/springdoc/docs.html
+        http://localhost:30080/springdoc/api-docs.yaml
 
 ##"deployable" folder content is copy from target, conf & script folders and Dockerfile.
 ##Quick deploy to cloud for test:
 1) Mvn clean package to build jar in target folder
-2) Update script/deployJar.sh and script/k8s-gcr.yaml set correct "image ver"
-3) run script/build-deployable script to generate the deployable folder
+2) run script/build-deployable script to generate the deployable folder
 4) Winscp or scp to copy deployable folder to server
 5) run deployJar.sh
 6) check by kubectl logs:

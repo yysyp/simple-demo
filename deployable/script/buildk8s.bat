@@ -2,7 +2,7 @@
 echo '-----------------Initializing...-----------------'
 set "curDir=%cd%"
 set imgName=simple-demo
-set ver=v1
+set ver=versionplaceholder
 set ns=app
 
 echo 'Please prepare the Dockerfile, k8s.yaml in currentDirectory!'
@@ -13,6 +13,10 @@ cd ..
 echo '-----------------Maven build and package...-----------------'
 call mvn clean package
 if %errorlevel% neq 0 exit /b %errorlevel%
+
+cd script
+call build-deployable.bat
+cd ..
 
 echo '-----------------Docker build...-----------------'
 call docker build -t %imgName%:%ver% .

@@ -23,7 +23,7 @@ spec:
         fsGroup: 9999
       containers:
         - name: simple-demo-web
-          image: simple-demo:v202207071759
+          image: simple-demo:versionplaceholder
           ports:
             - containerPort: 8080
           livenessProbe:
