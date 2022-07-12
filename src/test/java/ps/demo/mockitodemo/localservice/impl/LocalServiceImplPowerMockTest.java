@@ -63,18 +63,18 @@ public class LocalServiceImplPowerMockTest {
     /**
      * mock static方法
      */
-    @Test
-    @PrepareForTest(Node.class) //static方法定义在Node类中
-    public void testStatic() {
-        Node target = new Node(2, "mock");
-        PowerMockito.mockStatic(Node.class); //mock static方法前需要加这一句
-        PowerMockito.when(Node.getStaticNode()).thenReturn(target); //指定返回值
-
-        Node result = Node.getStaticNode(); //直接调用static方法，返回mock后的值
-        assertEquals(target, result); //验证返回值
-        assertEquals(2, result.getNum());
-        assertEquals("mock", result.getName());
-    }
+//    @Test
+//    @PrepareForTest(Node.class) //static方法定义在Node类中
+//    public void testStatic() {
+//        Node target = new Node(2, "mock");
+//        PowerMockito.mockStatic(Node.class); //mock static方法前需要加这一句
+//        PowerMockito.when(Node.getStaticNode()).thenReturn(target); //指定返回值
+//
+//        Node result = Node.getStaticNode(); //直接调用static方法，返回mock后的值
+//        assertEquals(target, result); //验证返回值
+//        assertEquals(2, result.getNum());
+//        assertEquals("mock", result.getName());
+//    }
 
     /**
      * mock 私有方法
