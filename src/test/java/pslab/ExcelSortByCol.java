@@ -1,44 +1,61 @@
 package pslab;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.read.builder.ExcelReaderBuilder;
+import com.alibaba.excel.read.metadata.ReadSheet;
+import org.apache.commons.lang3.StringUtils;
 import ps.demo.util.MyConvertUtil;
 import ps.demo.util.MyExcelUtil;
 import ps.demo.util.MyFileUtil;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ExcelSortByCol {
 
     public static void main(String[] args) {
 
+        File file = MyFileUtil.getFileInHomeDir("至7.18号应收款-3.xls");
+        ExcelReaderBuilder excelReaderBuilder = EasyExcel.read(file);
+        ExcelReader excelReader = excelReaderBuilder.build();
+        List<ReadSheet> sheets = excelReader.excelExecutor().sheetList();
+        for (ReadSheet sheet : sheets) {
+            System.out.println("--->>sheet ["+ (sheet.getSheetNo()+1) +"] ["+ sheet.getSheetName()+"]");
+        }
+
+
         List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
-                MyFileUtil.getFileInHomeDir("2022销售记录-共享版--V2-sort.xlsx").getPath(),
-                new Sheet(2));
+                MyFileUtil.getFileInHomeDir("至7.18号应收款-3.xls").getPath(),
+                new Sheet(3));
 
         excelLines.remove(0);
-        excelLines.remove(0);
+        //excelLines.remove(0);
 
         List<List<String>> table = convertToListListString(excelLines);
 
 
         List<List<String>> tableInvalid = table.stream().filter(e -> {
-            String seq = e.get(1);
+            String seq = e.get(2);
             return !(seq != null && seq.trim().startsWith("S"));
         }).collect(Collectors.toList());
 
         List<List<String>> table2 = table.stream().filter(e -> {
-            String seq = e.get(1);
+            String seq = e.get(2);
             return seq != null && seq.trim().startsWith("S");
         }).sorted((e1, e2) -> {
-            String s1 = e1.get(1).replace("S", "").replaceFirst("-", ".");
+            String s1 = e1.get(2).replace("S", "").replaceFirst("-", ".");
             s1 = s1.replaceAll("-", "")
                     .replaceAll("/", "")
                     .replaceAll("&", "")
                     .replaceAll("\\\\", "");
-            String s2 = e2.get(1).replace("S", "").replaceFirst("-", ".");
+            String s2 = e2.get(2).replace("S", "").replaceFirst("-", ".");
             s2 = s2.replaceAll("-", "")
                     .replaceAll("/", "")
                     .replaceAll("&", "")
@@ -46,8 +63,76 @@ public class ExcelSortByCol {
             return Double.compare(Double.parseDouble(s1), Double.parseDouble(s2));
         }).collect(Collectors.toList());
 
+        //table2 remove & merge -xxx
+        table2 = table2.stream().map(e -> {
+            String seq = StringUtils.substringBefore(e.get(2), "-");
+            e.set(2, seq);
+            return e;
+        }).collect(Collectors.toList());
+
+        Map<String, List<String>> groupList =
+        table2.stream().collect(Collectors.groupingBy(e -> {return e.get(2);},
+                Collectors.collectingAndThen(Collectors.toList(), list -> {
+                    List<String> firstLine = list.get(0);
+                    if (list.size() == 1) {
+                        return firstLine;
+                    }
+                    BigDecimal sumCol7 = new BigDecimal("0");
+                    BigDecimal sumCol8 = new BigDecimal("0");
+                    BigDecimal sumCol9 = new BigDecimal("0");
+                    BigDecimal sumCol10 = new BigDecimal("0");
+                    BigDecimal sumCol11 = new BigDecimal("0");
+                    BigDecimal sumCol12 = new BigDecimal("0");
+
+                    for (List<String> line : list) {
+                        try {
+                            String x = line.get(7);
+                            BigDecimal bd = new BigDecimal(x);
+                            sumCol7 = sumCol7.add(bd);
+                        } catch (Exception e) {}
+                        try {
+                            String x = line.get(8);
+                            BigDecimal bd = new BigDecimal(x);
+                            sumCol8 = sumCol8.add(bd);
+                        } catch (Exception e) {}
+                        try {
+                            String x = line.get(9);
+                            BigDecimal bd = new BigDecimal(x);
+                            sumCol9 = sumCol9.add(bd);
+                        } catch (Exception e) {}
+                        try {
+                            String x = line.get(10);
+                            BigDecimal bd = new BigDecimal(x);
+                            sumCol10 = sumCol10.add(bd);
+                        } catch (Exception e) {}
+                        try {
+                            String x = line.get(11);
+                            BigDecimal bd = new BigDecimal(x);
+                            sumCol11 = sumCol11.add(bd);
+                        } catch (Exception e) {}
+                        try {
+                            String x = line.get(12);
+                            BigDecimal bd = new BigDecimal(x);
+                            sumCol12 = sumCol12.add(bd);
+                        } catch (Exception e) {}
+
+                    }
+                    firstLine.set(7, sumCol7.toString());
+                    firstLine.set(8, sumCol8.toString());
+                    firstLine.set(9, sumCol9.toString());
+                    firstLine.set(10, sumCol10.toString());
+                    firstLine.set(11, sumCol11.toString());
+                    firstLine.set(12, sumCol12.toString());
+                    return firstLine;
+                })
+                ));
+
+        //table2.addAll(groupList.values());
+        //table2 = groupList.values();
+
         List<List<String>> tableAll = new ArrayList<>();
-        tableAll.addAll(table2);
+        //tableAll.addAll(table2);
+        tableAll.addAll(groupList.values());
         tableAll.addAll(tableInvalid);
         for (int i = 0; i < tableAll.size(); i++) {
             List<String> line = tableAll.get(i);
@@ -61,6 +146,7 @@ public class ExcelSortByCol {
         List<List<Object>> list = MyConvertUtil.castListToObject(tableAll);
         File outExcel = MyFileUtil.getFileTsInHomeDir("sorted-excel.xlsx");
         MyExcelUtil.writeBySimple(outExcel.getPath(), list);
+        System.out.println("-->OutExcel:"+outExcel);
 
     }
 
