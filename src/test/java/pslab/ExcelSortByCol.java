@@ -22,7 +22,8 @@ public class ExcelSortByCol {
 
     public static void main(String[] args) {
 
-        File file = MyFileUtil.getFileInHomeDir("至7.18号应收款-3.xls");
+        String fileName = "7.20号应收-3.xls";
+        File file = MyFileUtil.getFileInHomeDir(fileName);
         ExcelReaderBuilder excelReaderBuilder = EasyExcel.read(file);
         ExcelReader excelReader = excelReaderBuilder.build();
         List<ReadSheet> sheets = excelReader.excelExecutor().sheetList();
@@ -32,7 +33,7 @@ public class ExcelSortByCol {
 
 
         List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
-                MyFileUtil.getFileInHomeDir("至7.18号应收款-3.xls").getPath(),
+                MyFileUtil.getFileInHomeDir(fileName).getPath(),
                 new Sheet(3));
 
         excelLines.remove(0);
@@ -77,52 +78,9 @@ public class ExcelSortByCol {
                     if (list.size() == 1) {
                         return firstLine;
                     }
-                    BigDecimal sumCol7 = new BigDecimal("0");
-                    BigDecimal sumCol8 = new BigDecimal("0");
-                    BigDecimal sumCol9 = new BigDecimal("0");
-                    BigDecimal sumCol10 = new BigDecimal("0");
-                    BigDecimal sumCol11 = new BigDecimal("0");
-                    BigDecimal sumCol12 = new BigDecimal("0");
 
-                    for (List<String> line : list) {
-                        try {
-                            String x = line.get(7);
-                            BigDecimal bd = new BigDecimal(x);
-                            sumCol7 = sumCol7.add(bd);
-                        } catch (Exception e) {}
-                        try {
-                            String x = line.get(8);
-                            BigDecimal bd = new BigDecimal(x);
-                            sumCol8 = sumCol8.add(bd);
-                        } catch (Exception e) {}
-                        try {
-                            String x = line.get(9);
-                            BigDecimal bd = new BigDecimal(x);
-                            sumCol9 = sumCol9.add(bd);
-                        } catch (Exception e) {}
-                        try {
-                            String x = line.get(10);
-                            BigDecimal bd = new BigDecimal(x);
-                            sumCol10 = sumCol10.add(bd);
-                        } catch (Exception e) {}
-                        try {
-                            String x = line.get(11);
-                            BigDecimal bd = new BigDecimal(x);
-                            sumCol11 = sumCol11.add(bd);
-                        } catch (Exception e) {}
-                        try {
-                            String x = line.get(12);
-                            BigDecimal bd = new BigDecimal(x);
-                            sumCol12 = sumCol12.add(bd);
-                        } catch (Exception e) {}
+                    groupSum(list, firstLine);
 
-                    }
-                    firstLine.set(7, sumCol7.toString());
-                    firstLine.set(8, sumCol8.toString());
-                    firstLine.set(9, sumCol9.toString());
-                    firstLine.set(10, sumCol10.toString());
-                    firstLine.set(11, sumCol11.toString());
-                    firstLine.set(12, sumCol12.toString());
                     return firstLine;
                 })
                 ));
@@ -138,7 +96,7 @@ public class ExcelSortByCol {
             List<String> line = tableAll.get(i);
             line.add(0, (1000+i)+"");
         }
-        printList(tableAll);
+        //printList(tableAll);
         tableAll = tableAll.stream().sorted((e1, e2) -> {
             return Integer.compare(Integer.parseInt(e1.get(1)), Integer.parseInt(e2.get(1)));
         }).collect(Collectors.toList());
@@ -147,6 +105,29 @@ public class ExcelSortByCol {
         File outExcel = MyFileUtil.getFileTsInHomeDir("sorted-excel.xlsx");
         MyExcelUtil.writeBySimple(outExcel.getPath(), list);
         System.out.println("-->OutExcel:"+outExcel);
+
+    }
+
+    private static void groupSum(List<List<String>> list, List<String> firstLine) {
+
+        for (int i = 7; i <= 12; i++) {
+            BigDecimal sumCol = new BigDecimal("0");
+            for (List<String> line : list) {
+
+                try {
+                    String x = line.get(i);
+                    if (StringUtils.isBlank(x)) {
+                        x = "0";
+                    }
+                    BigDecimal bd = new BigDecimal(x);
+                    sumCol = sumCol.add(bd);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+            firstLine.set(i, sumCol.toString());
+        }
 
     }
 
