@@ -14,15 +14,43 @@ public class MyRegexUtil {
     public static final String REG_EMAIL = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
     public static final String REG_SYMBOL = "[\\pP\\pS\\pZ\\pM\\n]";
 
+    /**
+     * /pP 其中的小写 p 是 property 的意思，表示 Unicode 属性，用于 Unicode 正表达式的前缀。
+     *
+     * P：标点字符
+     * L：字母；
+     * M：标记符号（一般不会单独出现）；
+     * Z：分隔符（比如空格、换行等）；
+     * S：符号（比如数学符号、货币符号等）；
+     * N：数字（比如阿拉伯数字、罗马数字等）；
+     * C：其他字符
+     *
+     */
+
     public static final Pattern PATTERN_CHINESE_BY_REG =Pattern.compile("[\\u4E00-\\u9FBF]+");
     public static final Pattern PATTERN_CHINESE =Pattern.compile("[\u4E00-\u9FA5]+");
     public static final Pattern PATTERN_MESSY_CODE =Pattern.compile("\\s*|\t*|\r*|\n*");
 
     public static String removeSymbols(String s) {
+        return removeSymbolsByReg(s, REG_SYMBOL);
+    }
+
+    public static String removeSymbolsExceptAlpNumberHyphenUnderline(String s) {
+        return removeSymbolsByReg(s, "[^(a-zA-Z0-9\\-\\_)]");
+    }
+
+    public static String removeChinese(String s) {
         if (s == null) {
             return s;
         }
-        return s.replaceAll(REG_SYMBOL, "");
+        return s.replaceAll("[\u4E00-\u9FA5]+", "");
+    }
+
+    public static String removeSymbolsByReg(String s, String reg) {
+        if (s == null) {
+            return s;
+        }
+        return s.replaceAll(reg, "");
     }
 
     public static String regularString(String s) {

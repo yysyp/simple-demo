@@ -1,11 +1,15 @@
 package ps.demo.util;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.EasyExcelFactory;
+import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.metadata.BaseRowModel;
 import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.read.builder.ExcelReaderBuilder;
+import com.alibaba.excel.read.metadata.ReadSheet;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import lombok.Data;
 import lombok.Getter;
@@ -20,28 +24,84 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**<code>
-List<MyExcelModel> data = new ArrayList<>();
-for (int i = 0; i < 10; i++) {
-    MyExcelModel row = new MyExcelModel.MyExcelModelBuilder()
-    .name("haha-name" + i)
-    .age(new Random().nextInt(100))
-    .score(new Random().nextDouble() * 100).build();
-    data.add(row);
-}
-MyExcelUtil.writeBySimple(MyFileUtil.getFileTsInHomeDir("myexcel.xlsx"), data);
-
-
-System.out.println("--->>Excel read from myExcelFile=" + myExcelFile);
-List<MyExcelModel> list3 =  MyExcelUtil.readMoreThan1000Row(myExcelFile, 1, 1, MyExcelModel.class);
-int j = 0;
-for (MyExcelModel myExcelModel : list3) {
-    j++;
-    System.out.println("[" + j + "] " + myExcelModel);
-}</code>
-*/
+/**
+ * <code>
+ * List<MyExcelModel> data = new ArrayList<>();
+ * for (int i = 0; i < 10; i++) {
+ * MyExcelModel row = new MyExcelModel.MyExcelModelBuilder()
+ * .name("haha-name" + i)
+ * .age(new Random().nextInt(100))
+ * .score(new Random().nextDouble() * 100).build();
+ * data.add(row);
+ * }
+ * MyExcelUtil.writeBySimple(MyFileUtil.getFileTsInHomeDir("myexcel.xlsx"), data);
+ * <p>
+ * <p>
+ * System.out.println("--->>Excel read from myExcelFile=" + myExcelFile);
+ * List<MyExcelModel> list3 =  MyExcelUtil.readMoreThan1000Row(myExcelFile, 1, 1, MyExcelModel.class);
+ * int j = 0;
+ * for (MyExcelModel myExcelModel : list3) {
+ * j++;
+ * System.out.println("[" + j + "] " + myExcelModel);
+ * }</code>
+ */
 @Slf4j
 public class MyExcelUtil {
+
+
+    //================================New way Begin=====================================//
+    public static List<Object> loadExcelBySheetName(File file, String sheetName) {
+        ExcelReaderBuilder excelReaderBuilder = EasyExcel.read(file);
+        ExcelReader excelReader = excelReaderBuilder.build();
+        List<ReadSheet> sheets = excelReader.excelExecutor().sheetList();
+        int sheetNo = -1;
+        StringBuilder buffer = new StringBuilder();
+        for (ReadSheet sheet : sheets) {
+            buffer.append(sheet.getSheetName());
+            buffer.append(", ");
+            if (sheet.getSheetName().equals(sheetName)) {
+                sheetNo = sheet.getSheetNo() + 1;
+                //break;
+            }
+        }
+        if (sheetNo < 0) {
+            throw new RuntimeException("Not find the sheet "+sheetName);
+        }
+        log.info("Available sheets are {}", buffer);
+        List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
+                file.getPath(),
+                new Sheet(sheetNo));
+        return excelLines;
+    }
+
+    public static List<Object> loadExcelBySheetNameInHomeDir(String fileName, String sheetName) {
+        File file = MyFileUtil.getFileInHomeDir(fileName);
+        return MyExcelUtil.loadExcelBySheetName(file, sheetName);
+    }
+
+    public static List<List<Object>> castSheetForOutputSheet(List<Object> lists) {
+        List<List<Object>> listObj = new ArrayList<>();
+        for (Object line : lists) {
+            listObj.add((List<Object>) line);
+        }
+        return listObj;
+    }
+
+    public static File saveSheetDataToExcelInHomeDir(String fileName, List<Object> sheetData) {
+        File outExcel = MyFileUtil.getFileTsInHomeDir(fileName);
+        MyExcelUtil.writeBySimple(outExcel.getPath(), castSheetForOutputSheet(sheetData));
+        return outExcel;
+    }
+
+    public static void printList(List<Object> excel) {
+        int i = 0;
+        for (Object line : excel) {
+            System.out.println("[line:" + (++i) + "]: " + line);
+        }
+    }
+
+    //================================New way End=====================================//
+
 
     private static Sheet initSheet;
 
