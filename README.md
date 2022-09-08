@@ -76,3 +76,5 @@ src/main/java/pslab/Kuaima.java
 2, Run Kuaima.main method.
 3, Start springboot & visit: http://localhost:8080/api/{moduleName}/{table-name}
 
+##Page fetching:
+doc3\3-learn\33-coding\337-mytool-demo-snippet-code\myiconclick\src\ps\demo\OreillyFetch.java

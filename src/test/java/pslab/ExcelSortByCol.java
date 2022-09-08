@@ -22,7 +22,7 @@ public class ExcelSortByCol {
 
     public static void main(String[] args) {
 
-        String fileName = "7.20号应收-3.xls";
+        String fileName = "8月应收汇总-fix-column.xls";
         File file = MyFileUtil.getFileInHomeDir(fileName);
         ExcelReaderBuilder excelReaderBuilder = EasyExcel.read(file);
         ExcelReader excelReader = excelReaderBuilder.build();
@@ -34,7 +34,7 @@ public class ExcelSortByCol {
 
         List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
                 MyFileUtil.getFileInHomeDir(fileName).getPath(),
-                new Sheet(3));
+                new Sheet(1));
 
         excelLines.remove(0);
         //excelLines.remove(0);

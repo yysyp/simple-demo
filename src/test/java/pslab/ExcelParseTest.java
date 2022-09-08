@@ -18,8 +18,8 @@ public class ExcelParseTest {
 
     public static void main(String[] args) {
 
-        Sheet sheet4 = new Sheet(5);
-        List<Object> table = MyExcelUtil.readMoreThan1000RowBySheet("C:\\Users\\Dell\\应收款-0619导.xlsx", sheet4);
+        Sheet sheet4 = new Sheet(1);
+        List<Object> table = MyExcelUtil.readMoreThan1000RowBySheet("C:\\Users\\Dell\\8月应收汇总.xls", sheet4);
         List<RecMod> recMods = new ArrayList<>();
         for (int i = 0, n = table.size(); i < n; i++) {
             if (i == 0) {

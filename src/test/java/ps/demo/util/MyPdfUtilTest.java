@@ -18,7 +18,7 @@ public class MyPdfUtilTest {
 
     public static void main(String[] args) {
         List<File> files = new ArrayList();
-        File folder = new File("D:\\patrick\\book\\book1");
+        File folder = new File("D:\\patrick\\book\\Redux Made Easy with Rematch");
         File[] tempList = folder.listFiles();
         for (int i = 0; i < tempList.length; i++) {
             File file = tempList[i];
