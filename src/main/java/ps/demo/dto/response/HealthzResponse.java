@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class HealthzResponse extends BasicOkResponse {
+public class HealthzResponse extends DefaultResponse {
 
     private Health data;
 

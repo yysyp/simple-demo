@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.WebUtils;
-import ps.demo.dto.response.ErrorResponse;
 import ps.demo.exception.BadRequestException;
 import ps.demo.exception.CodeEnum;
 import ps.demo.util.MyJsonUtil;

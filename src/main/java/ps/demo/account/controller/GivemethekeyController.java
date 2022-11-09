@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ps.demo.account.service.LoginServiceImpl;
-import ps.demo.dto.response.ErrorResponse;
+
 
 @Slf4j
 @RestController

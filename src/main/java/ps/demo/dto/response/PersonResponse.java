@@ -8,7 +8,7 @@ import ps.demo.dto.Person;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonResponse extends BasicOkResponse {
+public class PersonResponse extends AbsResponse {
 
     private Person data;
 

@@ -1,4 +1,4 @@
-Refer to static/index.html
+Refer to static/oldindex.html
 
 
 sample form snippet:
@@ -26,7 +26,7 @@ sample form snippet:
 ---------------------------------------------------------------------------------------------
 #Run ps.demo.WebServerApplication
 health: http://localhost:8080/healthz
-http://localhost:8080/
+http://localhost:8080/oldindex.html
 Swagger Doc Visit:
 http://localhost:8080/springdoc/docs.html
 http://localhost:8080/springdoc/api-docs.yaml

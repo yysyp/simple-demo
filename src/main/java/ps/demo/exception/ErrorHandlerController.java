@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ps.demo.dto.response.ErrorResponse;
+import ps.demo.dto.response.DefaultResponse;
 import ps.demo.util.MyHeaderUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,10 +30,10 @@ public class ErrorHandlerController extends AbstractErrorController {
     }
 
     @RequestMapping
-    public ResponseEntity<ErrorResponse> error(HttpServletRequest request) {
+    public ResponseEntity<DefaultResponse> error(HttpServletRequest request) {
         log.info("--->>ErrorHandlerController error");
         BadRequestException exception = new BadRequestException(CodeEnum.NOT_FOUND);
-        ErrorResponse errorResponse = exception.toErrorResponse();
+        DefaultResponse errorResponse = exception.toErrorResponse();
         HttpStatus status = HttpStatus.valueOf(exception.getCodeEnum().getHttpCode());
         ErrorAttributeOptions options = ErrorAttributeOptions.defaults();
         options = options.including(new ErrorAttributeOptions.Include[]{ErrorAttributeOptions.Include.EXCEPTION})

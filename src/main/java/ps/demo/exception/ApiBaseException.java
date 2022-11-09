@@ -2,7 +2,7 @@ package ps.demo.exception;
 
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import ps.demo.dto.response.ErrorResponse;
+import ps.demo.dto.response.DefaultResponse;
 import ps.demo.util.MyHeaderUtil;
 import ps.demo.util.MyRequestContextUtil;
 import ps.demo.util.MyTimeUtil;
@@ -53,8 +53,8 @@ public class ApiBaseException extends RuntimeException {
         return this.retryable;
     }
 
-    public ErrorResponse toErrorResponse() {
-        ErrorResponse errorResponse = new ErrorResponse();
+    public DefaultResponse toErrorResponse() {
+        DefaultResponse errorResponse = new DefaultResponse();
         errorResponse.setCode(codeEnum.getCode());
         errorResponse.setMessage(this.getMessage());
         if (MyHeaderUtil.isTrace()) {
