@@ -1,3 +1,6 @@
+#Build to "src/main/resources/static/umi"
+cnpm i
+cnpm run build:sit
 
 #Init with umi-app template:
 cnpm i yarn tyarn -g
@@ -21,7 +24,7 @@ Umi 的配置在 .umirc.ts 或 config/config.ts (二选一，.umirc.ts 优先级
 运行顺序：global.tsx > app.tsx > umi.ts
 
 
-#http request: 
+#http request:
 cnpm install axios
 cnpm i --save lodash
 cnpm i --save xss

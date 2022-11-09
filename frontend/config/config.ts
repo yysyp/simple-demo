@@ -6,17 +6,24 @@ export default defineConfig({
   define: {
     reqBaseUrl: ''
   },
+//   nodeModulesTransform: {
+//     type: 'all',
+//   },
   nodeModulesTransform: {
-    type: 'none',
+      type: 'none',
   },
+//   nodeModulesTransform: {
+//     type: 'none',
+//     exclude: ['@umijs/utils'],
+//   },
   dva: {
     immer: false,
   },
   targets: {
     ie: 11,
   },
-  //base: '/',
-  //publicPath: '/',
+  //base: '/', //default is '/', modify it when not deploy to root context path
+  publicPath: '/umi/', //To make the generated 'index.html' to have href='/umi/xxx' and src='/umi/xxx'
   //runtimePublicPath: true,
   // routes: [
   //   { path: '/', component: '@/pages/index' },

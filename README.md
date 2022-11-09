@@ -1,4 +1,4 @@
-Refer to static/oldindex.html
+Refer to static/index.html
 
 
 sample form snippet:
@@ -26,7 +26,7 @@ sample form snippet:
 ---------------------------------------------------------------------------------------------
 #Run ps.demo.WebServerApplication
 health: http://localhost:8080/healthz
-http://localhost:8080/oldindex.html
+http://localhost:8080/index.html
 Swagger Doc Visit:
 http://localhost:8080/springdoc/docs.html
 http://localhost:8080/springdoc/api-docs.yaml
@@ -58,10 +58,12 @@ kubectl -n app logs $(kubectl -n app get pods --field-selector status.phase=Runn
 cd frontend
 cnpm i
 cnpm run build:sit
-Copy files in "src/main/resources/static/umi" to "src/main/resources/static" OR 
-Modify "src/main/resources/static/umi/index.html":
-a) href="/umi... TO href="/umi/umi...
-b) src="/umi... TO src="/umi/umi...
+
+Below "umi/index.html" no need anymore, as the config "publicPath: '/umi/'" can do the trick.
+#--Copy files in "src/main/resources/static/umi" to "src/main/resources/static" OR 
+#--Modify "src/main/resources/static/umi/index.html":
+#--a) href="/umi... TO href="/umi/umi...
+#--b) src="/umi... TO src="/umi/umi...
 
 #Copy dependencies from maven:
 1) run command: mvn install dependency:copy-dependencies 
