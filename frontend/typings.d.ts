@@ -16,5 +16,11 @@ declare const ENV: string;
 declare const reqBaseUrl: string;
 
 declare interface CommonRes {
-  status: string;
+  code: string;
+  message?: string;
+  trace?: string;
+  correlationId?: string;
+  instance?: string;
+  timestamp?: string;
+  path?: string;
 }

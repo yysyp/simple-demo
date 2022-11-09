@@ -24,7 +24,7 @@ namespace SubmitFormDataTest {
 const submitFormDataTest = (data: FormData): Promise<FormData> => {
   return request({
     method: 'post',
-    url: '/api/upload/file?key=umijsdemo2',
+    url: '/api/newstock/file/upload',
     data: data,
     headers: { 'Content-Type': 'multipart/form-data' },
   });
@@ -61,10 +61,31 @@ const getProduct = (req: GetProduct.Req): Promise<GetProduct.Res> => {
   });
 };
 
+namespace SubmitStock {
+  export type Req = {
+    formData: FormData;
+  };
+
+  export type Res = CommonRes & {
+    data?: {};
+  };
+}
+
+const submitStock = (req: SubmitStock.Req): Promise<SubmitStock.Res> => {
+  return request({
+    url: '/api/newstock/file/upload',
+    method: 'post',
+    headers: { 'Content-Type': 'multipart/form-data' },
+    data: req.formData,
+  });
+};
+
 export {
   GetUser,
   SubmitFormDataTest,
   GetProduct,
+  SubmitStock,
+  submitStock,
   getProduct,
   submitFormDataTest,
   getUser,

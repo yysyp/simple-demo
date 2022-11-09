@@ -4,16 +4,16 @@ export default defineConfig({
   devtool: 'source-map',
   define: {
     ENV: 'dev',
-    reqBaseUrl: 
-    //'http://localhost:8000'
-    ''
+    reqBaseUrl:
+      //'http://localhost:8000'
+      '',
   },
   proxy: {
-    "/api": {
-        "target": "http://localhost:8080",
-        "secure": false,
-        "changeOrigin": true,
-        //"pathRewrite": {"^/px": ""}
-    }
+    '/api': {
+      target: 'http://localhost:8080',
+      secure: false,
+      changeOrigin: true,
+      //"pathRewrite": {"^/px": ""}
+    },
   },
 });

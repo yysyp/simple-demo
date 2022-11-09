@@ -1,19 +1,28 @@
 package ps.demo.newstock.controller;
 
 
-
+import com.alibaba.excel.util.StringUtils;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ps.demo.dto.response.DefaultResponse;
+import ps.demo.exception.BadRequestException;
+import ps.demo.exception.CodeEnum;
+import ps.demo.exception.ServerApiException;
+import ps.demo.util.MyExcelUtil;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +33,34 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/api/newstock/file")
 public class FileImportExportController {
+
+    @Operation(summary = "File upload with multipart form data")
+    @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ResponseBody
+    public DefaultResponse uploadFile(@RequestParam("file") MultipartFile file,
+                             @RequestParam(value = "companyCode", required = true) String companyCode,
+                             @RequestParam(value = "companyName", required = true) String companyName,
+                             HttpServletRequest req) {
+        if (file == null) {
+            throw new BadRequestException(CodeEnum.BAD_REQUEST, false, "File is required.");
+        }
+        try {
+            String fileName = file.getOriginalFilename();
+            log.info("new Stock upload file companyName={}, companyCode={}", companyName, companyCode);
+
+            try (InputStream is = new BufferedInputStream(file.getInputStream())) {
+                List<Object> sheet = MyExcelUtil.readMoreThan1000RowBySheet(is, null);
+                for (int i = 0, n = sheet.size(); i < n; i++) {
+                    List<String> line = (List<String>) sheet.get(i);
+                    System.out.println("line<"+i+">: "+line);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new ServerApiException(CodeEnum.INTERNAL_SERVER_ERROR, true, "--------->>File upload failed, ex:" + e.getMessage());
+        }
+        return DefaultResponse.success("Upload Success");
+    }
 
 
 //    @PostMapping("/batchImport")
