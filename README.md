@@ -54,6 +54,15 @@ kubectl -n app logs $(kubectl -n app get pods --field-selector status.phase=Runn
 
 #Stop: kubectl delete namespace app
 ---------------------------------------------------------------------------------------------
+#Build frontend:
+cd frontend
+cnpm i
+cnpm run build:sit
+Copy files in "src/main/resources/static/umi" to "src/main/resources/static" OR 
+Modify "src/main/resources/static/umi/index.html":
+a) href="/umi... TO href="/umi/umi...
+b) src="/umi... TO src="/umi/umi...
+
 #Copy dependencies from maven:
 1) run command: mvn install dependency:copy-dependencies 
 2) find the jars in: target/dependency

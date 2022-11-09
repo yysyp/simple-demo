@@ -9,6 +9,12 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
+  dva: {
+    immer: false,
+  },
+  targets: {
+    ie: 11,
+  },
   //base: '/',
   //publicPath: '/',
   //runtimePublicPath: true,
@@ -18,5 +24,5 @@ export default defineConfig({
   // ],
   fastRefresh: {},
   mfsu: {},
-  outputPath: ''
+  outputPath: '../src/main/resources/static/umi',
 });
