@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,18 +15,22 @@ import ps.demo.dto.response.DefaultResponse;
 import ps.demo.exception.BadRequestException;
 import ps.demo.exception.CodeEnum;
 import ps.demo.exception.ServerApiException;
+import ps.demo.newstock.dto.NewStockDataDto;
+import ps.demo.newstock.entity.NewStockData;
+import ps.demo.newstock.service.HandleUpload;
+import ps.demo.newstock.service.NewStockDataServiceImpl;
 import ps.demo.util.MyExcelUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +38,12 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/api/newstock/file")
 public class FileImportExportController {
+
+    @Autowired
+    private HandleUpload handleUpload;
+
+    @Autowired
+    private NewStockDataServiceImpl newStockDataServiceImpl;
 
     @Operation(summary = "File upload with multipart form data")
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -50,13 +61,55 @@ public class FileImportExportController {
 
             try (InputStream is = new BufferedInputStream(file.getInputStream())) {
                 List<Object> sheet = MyExcelUtil.readMoreThan1000RowBySheet(is, null);
-                for (int i = 0, n = sheet.size(); i < n; i++) {
-                    List<String> line = (List<String>) sheet.get(i);
-                    System.out.println("line<"+i+">: "+line);
+                List<NewStockDataDto> kemuRecords = handleUpload.handleDebtBenefitCashFlowExcel(sheet, companyCode, companyName, fileName);
+
+                Instant now = Instant.now();
+                for (int i = 0; i < kemuRecords.size(); i++) {
+                    NewStockDataDto dto = kemuRecords.get(i);
+                    List<NewStockData> exist = newStockDataServiceImpl.findByCompanyCodePeriodKemu(dto.getCompanyCode(), dto.getPeriodYear(), dto.getPeriodMonth(), dto.getKemu());
+                    if (CollectionUtils.isEmpty(exist)) {
+                        dto.setCreatedOn(now);
+                        dto.setModifiedOn(now);
+                        dto.setCreatedBy("sys");
+                        dto.setModifiedBy("sys");
+                        dto.setIsActive(true);
+                        dto.setIsLogicalDeleted(false);
+                        newStockDataServiceImpl.save(dto);
+                    }
+                }
+
+                //Calc Yoy
+                Calendar calendar = Calendar.getInstance();
+                int nowYear = calendar.get(Calendar.YEAR);
+                Integer[] months = new Integer[] {3, 6, 9, 12};
+                for (Integer pm : months) {
+                    for (int year = 1991; year <= nowYear; year++) {
+                        int previousYear = year - 1;
+                        List<NewStockData> nullYoyList = newStockDataServiceImpl.findByCompanyCodePeriodWithNullYoy(companyCode, year, pm);
+                        for (NewStockData stockData : nullYoyList) {
+                            List<NewStockData> previousStocks = newStockDataServiceImpl.findByCompanyCodePeriodKemu(companyCode, previousYear, pm, stockData.getKemu());
+                            if (CollectionUtils.isEmpty(previousStocks)) {
+                                continue;
+                            }
+                            NewStockData previousStock = previousStocks.get(0);
+
+                            BigDecimal yoy = new BigDecimal("0");
+                            if (previousStock.getKemuValue().compareTo (BigDecimal.ZERO) != 0) {
+                                yoy = stockData.getKemuValue().subtract(previousStock.getKemuValue()).divide(
+                                        previousStock.getKemuValue(), 2, BigDecimal.ROUND_HALF_UP);
+                            }
+                            if (yoy.compareTo(BigDecimal.ZERO) == -1) {
+                                stockData.setFlag(-1);
+                            }
+                            stockData.setYoy(yoy);
+                            newStockDataServiceImpl.save(stockData);
+                        }
+                    }
                 }
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServerApiException(CodeEnum.INTERNAL_SERVER_ERROR, true, "--------->>File upload failed, ex:" + e.getMessage());
         }
         return DefaultResponse.success("Upload Success");

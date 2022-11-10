@@ -59,6 +59,11 @@ public class NewStockDataServiceImpl {
     }
 
     @Transactional
+    public NewStockData save(NewStockData newStockData) {
+        return newStockDataDao.save(newStockData);
+    }
+
+    @Transactional
     public List<NewStockDataDto> saveAll(Collection<NewStockDataDto> newStockDataDtoList) {
         if (CollectionUtils.isEmpty(newStockDataDtoList)) {
             return new ArrayList<>();
@@ -145,12 +150,14 @@ public class NewStockDataServiceImpl {
                     predicate = orEqual(predicate, cb, root,"periodYear", newStockData.getPeriodYear());
                     predicate = orEqual(predicate, cb, root,"periodMonth", newStockData.getPeriodMonth());
                     predicate = orLike(predicate, cb, root,"companyName", newStockData.getCompanyName());
-                    predicate = orLike(predicate, cb, root,"originalPeriod", newStockData.getOriginalPeriod());
-                    predicate = orLike(predicate, cb, root,"originalKemu", newStockData.getOriginalKemu());
+                    predicate = orLike(predicate, cb, root,"rawPeriod", newStockData.getRawPeriod());
+                    predicate = orLike(predicate, cb, root,"rawKemu", newStockData.getRawKemu());
                     predicate = orLike(predicate, cb, root,"kemu", newStockData.getKemu());
-                    predicate = orLike(predicate, cb, root,"originalKemuValue", newStockData.getOriginalKemuValue());
+                    predicate = orLike(predicate, cb, root,"rawKemuValue", newStockData.getRawKemuValue());
                     predicate = orEqual(predicate, cb, root,"kemuValue", newStockData.getKemuValue());
                     predicate = orEqual(predicate, cb, root,"yoy", newStockData.getYoy());
+                    predicate = orEqual(predicate, cb, root,"percentOnXx", newStockData.getPercentOnXx());
+                    predicate = orEqual(predicate, cb, root,"flag", newStockData.getFlag());
                     predicate = orLike(predicate, cb, root,"fileName", newStockData.getFileName());
                     predicate = orLike(predicate, cb, root,"comments", newStockData.getComments());
 
@@ -159,15 +166,17 @@ public class NewStockDataServiceImpl {
                     predicate = andEqual(predicate, cb, root, "companyCode", newStockData.getCompanyCode());
                     predicate = andEqual(predicate, cb, root, "periodYear", newStockData.getPeriodYear());
                     predicate = andEqual(predicate, cb, root, "periodMonth", newStockData.getPeriodMonth());
-                    predicate = andEqual(predicate, cb, root, "companyName", newStockData.getCompanyName());
-                    predicate = andEqual(predicate, cb, root, "originalPeriod", newStockData.getOriginalPeriod());
-                    predicate = andEqual(predicate, cb, root, "originalKemu", newStockData.getOriginalKemu());
+//                    predicate = andEqual(predicate, cb, root, "companyName", newStockData.getCompanyName());
+//                    predicate = andEqual(predicate, cb, root, "rawPeriod", newStockData.getRawPeriod());
+//                    predicate = andEqual(predicate, cb, root, "rawKemu", newStockData.getRawKemu());
                     predicate = andEqual(predicate, cb, root, "kemu", newStockData.getKemu());
-                    predicate = andEqual(predicate, cb, root, "originalKemuValue", newStockData.getOriginalKemuValue());
-                    predicate = andEqual(predicate, cb, root, "kemuValue", newStockData.getKemuValue());
-                    predicate = andEqual(predicate, cb, root, "yoy", newStockData.getYoy());
-                    predicate = andEqual(predicate, cb, root, "fileName", newStockData.getFileName());
-                    predicate = andEqual(predicate, cb, root, "comments", newStockData.getComments());
+//                    predicate = andEqual(predicate, cb, root, "rawKemuValue", newStockData.getRawKemuValue());
+//                    predicate = andEqual(predicate, cb, root, "kemuValue", newStockData.getKemuValue());
+//                    predicate = andEqual(predicate, cb, root, "yoy", newStockData.getYoy());
+//                    predicate = andEqual(predicate, cb, root, "percentOnXx", newStockData.getPercentOnXx());
+//                    predicate = andEqual(predicate, cb, root, "flag", newStockData.getFlag());
+//                    predicate = andEqual(predicate, cb, root, "fileName", newStockData.getFileName());
+//                    predicate = andEqual(predicate, cb, root, "comments", newStockData.getComments());
                 
                 }
 
@@ -221,6 +230,22 @@ public class NewStockDataServiceImpl {
         for (Long id : idList) {
             deleteById(id);
         }
+    }
+
+    public List<NewStockData> findByCompanyCodePeriodKemu(String companyCode, Integer year, Integer month, String kemu) {
+        List<NewStockData> list = newStockDataDao.findByCompanyCodeAndPeriodYearAndPeriodMonthAndKemu(companyCode, year, month, kemu);
+        return list;
+    }
+
+    public List<NewStockData> findByCompanyCodePeriodWithNullYoy(String companyCode, Integer year, Integer month) {
+        List<NewStockData> list = newStockDataDao.findByCompanyCodeAndPeriodYearAndPeriodMonthAndYoy(companyCode, year, month, null);
+        return list;
+    }
+
+
+    public List<NewStockData> findByCompanyCodeAndPeriodMonthAndKemuOrderByPeriodYearAsc(String companyCode, Integer month, String kemu) {
+        List<NewStockData> list = newStockDataDao.findByCompanyCodeAndPeriodMonthAndKemuOrderByPeriodYearAsc(companyCode, month, kemu);
+        return list;
     }
 
 }

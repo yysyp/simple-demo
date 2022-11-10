@@ -26,19 +26,21 @@ export const request = ({
         (response: AxiosResponse) => {
           resolve(response);
         },
-        (err: AxiosResponse) => {
-          const code: string = get(err, 'data.code');
-          console.log('axios call err ', err);
-          if (code != '200') {
-            message.openError(err, 'axios call not 200');
-            return Promise.reject(err);
-          }
-          reject(err);
-        },
+        // Here no need to handle again as it has been handled by axios.interceptors
+        // ,
+        // (err: AxiosResponse) => {
+        //   const code: string = get(err, 'data.code');
+        //   console.log('axios call err ', err);
+        //   if (code != '200') {
+        //     message.openError(err, 'axios call not 200');
+        //     return Promise.reject(err);
+        //   }
+        //   reject(err);
+        // },
       )
       .catch((err: AxiosError) => {
-        console.log('axios call err ', err);
-        message.openError(err, 'axios call error');
+        // Here need to forward reject.
+        console.log('axios call resolve err ', err);
         reject(err);
       });
   });
@@ -49,7 +51,8 @@ axios.interceptors.request.use(
     return { ...config, headers: { ...config.headers } };
   },
   (err) => {
-    console.log('axios req error', err);
+    //request timeout etc.
+    console.log('===>>axios req error', err);
     message.openError(err, 'axios request error');
     return Promise.reject(err);
   },
@@ -57,15 +60,19 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   (res) => {
+    //http status is 200
     console.log('axios res', res);
     const code: string = get(res, 'data.code');
-    if (code != '200') {
+    if (code == '200') {
+      message.openInfo(res.data.message, 'Info');
+    } else {
       message.openError(res, 'axios response not 200');
       return Promise.reject(res);
     }
   },
   (err) => {
-    console.log('axios res error', err);
+    //http status is not 200
+    console.log('===>>axios res error', err);
     message.openError(err, 'axios response error');
     return Promise.reject(err);
   },

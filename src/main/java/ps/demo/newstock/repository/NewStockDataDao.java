@@ -12,6 +12,19 @@ import java.math.*;
 @Repository
 public interface NewStockDataDao extends JpaRepository<NewStockData, Long>, JpaSpecificationExecutor {
 
+    public List<NewStockData> findByCompanyCodeAndPeriodYearAndPeriodMonthAndKemu(String companyCode,
+                                                                               Integer year,
+                                                                               Integer month,
+                                                                               String kemu);
+
+    List<NewStockData> findByCompanyCodeAndPeriodMonthAndKemuOrderByPeriodYearAsc(String companyCode,
+                                                                                  Integer month,
+                                                                                  String kemu);
+
+    public List<NewStockData> findByCompanyCodeAndPeriodYearAndPeriodMonthAndYoy(String companyCode,
+                                                                                  Integer year,
+                                                                                  Integer month,
+                                                                                 BigDecimal yoy);
 }
 
 

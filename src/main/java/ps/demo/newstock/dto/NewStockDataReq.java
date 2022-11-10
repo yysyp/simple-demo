@@ -22,12 +22,14 @@ public class NewStockDataReq extends MyPageReq {
     private Integer periodYear;
     private Integer periodMonth;
     private String companyName;
-    private String originalPeriod;
-    private String originalKemu;
+    private String rawPeriod;
+    private String rawKemu;
     private String kemu;
-    private String originalKemuValue;
+    private String rawKemuValue;
     private BigDecimal kemuValue;
     private BigDecimal yoy;
+    private BigDecimal percentOnXx;
+    private Integer flag;
     private String fileName;
     private String comments;
 

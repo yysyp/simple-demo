@@ -33,13 +33,21 @@ export default (props: any) => {
   //useEffect(() => {}, []);
 
   const handleSubmit = () => {
-    form.validate().then(() => {
-      var formData = new FormData();
-      formData.append('file', file);
-      formData.append('companyCode', form.values.companyCode);
-      formData.append('companyName', form.values.companyName);
-      store.dispatch.stock.submitStock(formData);
-    });
+    form
+      .validate()
+      .then(() => {
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('companyCode', form.values.companyCode);
+        formData.append('companyName', form.values.companyName);
+        store.dispatch.stock
+          .submitStock(formData)
+          .then((res) => {
+            console.log('stock page save sucess', res);
+          })
+          .catch((err) => console.log('stock page save error', err));
+      })
+      .catch((err: any) => {});
   };
 
   return (

@@ -95,10 +95,10 @@ public class NewStockDataTfController extends MyBaseController {
             
             newStockDataDto.setCompanyCode(percentWrapKey);
             newStockDataDto.setCompanyName(percentWrapKey);
-            newStockDataDto.setOriginalPeriod(percentWrapKey);
-            newStockDataDto.setOriginalKemu(percentWrapKey);
+            newStockDataDto.setRawPeriod(percentWrapKey);
+            newStockDataDto.setRawKemu(percentWrapKey);
             newStockDataDto.setKemu(percentWrapKey);
-            newStockDataDto.setOriginalKemuValue(percentWrapKey);
+            newStockDataDto.setRawKemuValue(percentWrapKey);
             newStockDataDto.setFileName(percentWrapKey);
             newStockDataDto.setComments(percentWrapKey);
 

@@ -5,6 +5,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class MyStringUtil {
@@ -102,11 +105,11 @@ public class MyStringUtil {
         if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
             return 0;
         }
-        if(!_eitherContains(x, y)) {
+        if (!_eitherContains(x, y)) {
             return 0;
         }
         double m = x.length(), n = y.length();
-        return (m < n)? m/n : n/m;
+        return (m < n) ? m / n : n / m;
     }
 
     private static boolean _eitherContains(String x, String y) {
@@ -239,7 +242,7 @@ public class MyStringUtil {
         }
         double containsRatio = eitherContainsRatio(x, y);
         double lcsRatio = getLongestCommonSequenceRatio(x, y);
-        return containsRatio*0.5 + lcsRatio*0.5;
+        return containsRatio * 0.5 + lcsRatio * 0.5;
     }
 
 //    public static int getFuzzyDistance(CharSequence term, CharSequence query, Locale locale) {
@@ -276,5 +279,19 @@ public class MyStringUtil {
 //            throw new IllegalArgumentException("Strings must not be null");
 //        }
 //    }
+
+    public static Date tryStrToDate(String dateStr, String... fmts) {
+        if (fmts == null || fmts.length == 0) {
+
+            fmts = new String[]{"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyy-MM", "HH:mm:ss", "HH:mm"};
+        }
+        for (String fmt : fmts) {
+            try {
+                return new SimpleDateFormat(fmt).parse(dateStr);
+            } catch (ParseException e) {
+            }
+        }
+        return null;
+    }
 
 }

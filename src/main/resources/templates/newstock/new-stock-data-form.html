@@ -35,12 +35,14 @@
     <tr><td><label>periodYear:</label></td><td width="75%"><input type="number" id="periodYear" name="periodYear"  required="required" maxlength="50" th:value="*{periodYear}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>periodMonth:</label></td><td width="75%"><input type="number" id="periodMonth" name="periodMonth"  required="required" maxlength="50" th:value="*{periodMonth}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>companyName:</label></td><td width="75%"><input type="text" id="companyName" name="companyName"   maxlength="50" th:value="*{companyName}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>originalPeriod:</label></td><td width="75%"><input type="text" id="originalPeriod" name="originalPeriod"  required="required" maxlength="50" th:value="*{originalPeriod}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>originalKemu:</label></td><td width="75%"><input type="text" id="originalKemu" name="originalKemu"  required="required" maxlength="50" th:value="*{originalKemu}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>rawPeriod:</label></td><td width="75%"><input type="text" id="rawPeriod" name="rawPeriod"  required="required" maxlength="50" th:value="*{rawPeriod}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>rawKemu:</label></td><td width="75%"><input type="text" id="rawKemu" name="rawKemu"  required="required" maxlength="50" th:value="*{rawKemu}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>kemu:</label></td><td width="75%"><input type="text" id="kemu" name="kemu"  required="required" maxlength="50" th:value="*{kemu}" /><label> &nbsp;</label></td></tr>
-    <tr><td><label>originalKemuValue:</label></td><td width="75%"><input type="text" id="originalKemuValue" name="originalKemuValue"  required="required" maxlength="50" th:value="*{originalKemuValue}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>rawKemuValue:</label></td><td width="75%"><input type="text" id="rawKemuValue" name="rawKemuValue"  required="required" maxlength="50" th:value="*{rawKemuValue}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>kemuValue:</label></td><td width="75%"><input type="number" id="kemuValue" name="kemuValue"  required="required" maxlength="50" th:value="*{kemuValue}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>yoy:</label></td><td width="75%"><input type="number" id="yoy" name="yoy"  required="required" maxlength="50" th:value="*{yoy}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>percentOnXx:</label></td><td width="75%"><input type="number" id="percentOnXx" name="percentOnXx"  required="required" maxlength="50" th:value="*{percentOnXx}" /><label> &nbsp;</label></td></tr>
+    <tr><td><label>flag:</label></td><td width="75%"><input type="number" id="flag" name="flag"  required="required" maxlength="50" th:value="*{flag}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>fileName:</label></td><td width="75%"><input type="text" id="fileName" name="fileName"   maxlength="50" th:value="*{fileName}" /><label> &nbsp;</label></td></tr>
     <tr><td><label>comments:</label></td><td width="75%"><textarea type="text" id="comments" name="comments"  rows="10" cols="50"  maxlength="65535" th:text="*{comments}" ></textarea><label> &nbsp;</label></td></tr>
 
@@ -75,6 +77,8 @@ $(function() {
     });
 
     
+        
+        
         
         
         

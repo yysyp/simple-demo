@@ -21,9 +21,7 @@ export const stock = createModel()({
   effects: (dispatch) => ({
     async submitStock(payload) {
       let resp = service.submitStock({ formData: payload });
-      console.log('submitStock', resp);
-      //   const res = await submitStock(payload);
-      //   return res;
+      return resp;
     },
   }),
 });
