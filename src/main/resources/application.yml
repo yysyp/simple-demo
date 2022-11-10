@@ -24,7 +24,7 @@ spring:
   application:
     name: simple-demo
   profiles:
-    active: dev
+    active: prod
   servlet:
     multipart:
       enabled: true
@@ -62,7 +62,7 @@ dir:
   upload-folder: upload-folder
 
 whitelist:
-  uris: /index.html,/umi/,/healthz,/css/,/js/,/img/,/vue/,/jqueryui/,/bootstrap-5.1.3/,/favicon.ico,/api/login,/login,/mock,/api/qnpoll/
+  uris: /index.html,/umi/,/healthz,/css/,/js/,/img/,/vue/,/jqueryui/,/bootstrap-5.1.3/,/favicon.ico,/api/login,/login,/mock,/api/qnpoll/,/api/newstock/,/error
   preciseUris: /
 
 note-card:

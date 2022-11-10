@@ -52,6 +52,7 @@
                         <td>periodMonth</td>
                         <td>companyName</td>
                         <td>rawPeriod</td>
+                        <td>kemuType</td>
                         <td>rawKemu</td>
                         <td>kemu</td>
                         <td>rawKemuValue</td>
@@ -66,7 +67,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${newStockDataModel.page.list.size()} eq 0">
-                        <td th:colspan="16">No data!</td>
+                        <td th:colspan="17">No data!</td>
                     </tr>
                     <tr th:each="newStockDataDto:${newStockDataModel.page.list}">
                         <td style="white-space: nowrap;">
@@ -81,6 +82,7 @@
                             <td th:text="${newStockDataDto.periodMonth}"></td>
                             <td th:text="${newStockDataDto.companyName}"></td>
                             <td th:text="${newStockDataDto.rawPeriod}"></td>
+                            <td th:text="${newStockDataDto.kemuType}"></td>
                             <td th:text="${newStockDataDto.rawKemu}"></td>
                             <td th:text="${newStockDataDto.kemu}"></td>
                             <td th:text="${newStockDataDto.rawKemuValue}"></td>

@@ -1,1 +1,37 @@
 
+
+spring:
+  datasource:
+    #    url: jdbc:h2:file:./h2/pathman
+    #    username: sa
+    #    password: Passwd
+    #    driver-class-name: org.h2.Driver
+    #url: jdbc:mariadb://localhost:${mariaDB4j.port}/?user=root
+    #url: jdbc:mysql://localhost:${mariaDB4j.port}/
+    #url: jdbc:p6spy:mysql://localhost:3306/newstk?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&characterEncoding=UTF-8&autoReconnect=true
+    url: jdbc:mysql://localhost:3306/newstk?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&characterEncoding=UTF-8&autoReconnect=true
+    username: root
+    password: Passwd_123456
+    #driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+
+    #ALWAYS, EMBEDDED, NEVER | always, embedded and never
+    #The default value is embedded - e.g. initialize only if you're running and embedded database, like H2.
+    #initialization-mode: always
+    #spring.datasource.schema=classpath:schema_empty.sql
+    #spring.datasource.data=classpath:data_empty.sql
+    sql-script-encoding: utf-8
+
+  jpa:
+    hibernate:
+      ddl-auto: none # Hibernate ddl auto (create, create-drop, validate, update, none)
+      # The "ddl-auto:" at the first time set to "create" to auto generate the tables
+      # After the table generated, then set to: "none"
+
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: false
+

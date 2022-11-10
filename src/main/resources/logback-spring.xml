@@ -52,7 +52,7 @@
     </springProfile>
 
     <springProfile name="prod">
-        <root level="INFO">
+        <root level="INFO" name="ps">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </root>

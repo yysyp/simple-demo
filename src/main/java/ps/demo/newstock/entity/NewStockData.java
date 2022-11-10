@@ -31,6 +31,7 @@ public class NewStockData extends MyBaseEntity {
     private Integer periodMonth;
     private String companyName;
     private String rawPeriod;
+    private String kemuType;
     private String rawKemu;
     private String kemu;
     private String rawKemuValue;

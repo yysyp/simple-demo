@@ -1,3 +1,16 @@
+---------------------------------------------------------------------------------------------
+#Set up prod environment:
+1) Create database name in i.e. Mysql and config the name in: "src/main/resources/application-prod.yml"
+2) Set "ddl-auto: create" in: "src/main/resources/application-prod.yml"
+3) Set "ddl-auto: none" in: "src/main/resources/application-prod.yml"
+4) Run initsql/dml.sql to create user and role.
+5) Start up the application and visit:
+   http://localhost:8080/index.html
+
+
+---------------------------------------------------------------------------------------------
+
+
 Refer to static/index.html
 
 
@@ -57,7 +70,8 @@ kubectl -n app logs $(kubectl -n app get pods --field-selector status.phase=Runn
 #Build frontend:
 cd frontend
 cnpm i
-cnpm run build:sit
+cnpm run build
+//cnpm run build:sit
 
 Below "umi/index.html" no need anymore, as the config "publicPath: '/umi/'" can do the trick.
 #--Copy files in "src/main/resources/static/umi" to "src/main/resources/static" OR 

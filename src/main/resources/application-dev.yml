@@ -50,4 +50,4 @@ exception:
 
 whitelist:
   enabled: false
-  uris: /index.html,/umi/,/healthz,/css/,/js/,/img/,/vue/,/jqueryui/,/bootstrap-5.1.3/,/favicon.ico,/api/login,/login,/mock,/api/qnpoll/,/error,/springdoc/,/h2-console/
+  uris: /index.html,/umi/,/healthz,/css/,/js/,/img/,/vue/,/jqueryui/,/bootstrap-5.1.3/,/favicon.ico,/api/login,/login,/mock,/api/qnpoll/,/api/newstock/,/error,/springdoc/,/h2-console/

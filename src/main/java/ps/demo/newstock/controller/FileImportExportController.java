@@ -51,6 +51,7 @@ public class FileImportExportController {
     public DefaultResponse uploadFile(@RequestParam("file") MultipartFile file,
                              @RequestParam(value = "companyCode", required = true) String companyCode,
                              @RequestParam(value = "companyName", required = true) String companyName,
+                             @RequestParam(value = "kemuType", required = true) String kemuType,
                              HttpServletRequest req) {
         if (file == null) {
             throw new BadRequestException(CodeEnum.BAD_REQUEST, false, "File is required.");
@@ -74,6 +75,7 @@ public class FileImportExportController {
                         dto.setModifiedBy("sys");
                         dto.setIsActive(true);
                         dto.setIsLogicalDeleted(false);
+                        dto.setKemuType(kemuType);
                         newStockDataServiceImpl.save(dto);
                     }
                 }
