@@ -54,11 +54,13 @@
                         <td>rawPeriod</td>
                         <td>kemuType</td>
                         <td>rawKemu</td>
+                        <td>kemuEn</td>
                         <td>kemu</td>
                         <td>rawKemuValue</td>
                         <td>kemuValue</td>
                         <td>yoy</td>
-                        <td>percentOnXx</td>
+                        <td>pctInAssetOrRevenue</td>
+                        <td>coreProfitOnAssetEffect</td>
                         <td>flag</td>
                         <td>fileName</td>
                         <td>comments</td>
@@ -67,7 +69,7 @@
                     </thead>
                     <tbody>
                     <tr th:if="${newStockDataModel.page.list.size()} eq 0">
-                        <td th:colspan="17">No data!</td>
+                        <td th:colspan="19">No data!</td>
                     </tr>
                     <tr th:each="newStockDataDto:${newStockDataModel.page.list}">
                         <td style="white-space: nowrap;">
@@ -84,11 +86,13 @@
                             <td th:text="${newStockDataDto.rawPeriod}"></td>
                             <td th:text="${newStockDataDto.kemuType}"></td>
                             <td th:text="${newStockDataDto.rawKemu}"></td>
+                            <td th:text="${newStockDataDto.kemuEn}"></td>
                             <td th:text="${newStockDataDto.kemu}"></td>
                             <td th:text="${newStockDataDto.rawKemuValue}"></td>
                             <td th:text="${newStockDataDto.kemuValue}"></td>
                             <td th:text="${newStockDataDto.yoy}"></td>
-                            <td th:text="${newStockDataDto.percentOnXx}"></td>
+                            <td th:text="${newStockDataDto.pctInAssetOrRevenue}"></td>
+                            <td th:text="${newStockDataDto.coreProfitOnAssetEffect}"></td>
                             <td th:text="${newStockDataDto.flag}"></td>
                             <td th:text="${newStockDataDto.fileName}"></td>
                             <td th:text="${newStockDataDto.comments}"></td>

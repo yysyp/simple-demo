@@ -62,7 +62,10 @@ public class FileImportExportController {
 
             try (InputStream is = new BufferedInputStream(file.getInputStream())) {
                 List<Object> sheet = MyExcelUtil.readMoreThan1000RowBySheet(is, null);
-                List<NewStockDataDto> kemuRecords = handleUpload.handleDebtBenefitCashFlowExcel(sheet, companyCode, companyName, fileName);
+                List<NewStockDataDto> kemuRecords = handleUpload.handleDebtBenefitCashFlowExcel(sheet, kemuType, companyCode, companyName, fileName);
+
+                //Calc pctInAssetOrRevenue
+                handleUpload.calcPctInAssetOrRevenue(kemuRecords);
 
                 Instant now = Instant.now();
                 for (int i = 0; i < kemuRecords.size(); i++) {
@@ -75,12 +78,11 @@ public class FileImportExportController {
                         dto.setModifiedBy("sys");
                         dto.setIsActive(true);
                         dto.setIsLogicalDeleted(false);
-                        dto.setKemuType(kemuType);
                         newStockDataServiceImpl.save(dto);
                     }
                 }
 
-                //Calc Yoy
+                //Calc and fill Yoy
                 Calendar calendar = Calendar.getInstance();
                 int nowYear = calendar.get(Calendar.YEAR);
                 Integer[] months = new Integer[] {3, 6, 9, 12};

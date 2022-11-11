@@ -121,7 +121,7 @@ public class FinRepDebtBenefitCashParser {
         int row = 0;
         for (int i = 0, n = table.size(); i < n; i++) {
             List<String> line = (List<String>) table.get(i);
-            double r = MyStringUtil.getLcsAndContainsRatio(itemName, line.get(0));
+            double r = MyStringUtil.getLcsOrMixContainsRatio(itemName, line.get(0));
             if (r > score) {
                 score = r;
                 row = i + 2;

@@ -245,6 +245,37 @@ public class MyStringUtil {
         return containsRatio * 0.5 + lcsRatio * 0.5;
     }
 
+    /**
+     * Recommend to use this method for similar string comparison
+     * @param x
+     * @param y
+     * @return
+     */
+    public static double getLcsOrMixContainsRatio(String x, String y) {
+        if (x == null || y == null) {
+            return 0;
+        }
+        x = MyRegexUtil.regularString(x);
+        y = MyRegexUtil.regularString(y);
+        if (StringUtils.isBlank(x) && StringUtils.isBlank(y)) {
+            return 1.0;
+        }
+        if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+            return 0;
+        }
+
+        int len1 = x.length();
+        int len2 = y.length();
+        int minlen = Math.min(len1, len2);
+        BigDecimal containRatio = new BigDecimal("0.5").subtract(
+                new BigDecimal(minlen).divide(new BigDecimal(len1+len2),
+                BigDecimal.ROUND_HALF_UP, 6));
+
+        double containsRatio = eitherContainsRatio(x, y);
+        double lcsRatio = getLongestCommonSequenceRatio(x, y);
+        return containsRatio * containRatio.doubleValue() + lcsRatio * (1-containRatio.doubleValue());
+    }
+
 //    public static int getFuzzyDistance(CharSequence term, CharSequence query, Locale locale) {
 //        if (term != null && query != null) {
 //            if (locale == null) {

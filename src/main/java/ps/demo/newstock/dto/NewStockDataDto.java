@@ -25,11 +25,13 @@ public class NewStockDataDto extends MyBaseDto {
     private String rawPeriod;
     private String kemuType;
     private String rawKemu;
+    private String kemuEn;
     private String kemu;
     private String rawKemuValue;
     private BigDecimal kemuValue;
     private BigDecimal yoy;
-    private BigDecimal percentOnXx;
+    private BigDecimal pctInAssetOrRevenue;
+    private BigDecimal coreProfitOnAssetEffect;
     private Integer flag;
     private String fileName;
     private String comments;
