@@ -245,12 +245,14 @@ public class FileImportExportController {
                     toUpdate.add(newStockData);
                     continue;
                 }
-                //收入，收益；支出，成本，费用，损失，
-                BigDecimal fz = coreProfit;
-                if (kemu.contains("收入") || kemu.contains("收益")) {
-                    fz.subtract(delta);
+                //收入，收益，利润，利得；支出，成本，费用，损失，税，
+                BigDecimal fz = BigDecimal.ZERO;;
+                if (kemu.contains("收入") || kemu.contains("收益")
+                        || kemu.contains("利润")
+                || kemu.contains("利得")) {
+                    fz = coreProfit.subtract(delta);
                 } else {
-                    fz.add(delta);
+                    fz = coreProfit.add(delta);
                 }
                 BigDecimal deltaCoreProfitOnAssets = coreProfitOnAssets.subtract(
                         fz.divide(assets, 4, BigDecimal.ROUND_HALF_UP));

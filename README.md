@@ -103,3 +103,14 @@ src/main/java/pslab/Kuaima.java
 
 ##Page fetching:
 doc3\3-learn\33-coding\337-mytool-demo-snippet-code\myiconclick\src\ps\demo\OreillyFetch.java
+
+##http://localhost:8080/umi/index.html#/stock
+#new stock table: new_stock_data structure:
+kemu: item of financial reports (debt, balance/benefit, cashflow)
+kemuType: debt or benefit or cash
+kemu_value: item's value
+yoy: year on year value of this kemu value.
+pctInAssetOrRevenue: for debt kemu, the value will be (kemu value / total assets value); for benefit kemu, the value will be (kemu value / income)
+coreProfitOnAssetEffect: the coreProfitOnAsset delta caused by this kemu value yoy difference.
+
+

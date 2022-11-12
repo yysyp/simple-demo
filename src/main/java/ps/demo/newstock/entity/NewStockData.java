@@ -10,6 +10,7 @@ import java.util.Date;
 
 import ps.demo.common.MyBaseEntity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.*;
@@ -36,9 +37,14 @@ public class NewStockData extends MyBaseEntity {
     private String kemuEn;
     private String kemu;
     private String rawKemuValue;
+
+    @Column(name = "kemu_value", precision = 19, scale = 4)
     private BigDecimal kemuValue;
+    @Column(name = "yoy", precision = 19, scale = 4)
     private BigDecimal yoy;
+    @Column(name = "pct_in_asset_or_revenue", precision = 19, scale = 4)
     private BigDecimal pctInAssetOrRevenue;
+    @Column(name = "core_profit_on_asset_effect", precision = 19, scale = 4)
     private BigDecimal coreProfitOnAssetEffect;
     private Integer flag;
     private String fileName;
