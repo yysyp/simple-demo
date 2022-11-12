@@ -268,8 +268,8 @@ public class MyStringUtil {
         int len2 = y.length();
         int minlen = Math.min(len1, len2);
         BigDecimal containRatio = new BigDecimal("0.5").subtract(
-                new BigDecimal(minlen).divide(new BigDecimal(len1+len2),
-                BigDecimal.ROUND_HALF_UP, 6));
+                new BigDecimal(minlen).divide(new BigDecimal(len1+len2), 6,
+                BigDecimal.ROUND_HALF_UP));
 
         double containsRatio = eitherContainsRatio(x, y);
         double lcsRatio = getLongestCommonSequenceRatio(x, y);

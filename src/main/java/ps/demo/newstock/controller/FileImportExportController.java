@@ -21,6 +21,7 @@ import ps.demo.newstock.dto.NewStockDataDto;
 import ps.demo.newstock.entity.NewStockData;
 import ps.demo.newstock.service.HandleUpload;
 import ps.demo.newstock.service.NewStockDataServiceImpl;
+import ps.demo.util.MyBeanUtil;
 import ps.demo.util.MyExcelUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,10 +52,10 @@ public class FileImportExportController {
     @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseBody
     public DefaultResponse uploadFile(@RequestParam("file") MultipartFile file,
-                             @RequestParam(value = "companyCode", required = true) String companyCode,
-                             @RequestParam(value = "companyName", required = true) String companyName,
-                             @RequestParam(value = "kemuType", required = true) String kemuType,
-                             HttpServletRequest req) {
+                                      @RequestParam(value = "companyCode", required = true) String companyCode,
+                                      @RequestParam(value = "companyName", required = true) String companyName,
+                                      @RequestParam(value = "kemuType", required = true) String kemuType,
+                                      HttpServletRequest req) {
         if (file == null) {
             throw new BadRequestException(CodeEnum.BAD_REQUEST, false, "File is required.");
         }
@@ -66,22 +67,44 @@ public class FileImportExportController {
                 List<Object> sheet = MyExcelUtil.readMoreThan1000RowBySheet(is, null);
                 List<NewStockDataDto> kemuRecords = handleUpload.handleDebtBenefitCashFlowExcel(sheet, kemuType, companyCode, companyName, fileName);
 
+                handleUpload.findAndSetKemuEnglishName(kemuRecords, kemuType);
+
                 //Calc pctInAssetOrRevenue
                 handleUpload.calcPctInAssetOrRevenue(kemuRecords);
 
-                //calc coreProfit, coreProfitOnRevenue
-
                 List<NewStockDataDto> toInsert = filterExists(kemuRecords);
+                batchSaveDto(toInsert);
+                toInsert.clear();
 
-                batchSave(toInsert);
+                Calendar calendar = Calendar.getInstance();
+                int nowYear = calendar.get(Calendar.YEAR);
+                Integer[] months = new Integer[]{3, 6, 9, 12};
+                Instant now = Instant.now();
+                List<NewStockDataDto> toSaveDtos = new ArrayList<>();
+                List<NewStockData> toSave = new ArrayList<>();
+                for (Integer month : months) {
+                    for (int year = 1991; year <= nowYear; year++) {
 
-                //calc coreProfit, coreProfitOnRevenue, revenueOnAssets, coreProfitOnAssets
-                calcCoreProfitOnAssetsEtc(companyCode, companyName);
+                        //Debt and Benefit and Cash reports data ready check
+                        if (newStockDataServiceImpl.existsByAllKemuType(companyCode, year, month)) {
+                            //calc coreProfit, coreProfitOnRevenue, revenueOnAssets, coreProfitOnAssets
+                            calcCoreProfitOnAssetsEtc(companyCode, companyName, year, month, now, toSaveDtos);
+                            batchSaveDto(toSaveDtos);
+                            toSaveDtos.clear();
 
-                calcYoy(companyCode);
+                            calcYoy(companyCode, year, month, toSave);
+                            batchSave(toSave);
+                            toSave.clear();
 
-                //calc yoy delta 's effect on coreProfitOnAssets
-                //calcCoreProfitOnAssetsEtc(companyCode, companyName);
+                            //calc yoy delta 's effect on coreProfitOnAssets
+                            calcKemuYoyDeltaCoreProfitOnAssetsEffect(companyCode, companyName, year, month, toSave);
+                            batchSave(toSave);
+                            toSave.clear();
+                        }
+
+                    }
+                }
+
             }
 
         } catch (Exception e) {
@@ -111,71 +134,131 @@ public class FileImportExportController {
         return toInsert;
     }
 
-    private void batchSave(List<NewStockDataDto> toInsert) {
-        List<List<NewStockDataDto>> lists
+    private void batchSaveDto(List<NewStockDataDto> toInsert) {
+        batchSave(MyBeanUtil.copyAndConvertItems(toInsert, NewStockData.class));
+//        List<List<NewStockDataDto>> lists
+//                = Lists.partition(toInsert, 1000);
+//        for (List<NewStockDataDto> subList : lists) {
+//            newStockDataServiceImpl.saveAll(subList);
+//        }
+    }
+
+    private void batchSave(List<NewStockData> toInsert) {
+        List<List<NewStockData>> lists
                 = Lists.partition(toInsert, 1000);
-        for (List<NewStockDataDto> subList : lists) {
+        for (List<NewStockData> subList : lists) {
             newStockDataServiceImpl.saveAll(subList);
         }
     }
 
-    private void calcCoreProfitOnAssetsEtc(String companyCode, String companyName) {
-        Calendar calendar = Calendar.getInstance();
-        int nowYear = calendar.get(Calendar.YEAR);
-        Integer[] months = new Integer[] {3, 6, 9, 12};
-        List<NewStockDataDto> toInsert = new ArrayList<>();
-        Instant now = Instant.now();
-        for (Integer pm : months) {
-            for (int year = 1991; year <= nowYear; year++) {
-                int previousYear = year - 1;
-                List<NewStockData> list = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, pm);
-                Optional exist = list.stream().filter(e -> e.getKemuType().equals(StkConstant.calc)).findAny();
-                if (exist.isPresent()) {
-                    return;
+    private void calcCoreProfitOnAssetsEtc(String companyCode, String companyName, Integer year, Integer month, Instant now, List<NewStockDataDto> toInsert) {
+
+        List<NewStockData> list = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, month);
+        Optional exist = list.stream().filter(e -> e.getKemuType().equals(StkConstant.calc)).findAny();
+        if (exist.isPresent()) {
+            return;
+        }
+
+        BigDecimal revenue = opGetKemuValue(findByKemuEn(list, StkConstant.income_main));
+        BigDecimal opCost = opGetKemuValue(findByKemuEn(list, StkConstant.cost_of_main_operation));
+        BigDecimal sale = opGetKemuValue(findByKemuEn(list, StkConstant.SALE_EXPENSE));
+        BigDecimal admin = opGetKemuValue(findByKemuEn(list, StkConstant.ADMINISTRATIVE_EXPENSE));
+        BigDecimal fin = opGetKemuValue(findByKemuEn(list, StkConstant.FINANCIAL_EXPENSE));
+        BigDecimal research = opGetKemuValue(findByKemuEn(list, StkConstant.RESEARCH_EXPENSE));
+        BigDecimal tax = opGetKemuValue(findByKemuEn(list, StkConstant.TAX_AND_ADDITIONAL_EXPENSE));
+
+        BigDecimal assets = opGetKemuValue(findByKemuEn(list, StkConstant.total_assets));
+
+        if (fin.compareTo(BigDecimal.ZERO) < 0) {
+            fin = BigDecimal.ZERO;
+        }
+        BigDecimal coreProfit = revenue.subtract(opCost).subtract(sale).subtract(admin).subtract(fin)
+                .subtract(research).subtract(tax);
+
+        NewStockDataDto dto = constructNewStockDataDto(companyCode, companyName, now, month, year, "核心利润", StkConstant.coreProfit, coreProfit);
+        toInsert.add(dto);
+
+        BigDecimal coreProfitOnRevenue = BigDecimal.ZERO;
+        if (revenue.compareTo(BigDecimal.ZERO) != 0) {
+            coreProfitOnRevenue = coreProfit.divide(revenue, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year, "核心利润/营收", StkConstant.coreProfitOnRevenue, coreProfitOnRevenue);
+        toInsert.add(dto);
+
+        BigDecimal revenueOnAssets = BigDecimal.ZERO;
+        if (assets.compareTo(BigDecimal.ZERO) != 0) {
+            revenueOnAssets = revenue.divide(assets, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year, "营收/总资产", StkConstant.revenueOnAssets, revenueOnAssets);
+        toInsert.add(dto);
+
+        BigDecimal coreProfitOnAssets = BigDecimal.ZERO;
+        if (assets.compareTo(BigDecimal.ZERO) != 0) {
+            coreProfitOnAssets = coreProfit.divide(assets, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year, "核心利润/总资产", StkConstant.coreProfitOnAssets, coreProfitOnAssets);
+        toInsert.add(dto);
+
+    }
+
+    private void calcKemuYoyDeltaCoreProfitOnAssetsEffect(String companyCode, String companyName, Integer year, Integer month, List<NewStockData> toUpdate) {
+
+        List<NewStockData> list = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, month);
+        Optional exist = list.stream().filter(e -> e.getCoreProfitOnAssetEffect() != null).findAny();
+        if (exist.isPresent()) {
+            return;
+        }
+
+        BigDecimal coreProfit = opGetKemuValue(findByKemuEn(list, StkConstant.coreProfit));
+        BigDecimal assets = opGetKemuValue(findByKemuEn(list, StkConstant.total_assets));
+        BigDecimal coreProfitOnAssets = opGetKemuValue(findByKemuEn(list, StkConstant.coreProfitOnAssets));
+        for (NewStockData newStockData : list) {
+            BigDecimal yoy = newStockData.getYoy();
+            String kemu = newStockData.getKemu();
+            String kemuType = newStockData.getKemuType();
+            if (kemuType == null
+                    || kemuType.equals(StkConstant.calc)
+                    || kemuType.equals(StkConstant.cash)
+                    || yoy == null || yoy.compareTo(BigDecimal.ZERO) == 0) {
+                continue;
+            }
+            BigDecimal kemuValue = newStockData.getKemuValue();
+            BigDecimal denominator = yoy.add(BigDecimal.ONE);
+            BigDecimal delta = BigDecimal.ZERO;
+            if (denominator.compareTo(BigDecimal.ZERO) != 0) {
+                BigDecimal oldKemuValue = kemuValue.divide(denominator, 4, BigDecimal.ROUND_HALF_UP);
+                delta = kemuValue.subtract(oldKemuValue);
+            }
+            if (StkConstant.debt.equals(kemuType)) {
+                BigDecimal fm = assets.subtract(delta);
+                BigDecimal deltaCoreProfitOnAssets = BigDecimal.ZERO;
+                if (fm.compareTo(BigDecimal.ZERO) != 0) {
+                    deltaCoreProfitOnAssets = coreProfitOnAssets.subtract(
+                            coreProfit.divide(fm, 4, BigDecimal.ROUND_HALF_UP));
                 }
+                newStockData.setCoreProfitOnAssetEffect(deltaCoreProfitOnAssets);
+                toUpdate.add(newStockData);
 
-                BigDecimal revenue = opGetKemuValue(findByKemuEn(list, StkConstant.income_main));
-                BigDecimal opCost = opGetKemuValue(findByKemuEn(list, StkConstant.cost_of_main_operation));
-                BigDecimal sale = opGetKemuValue(findByKemuEn(list, StkConstant.SALE_EXPENSE));
-                BigDecimal admin = opGetKemuValue(findByKemuEn(list, StkConstant.ADMINISTRATIVE_EXPENSE));
-                BigDecimal fin = opGetKemuValue(findByKemuEn(list, StkConstant.FINANCIAL_EXPENSE));
-                BigDecimal research = opGetKemuValue(findByKemuEn(list, StkConstant.RESEARCH_EXPENSE));
-                BigDecimal tax = opGetKemuValue(findByKemuEn(list, StkConstant.TAX_AND_ADDITIONAL_EXPENSE));
-
-                BigDecimal assets = opGetKemuValue(findByKemuEn(list, StkConstant.total_assets));
-
-                if (fin.compareTo(BigDecimal.ZERO) < 0) {
-                    fin = BigDecimal.ZERO;
+            } else if (StkConstant.benefit.equals(kemuType)) {
+                if (assets.compareTo(BigDecimal.ZERO) == 0) {
+                    newStockData.setCoreProfitOnAssetEffect(BigDecimal.ZERO);
+                    toUpdate.add(newStockData);
+                    continue;
                 }
-                BigDecimal coreProfit = revenue.subtract(opCost).subtract(sale).subtract(admin).subtract(fin)
-                        .subtract(research).subtract(tax);
-
-                NewStockDataDto dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "核心利润", StkConstant.coreProfit, coreProfit);
-                toInsert.add(dto);
-
-                BigDecimal coreProfitOnRevenue = BigDecimal.ZERO;
-                if (revenue.compareTo(BigDecimal.ZERO) != 0) {
-                    coreProfitOnRevenue = coreProfit.divide(revenue, BigDecimal.ROUND_HALF_UP, 4);
+                //收入，收益；支出，成本，费用，损失，
+                BigDecimal fz = coreProfit;
+                if (kemu.contains("收入") || kemu.contains("收益")) {
+                    fz.subtract(delta);
+                } else {
+                    fz.add(delta);
                 }
-                dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "核心利润/营收", StkConstant.coreProfitOnRevenue, coreProfitOnRevenue);
-                toInsert.add(dto);
-
-                BigDecimal revenueOnAssets = BigDecimal.ZERO;
-                if (assets.compareTo(BigDecimal.ZERO) != 0) {
-                    revenueOnAssets = revenue.divide(assets, BigDecimal.ROUND_HALF_UP, 5);
-                }
-                dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "营收/总资产", StkConstant.revenueOnAssets, revenueOnAssets);
-                toInsert.add(dto);
-
-                BigDecimal coreProfitOnAssets = BigDecimal.ZERO;
-                if (assets.compareTo(BigDecimal.ZERO) != 0) {
-                    coreProfitOnAssets = coreProfit.divide(assets, BigDecimal.ROUND_HALF_UP, 5);
-                }
-                dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "核心利润/总资产", StkConstant.coreProfitOnAssets, coreProfitOnAssets);
-                toInsert.add(dto);
-
+                BigDecimal deltaCoreProfitOnAssets = coreProfitOnAssets.subtract(
+                        fz.divide(assets, 4, BigDecimal.ROUND_HALF_UP));
+                newStockData.setCoreProfitOnAssetEffect(deltaCoreProfitOnAssets);
+                toUpdate.add(newStockData);
             }
         }
+
 
     }
 
@@ -187,7 +270,7 @@ public class FileImportExportController {
         dto.setRawKemu(kemu);
         dto.setKemu(kemu);
         dto.setKemuEn(kemuEn);
-        dto.setRawKemuValue(value+"");
+        dto.setRawKemuValue(value + "");
         dto.setKemuValue(value);
         dto.setPeriodYear(year);
         dto.setPeriodMonth(pm);
@@ -215,37 +298,29 @@ public class FileImportExportController {
         return null;
     }
 
-    private void calcYoy(String companyCode) {
-        //Calc and fill Yoy
-        Calendar calendar = Calendar.getInstance();
-        int nowYear = calendar.get(Calendar.YEAR);
-        Integer[] months = new Integer[] {3, 6, 9, 12};
-        for (Integer pm : months) {
-            for (int year = 1991; year <= nowYear; year++) {
-                int previousYear = year - 1;
-                List<NewStockData> nullYoyList = newStockDataServiceImpl.findByCompanyCodePeriodWithNullYoy(companyCode, year, pm);
-                for (NewStockData stockData : nullYoyList) {
-                    List<NewStockData> previousStocks = newStockDataServiceImpl.findByCompanyCodePeriodKemu(companyCode, previousYear, pm, stockData.getKemu());
-                    if (CollectionUtils.isEmpty(previousStocks)) {
-                        continue;
-                    }
-                    NewStockData previousStock = previousStocks.get(0);
-
-                    BigDecimal yoy = new BigDecimal("0");
-                    if (previousStock.getKemuValue().compareTo (BigDecimal.ZERO) != 0) {
-                        yoy = stockData.getKemuValue().subtract(previousStock.getKemuValue()).divide(
-                                previousStock.getKemuValue(), 2, BigDecimal.ROUND_HALF_UP);
-                    }
-                    if (yoy.compareTo(BigDecimal.ZERO) == -1) {
-                        stockData.setFlag(-1);
-                    }
-                    stockData.setYoy(yoy);
-                    newStockDataServiceImpl.save(stockData);
-                }
+    private void calcYoy(String companyCode, Integer year, Integer month, List<NewStockData> toSave) {
+        int previousYear = year - 1;
+        List<NewStockData> nullYoyList = newStockDataServiceImpl.findByCompanyCodePeriodWithNullYoy(companyCode, year, month);
+        for (NewStockData stockData : nullYoyList) {
+            List<NewStockData> previousStocks = newStockDataServiceImpl.findByCompanyCodePeriodKemu(companyCode, previousYear, month, stockData.getKemu());
+            if (CollectionUtils.isEmpty(previousStocks)) {
+                continue;
             }
-        }
-    }
+            NewStockData previousStock = previousStocks.get(0);
 
+            BigDecimal yoy = BigDecimal.ZERO;
+            if (previousStock.getKemuValue().compareTo(BigDecimal.ZERO) != 0) {
+                yoy = stockData.getKemuValue().subtract(previousStock.getKemuValue()).divide(
+                        previousStock.getKemuValue(), 4, BigDecimal.ROUND_HALF_UP);
+            }
+            if (yoy.compareTo(BigDecimal.ZERO) == -1) {
+                stockData.setFlag(-1);
+            }
+            stockData.setYoy(yoy);
+            toSave.add(stockData);
+        }
+
+    }
 
 
 //

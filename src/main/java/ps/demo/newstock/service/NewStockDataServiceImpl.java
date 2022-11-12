@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import org.springframework.transaction.annotation.Transactional;
+import ps.demo.newstock.constant.StkConstant;
 import ps.demo.order.repository.NewCartRepository;
 import ps.demo.newstock.dto.NewStockDataDto;
 import ps.demo.newstock.dto.NewStockDataReq;
@@ -58,17 +59,17 @@ public class NewStockDataServiceImpl {
         return newStockDataDto;
     }
 
-    @Transactional
-    public List<NewStockDataDto> saveAll(Collection<NewStockDataDto> newStockDataDtoList) {
-        if (CollectionUtils.isEmpty(newStockDataDtoList)) {
-            return new ArrayList<>();
-        }
-        List<NewStockDataDto> result = new ArrayList<>();
-        for (NewStockDataDto newStockDataDto : newStockDataDtoList) {
-            result.add(save(newStockDataDto));
-        }
-        return result;
-    }
+//    @Transactional
+//    public List<NewStockDataDto> saveAll(Collection<NewStockDataDto> newStockDataDtoList) {
+//        if (CollectionUtils.isEmpty(newStockDataDtoList)) {
+//            return new ArrayList<>();
+//        }
+//        List<NewStockDataDto> result = new ArrayList<>();
+//        for (NewStockDataDto newStockDataDto : newStockDataDtoList) {
+//            result.add(save(newStockDataDto));
+//        }
+//        return result;
+//    }
 
     public NewStockDataDto findById(Long id) {
         Optional<NewStockData> newStockDataOptional = newStockDataDao.findById(id);
@@ -263,6 +264,32 @@ public class NewStockDataServiceImpl {
         return list;
     }
 
+    @Transactional
+    public List<NewStockData> saveAll(Collection<NewStockData> newStockDataList) {
+        if (CollectionUtils.isEmpty(newStockDataList)) {
+            return new ArrayList<>();
+        }
+        return newStockDataDao.saveAll(newStockDataList);
+    }
+
+    public boolean existsByAllKemuType(String companyCode, Integer year, Integer month) {
+        return newStockDataDao.existsByCompanyCodeAndPeriodYearAndPeriodMonthAndKemuType(
+                companyCode,
+                year,
+                month,
+                StkConstant.debt
+        ) && newStockDataDao.existsByCompanyCodeAndPeriodYearAndPeriodMonthAndKemuType(
+                companyCode,
+                year,
+                month,
+                StkConstant.benefit
+        ) && newStockDataDao.existsByCompanyCodeAndPeriodYearAndPeriodMonthAndKemuType(
+                companyCode,
+                year,
+                month,
+                StkConstant.cash
+        );
+    }
 }
 
 

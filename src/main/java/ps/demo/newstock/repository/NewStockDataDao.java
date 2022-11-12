@@ -29,6 +29,12 @@ public interface NewStockDataDao extends JpaRepository<NewStockData, Long>, JpaS
     public List<NewStockData> findByCompanyCodeAndPeriodYearAndPeriodMonth(String companyCode,
                                                                                  Integer year,
                                                                                  Integer month);
+
+    public boolean existsByCompanyCodeAndPeriodYearAndPeriodMonthAndKemuType(
+            String companyCode,
+            Integer year,
+            Integer month,
+            String kemuType);
 }
 
 

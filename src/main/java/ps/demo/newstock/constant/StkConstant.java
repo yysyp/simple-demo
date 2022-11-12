@@ -38,7 +38,7 @@ public class StkConstant {
     public static Map<String, String> DebtKemuNameMap = new HashMap<>();
     public static Map<String, String> BenefitKemuNameMap = new HashMap<>();
     public static Map<String, String> CashKemuNameMap = new HashMap<>();
-    public static double minMatchScore = 0.8;
+    public static double minMatchScore = 0.3;
 
 
 
@@ -46,7 +46,10 @@ public class StkConstant {
 
         RegularKemuNameMap.put("他", "它");
         RegularKemuNameMap.put("合", "总");
-
+        RegularKemuNameMap.put("其中", "");
+        RegularKemuNameMap.put("元", "");
+        RegularKemuNameMap.put("加", "");
+        RegularKemuNameMap.put("减", "");
 
         DebtKemuNameMap.put("负债总计", TOTAL_LIABILITIES);
         DebtKemuNameMap.put("所有者权益或股东权益总计", NET_ASSETS);

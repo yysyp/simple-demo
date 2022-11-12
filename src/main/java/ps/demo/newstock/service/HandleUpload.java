@@ -1,6 +1,7 @@
 package ps.demo.newstock.service;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.extern.slf4j.Slf4j;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.stereotype.Service;
 import ps.demo.newstock.constant.StkConstant;
@@ -16,8 +17,10 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class HandleUpload {
+
 
     public static boolean isKemuPeriodCell(String str) {
         return Pattern.matches(StkConstant.KEMU_TIME_PATTERN, str.trim());
@@ -131,7 +134,6 @@ public class HandleUpload {
                 newStockDataDto.setPeriodYear(year);
                 newStockDataDto.setPeriodMonth(month);
                 newStockDataDto.setFileName(fileName);
-                findAndSetKemuEnglishName(newStockDataDto);
                 kemuRecords.add(newStockDataDto);
             }
         }
@@ -161,14 +163,14 @@ public class HandleUpload {
                 if (!assetKemu.isPresent()) {
                     continue;
                 }
-                BigDecimal pctOnXx = newStockDataDto.getKemuValue().divide(assetKemu.get().getKemuValue(), BigDecimal.ROUND_HALF_UP, 4);
+                BigDecimal pctOnXx = newStockDataDto.getKemuValue().divide(assetKemu.get().getKemuValue(), 4, BigDecimal.ROUND_HALF_UP);
                 newStockDataDto.setPctInAssetOrRevenue(pctOnXx);
             } else if (StkConstant.benefit.equals(kemuType)) {
                 revenueKemu = revenueList.stream().filter(e -> e.getPeriodYear().equals(year) && e.getPeriodMonth().equals(month)).findAny();
                 if (!revenueKemu.isPresent()) {
                     continue;
                 }
-                BigDecimal pctOnXx = newStockDataDto.getKemuValue().divide(revenueKemu.get().getKemuValue(), BigDecimal.ROUND_HALF_UP, 4);
+                BigDecimal pctOnXx = newStockDataDto.getKemuValue().divide(revenueKemu.get().getKemuValue(), 4, BigDecimal.ROUND_HALF_UP);
                 newStockDataDto.setPctInAssetOrRevenue(pctOnXx);
             } else if (StkConstant.cash.equals(kemuType)) {
             }
@@ -176,8 +178,7 @@ public class HandleUpload {
 
     }
 
-    public static void findAndSetKemuEnglishName(NewStockDataDto newStockDataDto) {
-        String kemuType = newStockDataDto.getKemuType();
+    public static void findAndSetKemuEnglishName(List<NewStockDataDto> newStockDataDtos, String kemuType) {
         Map<String, String> map = null;
         if (StkConstant.debt.equals(kemuType)) {
             map = StkConstant.DebtKemuNameMap;
@@ -186,32 +187,49 @@ public class HandleUpload {
         } else if (StkConstant.cash.equals(kemuType)) {
             map = StkConstant.CashKemuNameMap;
         }
-        if (map != null) {
-            Iterator<String> iterator = map.keySet().iterator();
-            String kemuEn = matchInMap(map, newStockDataDto.getKemu(), StkConstant.minMatchScore);
-            if (kemuEn != null) {
-                newStockDataDto.setKemuEn(kemuEn);
-            }
+        if (map == null) {
+            return;
         }
-    }
-
-    public static String matchInMap(Map<String, String> map, String q, double minMatchScore) {
-        double score = 0d;
-        String foundValue = null;
         Iterator<String> iterator = map.keySet().iterator();
         while (iterator.hasNext()) {
             String key = iterator.next();
-            double s = MyStringUtil.getLcsOrMixContainsRatio(q, key);
-            if (s > score) {
-                score = s;
-                foundValue = map.get(key);
+            String enName = map.get(key);
+            //Find best match NewStockDataDto
+            double score = 0d;
+            NewStockDataDto bestMatch = null;
+            for (NewStockDataDto dto : newStockDataDtos) {
+                double s = MyStringUtil.getLcsOrMixContainsRatio(key, dto.getKemu());
+                if (s > score) {
+                    score = s;
+                    bestMatch = dto;
+                }
+            }
+            if (score >= StkConstant.minMatchScore) {
+                bestMatch.setKemuEn(enName);
+            } else {
+                log.warn("Not able to find item to assign the english name {}", enName);
             }
         }
-        if (score < minMatchScore) {
-            return null;
-        }
-        return foundValue;
+
     }
+
+//    public static String matchInMap(Map<String, String> map, String q, double minMatchScore) {
+//        double score = 0d;
+//        String foundValue = null;
+//        Iterator<String> iterator = map.keySet().iterator();
+//        while (iterator.hasNext()) {
+//            String key = iterator.next();
+//            double s = MyStringUtil.getLcsOrMixContainsRatio(q, key);
+//            if (s > score) {
+//                score = s;
+//                foundValue = map.get(key);
+//            }
+//        }
+//        if (score < minMatchScore) {
+//            return null;
+//        }
+//        return foundValue;
+//    }
 
     public static Map<Integer, Date> constructColumnPeriodDateMap(List<String> line, int kemuAndDateCol) {
         Map<Integer, Date> columnPeriodDateMap = new HashMap<>();

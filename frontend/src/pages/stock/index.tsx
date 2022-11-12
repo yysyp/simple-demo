@@ -33,9 +33,11 @@ export default (props: any) => {
   const stock = useSelector((state: any) => state.stock);
   //useEffect(() => {}, []);
   const [spinning, setSpinning] = useState(false);
+  const [submitResult, setSubmitResult] = useState('');
 
   const handleSubmit = () => {
     setSpinning(true);
+    setSubmitResult('');
     form
       .validate()
       .then(() => {
@@ -49,13 +51,16 @@ export default (props: any) => {
           .then((res) => {
             console.log('stock page save sucess', res);
             setSpinning(false);
+            setSubmitResult('Success');
           })
           .catch((err) => {
             setSpinning(false);
+            setSubmitResult(JSON.stringify(err));
           });
       })
       .catch((err: any) => {
         setSpinning(false);
+        setSubmitResult(JSON.stringify(err));
       });
   };
 
@@ -64,6 +69,7 @@ export default (props: any) => {
       <Spin spinning={spinning} tip="Loading...">
         <div className={styles.content}>
           <h1 className={styles.title}>stock index</h1>
+          <div>{submitResult}</div>
 
           <Form form={form}>
             <MyFormLayout width={'450px'}>
