@@ -194,42 +194,30 @@ public class HandleUpload {
         while (iterator.hasNext()) {
             String key = iterator.next();
             String enName = map.get(key);
-            //Find best match NewStockDataDto
-            double score = 0d;
-            NewStockDataDto bestMatch = null;
-            for (NewStockDataDto dto : newStockDataDtos) {
-                double s = MyStringUtil.getLcsOrMixContainsRatio(key, dto.getKemu());
-                if (s > score) {
-                    score = s;
-                    bestMatch = dto;
+            Map<String, List<NewStockDataDto>> subDtos = newStockDataDtos.stream().collect(
+                    Collectors.groupingBy(e -> e.getPeriodYear()+"#"+e.getPeriodMonth())
+            );
+            for (List<NewStockDataDto> yearmonthDtos : subDtos.values()) {
+
+                //Find best match NewStockDataDto
+                double score = 0d;
+                NewStockDataDto bestMatch = null;
+                for (NewStockDataDto dto : yearmonthDtos) {
+                    double s = MyStringUtil.getLcsOrMixContainsRatio(key, dto.getKemu());
+                    if (s > score) {
+                        score = s;
+                        bestMatch = dto;
+                    }
                 }
-            }
-            if (score >= StkConstant.minMatchScore) {
-                bestMatch.setKemuEn(enName);
-            } else {
-                log.warn("Not able to find item to assign the english name {}", enName);
+                if (score >= StkConstant.minMatchScore) {
+                    bestMatch.setKemuEn(enName);
+                } else {
+                    log.warn("===>>***Not able to find item to assign the english name={}, bestMatch={}", enName, bestMatch);
+                }
             }
         }
 
     }
-
-//    public static String matchInMap(Map<String, String> map, String q, double minMatchScore) {
-//        double score = 0d;
-//        String foundValue = null;
-//        Iterator<String> iterator = map.keySet().iterator();
-//        while (iterator.hasNext()) {
-//            String key = iterator.next();
-//            double s = MyStringUtil.getLcsOrMixContainsRatio(q, key);
-//            if (s > score) {
-//                score = s;
-//                foundValue = map.get(key);
-//            }
-//        }
-//        if (score < minMatchScore) {
-//            return null;
-//        }
-//        return foundValue;
-//    }
 
     public static Map<Integer, Date> constructColumnPeriodDateMap(List<String> line, int kemuAndDateCol) {
         Map<Integer, Date> columnPeriodDateMap = new HashMap<>();
