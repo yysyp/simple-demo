@@ -247,6 +247,11 @@ public class NewStockDataServiceImpl {
         return list;
     }
 
+    public List<NewStockData> findByCompanyCodePeriod(String companyCode, Integer year, Integer month) {
+        List<NewStockData> list = newStockDataDao.findByCompanyCodeAndPeriodYearAndPeriodMonth(companyCode, year, month);
+        return list;
+    }
+
     public List<NewStockData> findByCompanyCodePeriodWithNullYoy(String companyCode, Integer year, Integer month) {
         List<NewStockData> list = newStockDataDao.findByCompanyCodeAndPeriodYearAndPeriodMonthAndYoy(companyCode, year, month, null);
         return list;

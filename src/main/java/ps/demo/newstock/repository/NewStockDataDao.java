@@ -25,6 +25,10 @@ public interface NewStockDataDao extends JpaRepository<NewStockData, Long>, JpaS
                                                                                   Integer year,
                                                                                   Integer month,
                                                                                  BigDecimal yoy);
+
+    public List<NewStockData> findByCompanyCodeAndPeriodYearAndPeriodMonth(String companyCode,
+                                                                                 Integer year,
+                                                                                 Integer month);
 }
 
 

@@ -2,6 +2,7 @@ package ps.demo.newstock.controller;
 
 
 import com.alibaba.excel.util.StringUtils;
+import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -15,6 +16,7 @@ import ps.demo.dto.response.DefaultResponse;
 import ps.demo.exception.BadRequestException;
 import ps.demo.exception.CodeEnum;
 import ps.demo.exception.ServerApiException;
+import ps.demo.newstock.constant.StkConstant;
 import ps.demo.newstock.dto.NewStockDataDto;
 import ps.demo.newstock.entity.NewStockData;
 import ps.demo.newstock.service.HandleUpload;
@@ -67,49 +69,19 @@ public class FileImportExportController {
                 //Calc pctInAssetOrRevenue
                 handleUpload.calcPctInAssetOrRevenue(kemuRecords);
 
-                Instant now = Instant.now();
-                for (int i = 0; i < kemuRecords.size(); i++) {
-                    NewStockDataDto dto = kemuRecords.get(i);
-                    List<NewStockData> exist = newStockDataServiceImpl.findByCompanyCodePeriodKemu(dto.getCompanyCode(), dto.getPeriodYear(), dto.getPeriodMonth(), dto.getKemu());
-                    if (CollectionUtils.isEmpty(exist)) {
-                        dto.setCreatedOn(now);
-                        dto.setModifiedOn(now);
-                        dto.setCreatedBy("sys");
-                        dto.setModifiedBy("sys");
-                        dto.setIsActive(true);
-                        dto.setIsLogicalDeleted(false);
-                        newStockDataServiceImpl.save(dto);
-                    }
-                }
+                //calc coreProfit, coreProfitOnRevenue
 
-                //Calc and fill Yoy
-                Calendar calendar = Calendar.getInstance();
-                int nowYear = calendar.get(Calendar.YEAR);
-                Integer[] months = new Integer[] {3, 6, 9, 12};
-                for (Integer pm : months) {
-                    for (int year = 1991; year <= nowYear; year++) {
-                        int previousYear = year - 1;
-                        List<NewStockData> nullYoyList = newStockDataServiceImpl.findByCompanyCodePeriodWithNullYoy(companyCode, year, pm);
-                        for (NewStockData stockData : nullYoyList) {
-                            List<NewStockData> previousStocks = newStockDataServiceImpl.findByCompanyCodePeriodKemu(companyCode, previousYear, pm, stockData.getKemu());
-                            if (CollectionUtils.isEmpty(previousStocks)) {
-                                continue;
-                            }
-                            NewStockData previousStock = previousStocks.get(0);
+                List<NewStockDataDto> toInsert = filterExists(kemuRecords);
 
-                            BigDecimal yoy = new BigDecimal("0");
-                            if (previousStock.getKemuValue().compareTo (BigDecimal.ZERO) != 0) {
-                                yoy = stockData.getKemuValue().subtract(previousStock.getKemuValue()).divide(
-                                        previousStock.getKemuValue(), 2, BigDecimal.ROUND_HALF_UP);
-                            }
-                            if (yoy.compareTo(BigDecimal.ZERO) == -1) {
-                                stockData.setFlag(-1);
-                            }
-                            stockData.setYoy(yoy);
-                            newStockDataServiceImpl.save(stockData);
-                        }
-                    }
-                }
+                batchSave(toInsert);
+
+                //calc coreProfit, coreProfitOnRevenue, revenueOnAssets, coreProfitOnAssets
+                calcCoreProfitOnAssetsEtc(companyCode, companyName);
+
+                calcYoy(companyCode);
+
+                //calc yoy delta 's effect on coreProfitOnAssets
+                //calcCoreProfitOnAssetsEtc(companyCode, companyName);
             }
 
         } catch (Exception e) {
@@ -119,103 +91,163 @@ public class FileImportExportController {
         return DefaultResponse.success("Upload Success");
     }
 
+    private List<NewStockDataDto> filterExists(List<NewStockDataDto> kemuRecords) {
+        List<NewStockDataDto> toInsert = new ArrayList<>();
+        Instant now = Instant.now();
+        for (int i = 0; i < kemuRecords.size(); i++) {
+            NewStockDataDto dto = kemuRecords.get(i);
+            List<NewStockData> exist = newStockDataServiceImpl.findByCompanyCodePeriodKemu(dto.getCompanyCode(), dto.getPeriodYear(), dto.getPeriodMonth(), dto.getKemu());
+            if (CollectionUtils.isEmpty(exist)) {
+                dto.setCreatedOn(now);
+                dto.setModifiedOn(now);
+                dto.setCreatedBy("sys");
+                dto.setModifiedBy("sys");
+                dto.setIsActive(true);
+                dto.setIsLogicalDeleted(false);
+                toInsert.add(dto);
 
-//    @PostMapping("/batchImport")
-//    public BasicOkResponse batchImportFile(@RequestParam("files") MultipartFile[] files) {
-//        if (files == null) {
-//            throw new MyInvalidRequestException("invalid files.");
-//        }
-//        String msg = null;
-//        for (MultipartFile multipartFile : files) {
-//            msg += handleImportFile(multipartFile);
-//        }
-//        MyDefaultResponse response = MyDefaultResponse.success();
-//        response.setMessage(msg);
-//        return response;
-//    }
-//
-////
-//    @PostMapping("/import")
-//    public MyDefaultResponse importFile(@RequestParam("file") MultipartFile file,
-//                                        @RequestParam(value = "key", required = false, defaultValue = "ExcelHandler") String key,
-//                                        @RequestParam(value = "companyCode", required = false) String companyCode,
-//                                        @RequestParam(value = "reportType", required = false, defaultValue = "") String reporttype
-//                                        //@RequestParam(value = "periods", required = true) @DateTimeFormat(pattern="yyyy-MM-dd") List<Date> periods
-//                                        ) {
-//        String msg = handleImportFile(file, key, companyCode, reporttype);
-//        MyDefaultResponse response = MyDefaultResponse.success();
-//        response.setMessage(msg);
-//        return response;
-//    }
-//
-//    public String handleImportFile(MultipartFile file) {
-//        return handleImportFile(file, null, null, null);
-//    }
-//    public String handleImportFile(MultipartFile file, String key, String companyCode, String reporttype) {
-//        String fileName = file.getOriginalFilename();
-//        if (StringUtils.isEmpty(key)) {
-//            key = "ExcelHandler";
-//            //if (fileName.toUpperCase().endsWith(".xls"))
-//        }
-//        if (StringUtils.isEmpty(companyCode)) {
-//            Pattern pt = Pattern.compile("[0-9]{6}", Pattern.CASE_INSENSITIVE);
-//            Matcher mt = pt.matcher(fileName);
-//            if (mt.find()) {
-//                companyCode = mt.group().trim();
-//                log.info("companyCode found = {}", companyCode);
-//            }
-//        }
-//        if (StringUtils.isEmpty(companyCode)) {
-//            throw new MyInvalidRequestException("companyCode is empty, invalid companyCode.");
-//        }
-//        ReportType reportTypeEnum = null;
-//
-//        if (StringUtils.isEmpty(reporttype)) {
-//            if (fileName.toUpperCase().contains("BALANCE") || fileName.toUpperCase().contains("DEBT")
-//                    || fileName.toUpperCase().contains("资产")
-//                    || fileName.toUpperCase().contains("负债")) {
-//                reportTypeEnum = ReportType.Balancesheet;
-//            } else if (fileName.toUpperCase().contains("INCOME")
-//                    || fileName.toUpperCase().contains("STATEMENT")
-//                    || fileName.toUpperCase().contains("BENEFIT")
-//                    || fileName.toUpperCase().contains("PROFIT")
-//                    || fileName.toUpperCase().contains("利润")
-//                    || fileName.toUpperCase().contains("损益")
-//            ) {
-//                reportTypeEnum = ReportType.Incomestatement;
-//                ;
-//            } else if (fileName.toUpperCase().contains("CASH")
-//                    || fileName.toUpperCase().contains("FLOW")
-//                    || fileName.toUpperCase().contains("现金")
-//                    || fileName.toUpperCase().contains("流量")) {
-//                reportTypeEnum = ReportType.Cashflow;
-//
-//            }
-//        }
-//        if (reportTypeEnum == null) {
-//            if (reporttype.equals("1")) {
-//                reportTypeEnum = ReportType.Balancesheet;
-//            } else if (reporttype.equals("2")) {
-//                reportTypeEnum = ReportType.Incomestatement;
-//            } else if (reporttype.equals("3")) {
-//                reportTypeEnum = ReportType.Cashflow;
-//            } else {
-//                reportTypeEnum = ReportType.valueOf(reporttype);
-//            }
-//        }
-//
-//        log.info("File import key={}, reportType={}, fileName={}", key, reporttype, fileName);
-//        FileHandler handler = SpringContextHolder.getBean(key);
-//        String msg = null;
-//        try (InputStream is = new BufferedInputStream(file.getInputStream())) {
-//            msg = handler.importFile(is, fileName, companyCode, reportTypeEnum);
-//        }catch (Exception e){
-//            log.error("ignore "+e.getMessage(), e);
-//            msg = e.getMessage();
-//        }
-//        log.info("File import success key={}, reportType={}, fileName={}", key, reporttype, fileName);
-//        return msg;
-//    }
+            }
+        }
+        return toInsert;
+    }
+
+    private void batchSave(List<NewStockDataDto> toInsert) {
+        List<List<NewStockDataDto>> lists
+                = Lists.partition(toInsert, 1000);
+        for (List<NewStockDataDto> subList : lists) {
+            newStockDataServiceImpl.saveAll(subList);
+        }
+    }
+
+    private void calcCoreProfitOnAssetsEtc(String companyCode, String companyName) {
+        Calendar calendar = Calendar.getInstance();
+        int nowYear = calendar.get(Calendar.YEAR);
+        Integer[] months = new Integer[] {3, 6, 9, 12};
+        List<NewStockDataDto> toInsert = new ArrayList<>();
+        Instant now = Instant.now();
+        for (Integer pm : months) {
+            for (int year = 1991; year <= nowYear; year++) {
+                int previousYear = year - 1;
+                List<NewStockData> list = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, pm);
+                Optional exist = list.stream().filter(e -> e.getKemuType().equals(StkConstant.calc)).findAny();
+                if (exist.isPresent()) {
+                    return;
+                }
+
+                BigDecimal revenue = opGetKemuValue(findByKemuEn(list, StkConstant.income_main));
+                BigDecimal opCost = opGetKemuValue(findByKemuEn(list, StkConstant.cost_of_main_operation));
+                BigDecimal sale = opGetKemuValue(findByKemuEn(list, StkConstant.SALE_EXPENSE));
+                BigDecimal admin = opGetKemuValue(findByKemuEn(list, StkConstant.ADMINISTRATIVE_EXPENSE));
+                BigDecimal fin = opGetKemuValue(findByKemuEn(list, StkConstant.FINANCIAL_EXPENSE));
+                BigDecimal research = opGetKemuValue(findByKemuEn(list, StkConstant.RESEARCH_EXPENSE));
+                BigDecimal tax = opGetKemuValue(findByKemuEn(list, StkConstant.TAX_AND_ADDITIONAL_EXPENSE));
+
+                BigDecimal assets = opGetKemuValue(findByKemuEn(list, StkConstant.total_assets));
+
+                if (fin.compareTo(BigDecimal.ZERO) < 0) {
+                    fin = BigDecimal.ZERO;
+                }
+                BigDecimal coreProfit = revenue.subtract(opCost).subtract(sale).subtract(admin).subtract(fin)
+                        .subtract(research).subtract(tax);
+
+                NewStockDataDto dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "核心利润", StkConstant.coreProfit, coreProfit);
+                toInsert.add(dto);
+
+                BigDecimal coreProfitOnRevenue = BigDecimal.ZERO;
+                if (revenue.compareTo(BigDecimal.ZERO) != 0) {
+                    coreProfitOnRevenue = coreProfit.divide(revenue, BigDecimal.ROUND_HALF_UP, 4);
+                }
+                dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "核心利润/营收", StkConstant.coreProfitOnRevenue, coreProfitOnRevenue);
+                toInsert.add(dto);
+
+                BigDecimal revenueOnAssets = BigDecimal.ZERO;
+                if (assets.compareTo(BigDecimal.ZERO) != 0) {
+                    revenueOnAssets = revenue.divide(assets, BigDecimal.ROUND_HALF_UP, 5);
+                }
+                dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "营收/总资产", StkConstant.revenueOnAssets, revenueOnAssets);
+                toInsert.add(dto);
+
+                BigDecimal coreProfitOnAssets = BigDecimal.ZERO;
+                if (assets.compareTo(BigDecimal.ZERO) != 0) {
+                    coreProfitOnAssets = coreProfit.divide(assets, BigDecimal.ROUND_HALF_UP, 5);
+                }
+                dto = constructNewStockDataDto(companyCode, companyName, now, pm, year, "核心利润/总资产", StkConstant.coreProfitOnAssets, coreProfitOnAssets);
+                toInsert.add(dto);
+
+            }
+        }
+
+    }
+
+    private NewStockDataDto constructNewStockDataDto(String companyCode, String companyName, Instant now, Integer pm, int year, String kemu, String kemuEn, BigDecimal value) {
+        NewStockDataDto dto = new NewStockDataDto();
+        dto.setKemuType(StkConstant.calc);
+        dto.setCompanyCode(companyCode);
+        dto.setCompanyName(companyName);
+        dto.setRawKemu(kemu);
+        dto.setKemu(kemu);
+        dto.setKemuEn(kemuEn);
+        dto.setRawKemuValue(value+"");
+        dto.setKemuValue(value);
+        dto.setPeriodYear(year);
+        dto.setPeriodMonth(pm);
+        dto.setCreatedOn(now);
+        dto.setModifiedOn(now);
+        dto.setCreatedBy("sys");
+        dto.setModifiedBy("sys");
+        dto.setIsActive(true);
+        dto.setIsLogicalDeleted(false);
+        return dto;
+    }
+
+    public BigDecimal opGetKemuValue(NewStockData newStockData) {
+        if (newStockData == null || newStockData.getKemuValue() == null) {
+            return new BigDecimal("0");
+        }
+        return newStockData.getKemuValue();
+    }
+
+    public NewStockData findByKemuEn(List<NewStockData> list, String kemuEn) {
+        Optional<NewStockData> optionalNewStockData = list.stream().filter(e -> kemuEn.equals(e.getKemuEn())).findAny();
+        if (optionalNewStockData.isPresent()) {
+            return optionalNewStockData.get();
+        }
+        return null;
+    }
+
+    private void calcYoy(String companyCode) {
+        //Calc and fill Yoy
+        Calendar calendar = Calendar.getInstance();
+        int nowYear = calendar.get(Calendar.YEAR);
+        Integer[] months = new Integer[] {3, 6, 9, 12};
+        for (Integer pm : months) {
+            for (int year = 1991; year <= nowYear; year++) {
+                int previousYear = year - 1;
+                List<NewStockData> nullYoyList = newStockDataServiceImpl.findByCompanyCodePeriodWithNullYoy(companyCode, year, pm);
+                for (NewStockData stockData : nullYoyList) {
+                    List<NewStockData> previousStocks = newStockDataServiceImpl.findByCompanyCodePeriodKemu(companyCode, previousYear, pm, stockData.getKemu());
+                    if (CollectionUtils.isEmpty(previousStocks)) {
+                        continue;
+                    }
+                    NewStockData previousStock = previousStocks.get(0);
+
+                    BigDecimal yoy = new BigDecimal("0");
+                    if (previousStock.getKemuValue().compareTo (BigDecimal.ZERO) != 0) {
+                        yoy = stockData.getKemuValue().subtract(previousStock.getKemuValue()).divide(
+                                previousStock.getKemuValue(), 2, BigDecimal.ROUND_HALF_UP);
+                    }
+                    if (yoy.compareTo(BigDecimal.ZERO) == -1) {
+                        stockData.setFlag(-1);
+                    }
+                    stockData.setYoy(yoy);
+                    newStockDataServiceImpl.save(stockData);
+                }
+            }
+        }
+    }
+
+
+
 //
 //    @GetMapping("/export")
 //    public void exportFile(@RequestParam(value = "key", required = false, defaultValue = "ExcelHandler") String key,
@@ -225,58 +257,7 @@ public class FileImportExportController {
 //                           ) throws Exception {
 //        if (StringUtils.isEmpty(monthList)) {
 //            monthList = "3, 6, 9, 12"; // "3;6;9;12"
-//        }
-//        log.info("File export key={}, monthList={}", key, monthList);
-//        FileHandler handler = SpringContextHolder.getBean(key);
-//        List<ReportCalculation> reportCalculations = new ArrayList<>();
-//        reportCalculations.add(new MlZzGgZcCalculation());
-//        reportCalculations.add(new YoyCalculation());
-//        reportCalculations.add(new AverageCalculation());
-//
-//
-//        List<List<MyCell>> allData = new ArrayList<>();
-//        List<List<MyCell>> data = getBalanceReport(companyCode, pageSize, monthList);
-//        if (CollectionUtils.isNotEmpty(data)) {
-//            allData.addAll(new MyMatrix(data).reverseRowColumn().getTable());
-//        }
-//
-//        data = getIncomeReport(companyCode, pageSize, monthList);
-//        if (CollectionUtils.isNotEmpty(data)) {
-//            allData.addAll(new MyMatrix(data).reverseRowColumn().getTable());
-//        }
-//
-//        data = getCashReport(companyCode, pageSize, monthList);
-//        if (CollectionUtils.isNotEmpty(data)) {
-//            allData.addAll(new MyMatrix(data).reverseRowColumn().getTable());
-//        }
-//
-//        //Calc yoy etc.
-//        List<List<MyCell>> newAllData = allData;
-//        for (ReportCalculation reportCalculation : reportCalculations) {
-//            newAllData = reportCalculation.calc(newAllData);
-//        }
-//
-//        //Set Kume and convert to List<List<Object>>
-//        List<SqeItemKeysEntity> sqeItemKeysEntities = sqeItemKeysService.selectListBy(null);
-//        List<List<Object>> exportData = new ArrayList<>();
-//
-//        for (int i = 0, n = newAllData.size(); i < n; i++) {
-//            List<Object> line = new ArrayList<>(newAllData.get(i));
-//            String kemuEn = ((ReportCell)line.get(0)).getKemuName();
-//            if (StkConstant.KEMU_TIME.equals(kemuEn)) {
-//                line.add(0, kemuEn);
-//            } else {
-//                Optional<SqeItemKeysEntity> optionalSqeItemKeysEntity = sqeItemKeysEntities.stream().
-//                        filter(sqeItem -> sqeItem.getEnglishname().equals(kemuEn)).findAny();
-//                if (optionalSqeItemKeysEntity.isPresent()) {
-//                    line.add(0, optionalSqeItemKeysEntity.get().getName());
-//                } else {
-//                    line.add(0, kemuEn);
-//                }
-//            }
-//            exportData.add(line);
-//        }
-//
+//        }...
 //        //Download
 //        byte[] bs = null;
 //        try(InputStream in = handler.exportFile(exportData)) {

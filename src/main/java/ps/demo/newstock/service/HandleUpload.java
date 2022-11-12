@@ -112,6 +112,15 @@ public class HandleUpload {
                 }
 
                 NewStockDataDto newStockDataDto = new NewStockDataDto();
+                final int yearfinal = year;
+                final int monthfinal = month;
+                Optional exist = kemuRecords.stream().filter(e -> e.getPeriodYear().equals(yearfinal)
+                && e.getPeriodMonth().equals(monthfinal)
+                && e.getCompanyCode().equals(companyCode)
+                && e.getKemu().equals(kemus[1])).findAny();
+                if (exist.isPresent()) {
+                    continue;
+                }
                 newStockDataDto.setKemuType(kemuType);
                 newStockDataDto.setCompanyCode(companyCode);
                 newStockDataDto.setCompanyName(companyName);
@@ -154,7 +163,7 @@ public class HandleUpload {
                 }
                 BigDecimal pctOnXx = newStockDataDto.getKemuValue().divide(assetKemu.get().getKemuValue(), BigDecimal.ROUND_HALF_UP, 4);
                 newStockDataDto.setPctInAssetOrRevenue(pctOnXx);
-            } else if (revenueKemu != null && StkConstant.benefit.equals(kemuType)) {
+            } else if (StkConstant.benefit.equals(kemuType)) {
                 revenueKemu = revenueList.stream().filter(e -> e.getPeriodYear().equals(year) && e.getPeriodMonth().equals(month)).findAny();
                 if (!revenueKemu.isPresent()) {
                     continue;
