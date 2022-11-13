@@ -41,22 +41,30 @@ export default (props: any) => {
     form
       .validate()
       .then(() => {
-        var formData = new FormData();
-        formData.append('file', file);
-        formData.append('companyCode', form.values.companyCode);
-        formData.append('companyName', form.values.companyName);
-        formData.append('kemuType', form.values.reportType);
-        store.dispatch.stock
-          .submitStock(formData)
-          .then((res) => {
-            console.log('stock page save sucess', res);
-            setSpinning(false);
-            setSubmitResult('Success');
-          })
-          .catch((err) => {
-            setSpinning(false);
-            setSubmitResult(JSON.stringify(err));
-          });
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        link.href =
+          '/api/newstock/file/export?companyCode=' +
+          form.values.companyCode +
+          '&month=' +
+          form.values.reportMonth;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setSpinning(false);
+        // store.dispatch.stock
+        //   .downloadStock({
+        //     companyCode: form.values.companyCode,
+        //     month: form.values.reportMonth,
+        //   })
+        //   .then((res) => {
+        //     setSpinning(false);
+        //     setSubmitResult('Success');
+        //   })
+        //   .catch((err) => {
+        //     setSpinning(false);
+        //     setSubmitResult(JSON.stringify(err));
+        //   });
       })
       .catch((err: any) => {
         setSpinning(false);
@@ -70,12 +78,13 @@ export default (props: any) => {
         <div className={styles.content}>
           <h1 className={styles.title}>stock index</h1>
           <div>{submitResult}</div>
+
           <Button
             onClick={() => {
-              history.push('/stock/download');
+              history.push('/stock');
             }}
           >
-            To Download
+            To Upload
           </Button>
           <Form form={form}>
             <MyFormLayout width={'450px'}>
@@ -91,47 +100,19 @@ export default (props: any) => {
               />
 
               <Field
-                name="companyName"
-                title="Company Name"
-                validator={[
-                  { required: true, message: 'Company Name is required!' },
-                ]}
-                decorator={[FormItem]}
-                component={[TextInput]}
-              />
-
-              <Field
-                name="reportType"
-                title="Report Type"
-                validator={[
-                  { required: true, message: 'Report Type is required!' },
-                ]}
+                name="reportMonth"
+                title="Report Month"
                 decorator={[FormItem]}
                 dataSource={[
-                  { label: '', value: '' },
-                  { label: 'Debt', value: 'debt' },
-                  { label: 'Benefit', value: 'benefit' },
-                  { label: 'Cash', value: 'cash' },
+                  { label: '12', value: '12' },
+                  { label: '9', value: '9' },
+                  { label: '6', value: '6' },
+                  { label: '3', value: '3' },
                 ]}
                 component={[Select]}
               />
 
-              <Field
-                name="file"
-                title="File"
-                validator={[{ required: true, message: 'file is required!' }]}
-                decorator={[FormItem]}
-                component={[
-                  Upload,
-                  {
-                    onChangex: (f: any) => {
-                      setFile(f);
-                    },
-                  },
-                ]}
-              />
-
-              <Button onClick={handleSubmit}>Submit</Button>
+              <Button onClick={handleSubmit}>Download</Button>
             </MyFormLayout>
           </Form>
         </div>

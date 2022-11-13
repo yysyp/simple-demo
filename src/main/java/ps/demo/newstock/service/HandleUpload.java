@@ -1,15 +1,25 @@
 package ps.demo.newstock.service;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.stereotype.Service;
+import ps.demo.newstock.cellstyle.StyleExcelHandler;
 import ps.demo.newstock.constant.StkConstant;
 import ps.demo.newstock.dto.NewStockDataDto;
 import ps.demo.util.MyRegexUtil;
 import ps.demo.util.MyStringUtil;
 import ps.demo.util.matrix.MyMatrix;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -244,5 +254,22 @@ public class HandleUpload {
         return rowKemuMap;
     }
 
+
+
+    public InputStream exportFile(List<List<Object>> data) {
+        try (OutputStream out = new ByteArrayOutputStream()) {
+            ExcelWriter writer = EasyExcel.write(out).build();
+            WriteSheet writerSheet = EasyExcel.writerSheet("sheet1").build();
+            writer.write(data, writerSheet);
+
+            writer.finish();
+            return new ByteArrayInputStream(((ByteArrayOutputStream) out).toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("ignore "+e.getMessage(), e);
+        }
+
+        return null;
+    }
 
 }

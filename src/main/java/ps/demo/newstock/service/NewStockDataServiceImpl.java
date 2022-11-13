@@ -249,7 +249,7 @@ public class NewStockDataServiceImpl {
     }
 
     public List<NewStockData> findByCompanyCodePeriod(String companyCode, Integer year, Integer month) {
-        List<NewStockData> list = newStockDataDao.findByCompanyCodeAndPeriodYearAndPeriodMonth(companyCode, year, month);
+        List<NewStockData> list = newStockDataDao.findByCompanyCodeAndPeriodYearAndPeriodMonthOrderByIdAsc(companyCode, year, month);
         return list;
     }
 
@@ -290,6 +290,7 @@ public class NewStockDataServiceImpl {
                 StkConstant.cash
         );
     }
+
 }
 
 

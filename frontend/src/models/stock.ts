@@ -23,5 +23,10 @@ export const stock = createModel()({
       let resp = service.submitStock({ formData: payload });
       return resp;
     },
+
+    async downloadStock(payload) {
+      let resp = service.downloadStock(payload);
+      return resp;
+    },
   }),
 });

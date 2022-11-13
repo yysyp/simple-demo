@@ -80,11 +80,35 @@ const submitStock = (req: SubmitStock.Req): Promise<SubmitStock.Res> => {
   });
 };
 
+namespace DownloadStock {
+  export type Req = {
+    companyCode: string;
+    month: number;
+  };
+
+  export type Res = CommonRes & {
+    data?: {};
+  };
+}
+
+const downloadStock = (req: DownloadStock.Req): Promise<DownloadStock.Res> => {
+  return request({
+    url:
+      '/api/newstock/file/export?companyCode=' +
+      req.companyCode +
+      '&month=' +
+      req.month,
+    method: 'get',
+  });
+};
+
 export {
   GetUser,
   SubmitFormDataTest,
   GetProduct,
   SubmitStock,
+  DownloadStock,
+  downloadStock,
   submitStock,
   getProduct,
   submitFormDataTest,

@@ -21,11 +21,11 @@ import ps.demo.newstock.dto.NewStockDataDto;
 import ps.demo.newstock.entity.NewStockData;
 import ps.demo.newstock.service.HandleUpload;
 import ps.demo.newstock.service.NewStockDataServiceImpl;
-import ps.demo.util.MyBeanUtil;
-import ps.demo.util.MyExcelUtil;
+import ps.demo.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.html.Option;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
@@ -36,6 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -246,10 +247,11 @@ public class FileImportExportController {
                     continue;
                 }
                 //收入，收益，利润，利得；支出，成本，费用，损失，税，
-                BigDecimal fz = BigDecimal.ZERO;;
+                BigDecimal fz = BigDecimal.ZERO;
+                ;
                 if (kemu.contains("收入") || kemu.contains("收益")
                         || kemu.contains("利润")
-                || kemu.contains("利得")) {
+                        || kemu.contains("利得")) {
                     fz = coreProfit.subtract(delta);
                 } else {
                     fz = coreProfit.add(delta);
@@ -325,39 +327,123 @@ public class FileImportExportController {
     }
 
 
-//
-//    @GetMapping("/export")
-//    public void exportFile(@RequestParam(value = "key", required = false, defaultValue = "ExcelHandler") String key,
-//                           @RequestParam(value = "companyCode", required = true) String companyCode,
-//                           @RequestParam(value = "monthList", required = false, defaultValue = "3, 6, 9, 12") String monthList,
-//                           @RequestParam(value = "pageSize", required = false, defaultValue = "7") Long pageSize
-//                           ) throws Exception {
-//        if (StringUtils.isEmpty(monthList)) {
-//            monthList = "3, 6, 9, 12"; // "3;6;9;12"
-//        }...
-//        //Download
-//        byte[] bs = null;
-//        try(InputStream in = handler.exportFile(exportData)) {
-//            bs = IOUtils.toByteArray(in);
-//        } catch (Exception e) {
-//            log.error("ignore "+e.getMessage(), e);
-//            throw e;
-//        }
-//        if (bs != null) {
-//            HttpServletResponse response = ServletUtil.getResponse();
-//            response.reset();
-//            response.addHeader("Access-Control-Allow-Origin", "*");
-//            response.addHeader("Access-Control-Allow-Headers", "*");
-//            response.setHeader("Content-Disposition", "attachment; filename=" +
-//                    URLEncoder.encode("export-"+companyCode+"-"+ MyStringUtil.getDateTimeStr()+"."+handler.getFileType(), "UTF-8"));
-//            response.addHeader("Content-Length", "" + bs.length);
-//            response.setContentType("application/octet-stream; charset=UTF-8");
-//            response.flushBuffer();
-//            //IOUtils.copy(in, response.getOutputStream());
-//            IOUtils.write(bs, response.getOutputStream());
-//        }
-//
-//    }
+    //
+    @GetMapping("/export")
+    public void exportFile(@RequestParam(value = "companyCode", required = true) String companyCode,
+                           @RequestParam(value = "month", required = true, defaultValue = "12") Integer month
+    ) throws Exception {
+        //line, column
+        List<List<Object>> lines = new ArrayList<>();
+        List<String> lineHeaders = new ArrayList<>();
 
+        Calendar calendar = Calendar.getInstance();
+        int nowYear = calendar.get(Calendar.YEAR);
+        for (int year = 2000; year <= nowYear; year++) {
+            List<NewStockData> newStockDataList = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, month);
+            if (CollectionUtils.isEmpty(newStockDataList)) {
+                continue;
+            }
+            if (lineHeaders.isEmpty()) {
+                lineHeaders = getLineHeaders(newStockDataList);
+            }
+            convertAndPutIn(newStockDataList, lines, lineHeaders);
+        }
+
+        byte[] bs = null;
+        try (InputStream in = handleUpload.exportFile(lines)) {
+            bs = IOUtils.toByteArray(in);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("ignore " + e.getMessage(), e);
+            throw e;
+        }
+        if (bs != null) {
+            HttpServletResponse response = MyRequestContextUtil.getResponse();
+            response.reset();
+            response.addHeader("Access-Control-Allow-Origin", "*");
+            response.addHeader("Access-Control-Allow-Headers", "*");
+            response.setHeader("Content-Disposition", "attachment; filename=" +
+                    URLEncoder.encode("export-" + companyCode + "-" + MyTimeUtil.getNowStr() + ".xlsx", "UTF-8"));
+            response.addHeader("Content-Length", "" + bs.length);
+            response.setContentType("application/octet-stream; charset=UTF-8");
+            response.flushBuffer();
+            //IOUtils.copy(in, response.getOutputStream());
+            IOUtils.write(bs, response.getOutputStream());
+        }
+
+    }
+
+
+    private List<String> getLineHeaders(List<NewStockData> newStockDataList) {
+        List<String> lineHeaders = new ArrayList<>();
+        if (CollectionUtils.isEmpty(newStockDataList)) {
+            return lineHeaders;
+        }
+        Map<String, List<NewStockData>> mapList = newStockDataList.stream().collect(Collectors.groupingBy(e -> e.getKemuType()));
+        lineHeaders.add("");
+        lineHeaders.add(StkConstant.KEMU_TIME);
+        List<NewStockData> calcList = mapList.get(StkConstant.calc);
+        for (NewStockData newStockData : calcList) {
+            lineHeaders.add(newStockData.getRawKemu());
+        }
+        lineHeaders.add("");
+        lineHeaders.add("");
+        lineHeaders.add(StkConstant.KEMU_TIME);
+        List<NewStockData> debtList = mapList.get(StkConstant.debt);
+        for (NewStockData newStockData : debtList) {
+            lineHeaders.add(newStockData.getRawKemu());
+        }
+        lineHeaders.add("");
+        lineHeaders.add("");
+        lineHeaders.add(StkConstant.KEMU_TIME);
+        List<NewStockData> benefitList = mapList.get(StkConstant.benefit);
+        for (NewStockData newStockData : benefitList) {
+            lineHeaders.add(newStockData.getRawKemu());
+        }
+        lineHeaders.add("");
+        lineHeaders.add("");
+        lineHeaders.add(StkConstant.KEMU_TIME);
+        List<NewStockData> cashList = mapList.get(StkConstant.cash);
+        for (NewStockData newStockData : cashList) {
+            lineHeaders.add(newStockData.getRawKemu());
+        }
+
+
+        return lineHeaders;
+    }
+
+    private void convertAndPutIn(List<NewStockData> newStockDataList, List<List<Object>> lines, List<String> lineHeaders) {
+        if (lines.isEmpty()) {
+            for (String rawKemu : lineHeaders) {
+                List<Object> line = new ArrayList<>();
+                line.add(rawKemu);
+                lines.add(line);
+            }
+        }
+        for (List line : lines) {
+            String rawKemu = line.get(0)+"";
+            if (StringUtils.isEmpty(rawKemu)) {
+                continue;
+            }
+            if (rawKemu.equals(StkConstant.KEMU_TIME)) {
+                NewStockData d = newStockDataList.get(0);
+                String yearMonth = d.getPeriodYear()+"-"+d.getPeriodMonth();
+                line.add(yearMonth);
+                line.add("Yoy");
+                line.add("percentInAssetOrRevenue");
+                line.add("CoreProfitOnAssetEffectByYoyDelta");
+                continue;
+            }
+            Optional<NewStockData> newStockData = newStockDataList.stream().filter(e -> e.getRawKemu().equals(rawKemu)).findAny();
+            if (!newStockData.isPresent()) {
+                continue;
+            }
+            NewStockData nsd = newStockData.get();
+            line.add(nsd.getKemuValue());
+            line.add(nsd.getYoy());
+            line.add(nsd.getPctInAssetOrRevenue());
+            line.add(nsd.getCoreProfitOnAssetEffect());
+        }
+    }
 
 }
