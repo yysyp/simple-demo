@@ -330,6 +330,7 @@ public class FileImportExportController {
     //
     @GetMapping("/export")
     public void exportFile(@RequestParam(value = "companyCode", required = true) String companyCode,
+                           @RequestParam(value = "fromYear", required = true, defaultValue = "2000") Integer fromYear,
                            @RequestParam(value = "month", required = true, defaultValue = "12") Integer month
     ) throws Exception {
         //line, column
@@ -338,7 +339,7 @@ public class FileImportExportController {
 
         Calendar calendar = Calendar.getInstance();
         int nowYear = calendar.get(Calendar.YEAR);
-        for (int year = 2000; year <= nowYear; year++) {
+        for (int year = fromYear; year <= nowYear; year++) {
             List<NewStockData> newStockDataList = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, month);
             if (CollectionUtils.isEmpty(newStockDataList)) {
                 continue;

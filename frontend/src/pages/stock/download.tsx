@@ -46,6 +46,8 @@ export default (props: any) => {
         link.href =
           '/api/newstock/file/export?companyCode=' +
           form.values.companyCode +
+          '&fromYear=' +
+          form.values.fromYear +
           '&month=' +
           form.values.reportMonth;
         document.body.appendChild(link);
@@ -94,6 +96,17 @@ export default (props: any) => {
                 validator={[
                   { required: true, message: 'Company Code is required!' },
                   { maxLength: 6, message: 'Company Code length is 6!' },
+                ]}
+                decorator={[FormItem]}
+                component={[TextInput]}
+              />
+
+              <Field
+                name="fromYear"
+                title="From Year"
+                validator={[
+                  { minLength: 4, message: 'From Year length is 4!' },
+                  { maxLength: 4, message: 'From Year length is 4!' },
                 ]}
                 decorator={[FormItem]}
                 component={[TextInput]}
