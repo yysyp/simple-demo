@@ -160,6 +160,7 @@ public class FileImportExportController {
             return;
         }
 
+        BigDecimal net_income = opGetKemuValue(findByKemuEn(list, StkConstant.NET_INCOME));
         BigDecimal revenue = opGetKemuValue(findByKemuEn(list, StkConstant.income_main));
         BigDecimal opCost = opGetKemuValue(findByKemuEn(list, StkConstant.cost_of_main_operation));
         BigDecimal sale = opGetKemuValue(findByKemuEn(list, StkConstant.SALE_EXPENSE));
@@ -168,7 +169,13 @@ public class FileImportExportController {
         BigDecimal research = opGetKemuValue(findByKemuEn(list, StkConstant.RESEARCH_EXPENSE));
         BigDecimal tax = opGetKemuValue(findByKemuEn(list, StkConstant.TAX_AND_ADDITIONAL_EXPENSE));
 
+        BigDecimal netAssets = opGetKemuValue(findByKemuEn(list, StkConstant.NET_ASSETS));
         BigDecimal assets = opGetKemuValue(findByKemuEn(list, StkConstant.total_assets));
+
+        BigDecimal sale_cash = opGetKemuValue(findByKemuEn(list, StkConstant.SALE_PRODUCT_PROVIDE_SERVICE_RECEIVED_CASH));
+        BigDecimal net_op_cash = opGetKemuValue(findByKemuEn(list, StkConstant.NET_OPERATION_GENERATED_CASH));
+        BigDecimal ending_cash = opGetKemuValue(findByKemuEn(list, StkConstant.ENDING_CASH_EQUIVALENT_VALUE));
+
 
         if (fin.compareTo(BigDecimal.ZERO) < 0) {
             fin = BigDecimal.ZERO;
@@ -198,6 +205,92 @@ public class FileImportExportController {
             coreProfitOnAssets = coreProfit.divide(assets, 4, BigDecimal.ROUND_HALF_UP);
         }
         dto = constructNewStockDataDto(companyCode, companyName, now, month, year, "核心利润/总资产", StkConstant.coreProfitOnAssets, coreProfitOnAssets);
+        toInsert.add(dto);
+
+        //gross_profit = "gross_profit";
+        BigDecimal gross_profit = BigDecimal.ZERO;
+        if (revenue.compareTo(BigDecimal.ZERO) != 0) {
+            gross_profit = revenue.subtract(opCost).divide(revenue, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "毛利率(营业收入-营业成本)/营业成本", StkConstant.gross_profit, gross_profit);
+        toInsert.add(dto);
+
+        //return_on_equity = "return_on_equity";
+        BigDecimal return_on_equity = BigDecimal.ZERO;
+        if (netAssets.compareTo(BigDecimal.ZERO) != 0) {
+            return_on_equity = net_income.divide(netAssets, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "ROE净资产收益率", StkConstant.return_on_equity, return_on_equity);
+        toInsert.add(dto);
+
+        //expenses_on_income = "expenses_on_income";
+        BigDecimal expenses_on_income = BigDecimal.ZERO;
+        if (revenue.compareTo(BigDecimal.ZERO) != 0) {
+            expenses_on_income = sale.add(admin).add(fin).add(research).divide(revenue, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "费用率:销管研财/营业总收入", StkConstant.expenses_on_income, expenses_on_income);
+        toInsert.add(dto);
+
+        //net_operating_cash_on_net_profit = "net_operating_cash_on_net_profit";
+        BigDecimal net_operating_cash_on_net_profit = BigDecimal.ZERO;
+        if (net_income.compareTo(BigDecimal.ZERO) != 0) {
+            net_operating_cash_on_net_profit = net_op_cash.divide(net_income, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "经营现金流净额/净利润", StkConstant.net_operating_cash_on_net_profit, net_operating_cash_on_net_profit);
+        toInsert.add(dto);
+
+        //sales_cash_on_income = "sales_cash_on_income";
+        BigDecimal sales_cash_on_income = BigDecimal.ZERO;
+        if (revenue.compareTo(BigDecimal.ZERO) != 0) {
+            sales_cash_on_income = sale_cash.divide(revenue, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "销售现金/营收", StkConstant.sales_cash_on_income, sales_cash_on_income);
+        toInsert.add(dto);
+
+        //heavy_assets_on_assets = "heavy_assets_on_assets";
+        BigDecimal heavy_assets_on_assets = BigDecimal.ZERO;
+        if (assets.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal heavyassets = sumKemuByKeywordMatch(StkConstant.debt, list, "土地", "房地产", "固定资产", "在建工程", "生物资产", "油气资产");
+            heavy_assets_on_assets = heavyassets.divide(assets, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "重资产/总资产", StkConstant.heavy_assets_on_assets, heavy_assets_on_assets);
+        toInsert.add(dto);
+
+        //receivables_on_assets = "receivables_on_assets";
+        BigDecimal receivables_on_assets = BigDecimal.ZERO;
+        if (assets.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal allys = sumKemuByKeywordMatch(StkConstant.debt, list, "应收");
+            BigDecimal pj = sumKemuByKeywordMatch(StkConstant.debt, list, "应收票据");
+            receivables_on_assets = allys.subtract(pj).divide(assets, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "应收/总资产", StkConstant.receivables_on_assets, receivables_on_assets);
+        toInsert.add(dto);
+
+        //financial_assets_on_assets = "financial_assets_on_assets";
+        BigDecimal financial_assets_on_assets = BigDecimal.ZERO;
+        if (assets.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal finassets = sumKemuByKeywordMatch(StkConstant.debt, list, "金融资产", "投资", "持有待售");
+            financial_assets_on_assets = finassets.divide(assets, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "金融资产/总资产", StkConstant.financial_assets_on_assets, financial_assets_on_assets);
+        toInsert.add(dto);
+
+        //ending_cash_on_interest_bearing_liabilities = "ending_cash_on_interest_bearing_liabilities";
+        BigDecimal ending_cash_on_interest_bearing_liabilities = BigDecimal.ZERO;
+        BigDecimal interestBearingLiabilities = sumKemuByKeywordMatch(StkConstant.debt, list, "借款");
+        if (interestBearingLiabilities.compareTo(BigDecimal.ZERO) != 0) {
+            ending_cash_on_interest_bearing_liabilities = ending_cash.divide(interestBearingLiabilities, 4, BigDecimal.ROUND_HALF_UP);
+        }
+        dto = constructNewStockDataDto(companyCode, companyName, now, month, year
+                , "期末现金/有息负债", StkConstant.ending_cash_on_interest_bearing_liabilities, ending_cash_on_interest_bearing_liabilities);
         toInsert.add(dto);
 
     }
@@ -302,6 +395,21 @@ public class FileImportExportController {
         return null;
     }
 
+    public BigDecimal sumKemuByKeywordMatch(String kemuType, List<NewStockData> list, String... keywords) {
+        BigDecimal result = list.stream().filter(e -> {
+            if (!kemuType.equals(e.getKemuType())) {
+                return false;
+            }
+            for (String k : keywords) {
+                if (e.getKemu().contains(k)) {
+                    return true;
+                }
+            }
+            return false;
+        }).map(e -> e.getKemuValue()).reduce(BigDecimal.ZERO, (p, q) -> p.add(q));
+        return result;
+    }
+
     private void calcYoy(String companyCode, Integer year, Integer month, List<NewStockData> toSave) {
         int previousYear = year - 1;
         List<NewStockData> nullYoyList = newStockDataServiceImpl.findByCompanyCodePeriodWithNullYoy(companyCode, year, month);
@@ -351,7 +459,7 @@ public class FileImportExportController {
         }
 
         byte[] bs = null;
-        try (InputStream in = handleUpload.exportFile(lines)) {
+        try (InputStream in = handleUpload.exportFile(companyCode, lines)) {
             bs = IOUtils.toByteArray(in);
         } catch (Exception e) {
             e.printStackTrace();

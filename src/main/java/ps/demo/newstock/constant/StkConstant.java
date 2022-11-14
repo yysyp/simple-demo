@@ -32,6 +32,17 @@ public class StkConstant {
     public static String coreProfitOnRevenue = "coreProfitOnRevenue";
     public static String revenueOnAssets = "revenueOnAssets";
     public static String coreProfitOnAssets = "coreProfitOnAssets";
+    //
+    public static String gross_profit = "gross_profit";
+    public static String return_on_equity = "return_on_equity";
+    public static String expenses_on_income = "expenses_on_income";
+    public static String net_operating_cash_on_net_profit = "net_operating_cash_on_net_profit";
+    public static String sales_cash_on_income = "sales_cash_on_income";
+    public static String heavy_assets_on_assets = "heavy_assets_on_assets";
+    public static String receivables_on_assets = "receivables_on_assets";
+    public static String financial_assets_on_assets = "financial_assets_on_assets";
+    public static String ending_cash_on_interest_bearing_liabilities = "ending_cash_on_interest_bearing_liabilities";
+
 
     public static Map<String, String> RegularKemuNameMap = new HashMap<>();
 

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.plexus.util.StringUtils;
 import org.springframework.stereotype.Service;
-import ps.demo.newstock.cellstyle.StyleExcelHandler;
 import ps.demo.newstock.constant.StkConstant;
 import ps.demo.newstock.dto.NewStockDataDto;
 import ps.demo.util.MyRegexUtil;
@@ -256,10 +255,10 @@ public class HandleUpload {
 
 
 
-    public InputStream exportFile(List<List<Object>> data) {
+    public InputStream exportFile(String companyCode, List<List<Object>> data) {
         try (OutputStream out = new ByteArrayOutputStream()) {
             ExcelWriter writer = EasyExcel.write(out).build();
-            WriteSheet writerSheet = EasyExcel.writerSheet("sheet1").build();
+            WriteSheet writerSheet = EasyExcel.writerSheet(companyCode).build();
             writer.write(data, writerSheet);
 
             writer.finish();
