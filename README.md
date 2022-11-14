@@ -113,4 +113,5 @@ yoy: year on year value of this kemu value.
 pctInAssetOrRevenue: for debt kemu, the value will be (kemu value / total assets value); for benefit kemu, the value will be (kemu value / income)
 coreProfitOnAssetEffect: the coreProfitOnAsset delta caused by this kemu value yoy difference.
 
-
+import excels in "newstock-import-samples" downloaded from: http://stockpage.10jqka.com.cn/600519/finance/#finance
+and these excels can be parsed and import into new_stock_data
