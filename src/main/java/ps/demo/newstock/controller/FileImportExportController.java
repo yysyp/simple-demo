@@ -464,7 +464,8 @@ public class FileImportExportController {
     @GetMapping("/export")
     public void exportFile(@RequestParam(value = "companyCode", required = true) String companyCode,
                            @RequestParam(value = "fromYear", required = true, defaultValue = "2000") Integer fromYear,
-                           @RequestParam(value = "month", required = true, defaultValue = "12") Integer month
+                           @RequestParam(value = "toYear", required = false, defaultValue = "0") Integer toYear,
+                           @RequestParam(value = "months", required = true, defaultValue = "3,6,9,12") List<Integer> months
     ) throws Exception {
         //line, column
         List<List<Object>> lines = new ArrayList<>();
@@ -472,15 +473,22 @@ public class FileImportExportController {
 
         Calendar calendar = Calendar.getInstance();
         int nowYear = calendar.get(Calendar.YEAR);
-        for (int year = fromYear; year <= nowYear; year++) {
-            List<NewStockData> newStockDataList = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, month);
-            if (CollectionUtils.isEmpty(newStockDataList)) {
-                continue;
+        if (toYear == 0) {
+            toYear = nowYear;
+        }
+        List<Integer> sortedMonths = months.stream().sorted().collect(Collectors.toList());
+        for (int year = fromYear; year <= toYear; year++) {
+            for (int mi = 0; mi < sortedMonths.size(); mi++) {
+                int month = sortedMonths.get(mi);
+                List<NewStockData> newStockDataList = newStockDataServiceImpl.findByCompanyCodePeriod(companyCode, year, month);
+                if (CollectionUtils.isEmpty(newStockDataList)) {
+                    continue;
+                }
+                if (lineHeaders.isEmpty()) {
+                    lineHeaders = getLineHeaders(newStockDataList);
+                }
+                convertAndPutIn(newStockDataList, lines, lineHeaders);
             }
-            if (lineHeaders.isEmpty()) {
-                lineHeaders = getLineHeaders(newStockDataList);
-            }
-            convertAndPutIn(newStockDataList, lines, lineHeaders);
         }
 
         byte[] bs = null;

@@ -48,8 +48,10 @@ export default (props: any) => {
           form.values.companyCode +
           '&fromYear=' +
           form.values.fromYear +
-          '&month=' +
-          form.values.reportMonth;
+          '&toYear=' +
+          form.values.toYear +
+          '&months=' +
+          form.values.reportMonths;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -104,6 +106,7 @@ export default (props: any) => {
               <Field
                 name="fromYear"
                 title="From Year"
+                initialValue={new Date().getFullYear() - 3}
                 validator={[
                   { minLength: 4, message: 'From Year length is 4!' },
                   { maxLength: 4, message: 'From Year length is 4!' },
@@ -113,16 +116,29 @@ export default (props: any) => {
               />
 
               <Field
-                name="reportMonth"
-                title="Report Month"
+                name="toYear"
+                title="To Year"
+                initialValue={new Date().getFullYear()}
+                validator={[
+                  { minLength: 4, message: 'To Year length is 4!' },
+                  { maxLength: 4, message: 'To Year length is 4!' },
+                ]}
                 decorator={[FormItem]}
+                component={[TextInput]}
+              />
+
+              <Field
+                name="reportMonths"
+                title="Report Months"
+                decorator={[FormItem]}
+                initialValue={12}
                 dataSource={[
                   { label: '12', value: '12' },
                   { label: '9', value: '9' },
                   { label: '6', value: '6' },
                   { label: '3', value: '3' },
                 ]}
-                component={[Select]}
+                component={[Select, { mode: 'multiple' }]}
               />
 
               <Button onClick={handleSubmit}>Download</Button>

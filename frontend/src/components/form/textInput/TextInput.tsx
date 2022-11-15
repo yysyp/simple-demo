@@ -16,7 +16,9 @@ export const TextInput = connect(
           (errors.length == 0 ? styles.TextInputOk : styles.TextInputErr)
         }
         onChange={props.onChange}
-        //value={props.value} /*devScripts.js:6523 Warning: A component is changing an uncontrolled input to be controlled.*/
+        value={
+          props.value
+        } /*devScripts.js:6523 Warning: A component is changing an uncontrolled input to be controlled.*/
       ></input>
     );
   },
