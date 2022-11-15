@@ -34,6 +34,7 @@ public class StkConstant {
     public static String coreProfitOnAssets = "coreProfitOnAssets";
     //
     public static String gross_profit = "gross_profit";
+    public static String inventory_turnover = "inventory_turnover";
     public static String return_on_equity = "return_on_equity";
     public static String expenses_on_income = "expenses_on_income";
     public static String net_operating_cash_on_net_profit = "net_operating_cash_on_net_profit";
@@ -42,7 +43,8 @@ public class StkConstant {
     public static String receivables_on_assets = "receivables_on_assets";
     public static String financial_assets_on_assets = "financial_assets_on_assets";
     public static String ending_cash_on_interest_bearing_liabilities = "ending_cash_on_interest_bearing_liabilities";
-
+    public static final String INVENTORY = "inventory";
+    public static final String asset_liability_ratio = "asset_liability_ratio";
 
     public static Map<String, String> RegularKemuNameMap = new HashMap<>();
 
@@ -50,6 +52,7 @@ public class StkConstant {
     public static Map<String, String> BenefitKemuNameMap = new HashMap<>();
     public static Map<String, String> CashKemuNameMap = new HashMap<>();
     public static double minMatchScore = 0.3;
+
 
 
 
@@ -63,8 +66,9 @@ public class StkConstant {
         RegularKemuNameMap.put("减", "");
 
         DebtKemuNameMap.put("负债总计", TOTAL_LIABILITIES);
+        DebtKemuNameMap.put("负债总计", TOTAL_LIABILITIES);
         DebtKemuNameMap.put("所有者权益或股东权益总计", NET_ASSETS);
-        //DebtKemuNameMap.put("负债和所有者权益或股东权益总计", total_assets);
+        DebtKemuNameMap.put("存货", INVENTORY);
         DebtKemuNameMap.put("资产总计", total_assets);
 
         BenefitKemuNameMap.put("营业总收入", income_main);
