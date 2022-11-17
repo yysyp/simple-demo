@@ -33,7 +33,8 @@ public class StkConstant {
     public static String revenueOnAssets = "revenueOnAssets";
     public static String coreProfitOnAssets = "coreProfitOnAssets";
     //
-    public static String gross_profit = "gross_profit";
+    public static String gross_profit_hk = "gross_profit_hk";
+    public static String gross_profit_margin = "gross_profit_margin";
     public static String inventory_turnover = "inventory_turnover";
     public static String return_on_equity = "return_on_equity";
     public static String expenses_on_income = "expenses_on_income";
@@ -51,7 +52,7 @@ public class StkConstant {
     public static Map<String, String> DebtKemuNameMap = new HashMap<>();
     public static Map<String, String> BenefitKemuNameMap = new HashMap<>();
     public static Map<String, String> CashKemuNameMap = new HashMap<>();
-    public static double minMatchScore = 0.3;
+    public static double minMatchScore = 0.4;
 
 
 
@@ -79,6 +80,7 @@ public class StkConstant {
         BenefitKemuNameMap.put("财务费用", FINANCIAL_EXPENSE);
         BenefitKemuNameMap.put("税金及附加", TAX_AND_ADDITIONAL_EXPENSE);
         BenefitKemuNameMap.put("净利润", NET_INCOME);
+        BenefitKemuNameMap.put("毛利", gross_profit_hk);
 
         CashKemuNameMap.put("销售商品提供劳务收到的现金", SALE_PRODUCT_PROVIDE_SERVICE_RECEIVED_CASH);
         CashKemuNameMap.put("经营活动产生的现金流量净额", NET_OPERATION_GENERATED_CASH);

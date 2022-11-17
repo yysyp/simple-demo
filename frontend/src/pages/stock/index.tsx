@@ -23,7 +23,9 @@ import { Alert, Spin } from 'antd';
 
 export default (props: any) => {
   const history = useHistory();
-  const [file, setFile] = useState();
+  const [file1, setFile1] = useState();
+  const [file2, setFile2] = useState();
+  const [file3, setFile3] = useState();
   const form = useMemo(() => {
     return createForm({
       validateFirst: true,
@@ -42,10 +44,12 @@ export default (props: any) => {
       .validate()
       .then(() => {
         var formData = new FormData();
-        formData.append('file', file);
+        formData.append('files', file1 as any);
+        formData.append('files', file2 as any);
+        formData.append('files', file3 as any);
         formData.append('companyCode', form.values.companyCode);
         formData.append('companyName', form.values.companyName);
-        formData.append('kemuType', form.values.reportType);
+        //formData.append('kemuType', form.values.reportType);
         store.dispatch.stock
           .submitStock(formData)
           .then((res) => {
@@ -100,7 +104,7 @@ export default (props: any) => {
                 component={[TextInput]}
               />
 
-              <Field
+              {/* <Field
                 name="reportType"
                 title="Report Type"
                 validator={[
@@ -114,18 +118,48 @@ export default (props: any) => {
                   { label: 'Cash', value: 'cash' },
                 ]}
                 component={[Select]}
-              />
+              /> */}
 
               <Field
-                name="file"
-                title="File"
-                validator={[{ required: true, message: 'file is required!' }]}
+                name="file1"
+                title="File1"
+                validator={[{ required: true, message: 'file1 is required!' }]}
                 decorator={[FormItem]}
                 component={[
                   Upload,
                   {
                     onChangex: (f: any) => {
-                      setFile(f);
+                      setFile1(f);
+                    },
+                  },
+                ]}
+              />
+
+              <Field
+                name="file2"
+                title="File2"
+                validator={[{ required: true, message: 'file2 is required!' }]}
+                decorator={[FormItem]}
+                component={[
+                  Upload,
+                  {
+                    onChangex: (f: any) => {
+                      setFile2(f);
+                    },
+                  },
+                ]}
+              />
+
+              <Field
+                name="file3"
+                title="File3"
+                validator={[{ required: true, message: 'file3 is required!' }]}
+                decorator={[FormItem]}
+                component={[
+                  Upload,
+                  {
+                    onChangex: (f: any) => {
+                      setFile3(f);
                     },
                   },
                 ]}

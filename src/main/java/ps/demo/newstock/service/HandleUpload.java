@@ -66,7 +66,7 @@ public class HandleUpload {
         return null;
     }
 
-    public List<NewStockDataDto> handleDebtBenefitCashFlowExcel(List<Object> sheet, String kemuType, String companyCode, String companyName, String fileName) {
+    public List<NewStockDataDto> handleDebtBenefitCashFlowExcel(List<Object> sheet, String companyCode, String companyName, String fileName) {
         if (sheet == null) {
             return new ArrayList<>();
         }
@@ -133,7 +133,6 @@ public class HandleUpload {
                 if (exist.isPresent()) {
                     continue;
                 }
-                newStockDataDto.setKemuType(kemuType);
                 newStockDataDto.setCompanyCode(companyCode);
                 newStockDataDto.setCompanyName(companyName);
                 newStockDataDto.setRawKemu(kemus[0]);
@@ -148,6 +147,30 @@ public class HandleUpload {
         }
 
         return kemuRecords;
+    }
+
+    public static String autoIdentifyKemuType(List<NewStockDataDto> kemuRecords) {
+        boolean isBenefit = kemuRecords.stream().anyMatch(e -> e.getKemu().contains("营业收入"))
+                && kemuRecords.stream().anyMatch(e -> e.getKemu().contains("成本"))
+                && kemuRecords.stream().anyMatch(e -> e.getKemu().contains("费用"));
+
+        boolean isDebt = kemuRecords.stream().anyMatch(e -> e.getKemu().contains("流动负债"))
+        && kemuRecords.stream().anyMatch(e -> e.getKemu().contains("负债总计"))
+                && kemuRecords.stream().anyMatch(e -> e.getKemu().contains("资产总计"));
+
+        boolean isCash = kemuRecords.stream().anyMatch(e -> e.getKemu().contains("现金流量"))
+        && kemuRecords.stream().anyMatch(e -> e.getKemu().contains("活动"));
+
+        if (isDebt) {
+            return StkConstant.debt;
+        }
+        if (isBenefit) {
+            return StkConstant.benefit;
+        }
+        if (isCash) {
+            return StkConstant.cash;
+        }
+        return null;
     }
 
     public void calcPctInAssetOrRevenue(List<NewStockDataDto> kemuRecords) {

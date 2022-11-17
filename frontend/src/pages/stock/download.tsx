@@ -8,7 +8,7 @@ import { history } from 'umi';
 import { Button, notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification';
 import { openNotification, openError } from '@/util';
-import { Form, FormItem, Select } from '@formily/antd';
+import { Form, FormItem, Select, Input } from '@formily/antd';
 import { Upload, TextInput, MyFormLayout } from '@/components/form';
 import { MyTable } from '@/components/table';
 import {
@@ -27,6 +27,10 @@ export default (props: any) => {
   const form = useMemo(() => {
     return createForm({
       validateFirst: true,
+      initialValues: {
+        fromYear: new Date().getFullYear() - 3,
+        toYear: new Date().getFullYear(),
+      },
     });
   }, []);
 
@@ -107,24 +111,22 @@ export default (props: any) => {
                 name="fromYear"
                 title="From Year"
                 initialValue={new Date().getFullYear() - 3}
-                validator={[
-                  { minLength: 4, message: 'From Year length is 4!' },
-                  { maxLength: 4, message: 'From Year length is 4!' },
-                ]}
+                //validator={[{ len: 4, message: 'From Year length is 4!' }]}
                 decorator={[FormItem]}
-                component={[TextInput]}
+                component={[Input]}
+                value={new Date().getFullYear() - 3}
+                //component={[TextInput]}
               />
 
               <Field
                 name="toYear"
                 title="To Year"
                 initialValue={new Date().getFullYear()}
-                validator={[
-                  { minLength: 4, message: 'To Year length is 4!' },
-                  { maxLength: 4, message: 'To Year length is 4!' },
-                ]}
+                //validator={[{ len: 4, message: 'To Year length is 4!' }]}
                 decorator={[FormItem]}
-                component={[TextInput]}
+                component={[Input]}
+                value={new Date().getFullYear()}
+                //component={[TextInput]}
               />
 
               <Field

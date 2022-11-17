@@ -73,7 +73,7 @@ namespace SubmitStock {
 
 const submitStock = (req: SubmitStock.Req): Promise<SubmitStock.Res> => {
   return request({
-    url: '/api/newstock/file/upload',
+    url: '/api/newstock/file/upload-files',
     method: 'post',
     headers: { 'Content-Type': 'multipart/form-data' },
     data: req.formData,

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,17 +24,11 @@ import ps.demo.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.Option;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.nio.file.Paths;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,12 +43,28 @@ public class FileImportExportController {
     private NewStockDataServiceImpl newStockDataServiceImpl;
 
     @Operation(summary = "File upload with multipart form data")
-    @PostMapping(value = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/upload-files", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @ResponseBody
+    public DefaultResponse uploadFiles(@RequestParam("files") MultipartFile[] files,
+                                      @RequestParam(value = "companyCode", required = true) String companyCode,
+                                      @RequestParam(value = "companyName", required = true) String companyName,
+                                      HttpServletRequest req) {
+        StringBuffer stringBuffer = new StringBuffer();
+        for (MultipartFile file : files) {
+            DefaultResponse res = uploadFile(file, companyCode, companyName, req);
+            stringBuffer.append(res.getMessage());
+        }
+        return DefaultResponse.success(stringBuffer.toString());
+
+    }
+
+    @Operation(summary = "File upload with multipart form data")
+    @PostMapping(value = "/upload-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseBody
     public DefaultResponse uploadFile(@RequestParam("file") MultipartFile file,
                                       @RequestParam(value = "companyCode", required = true) String companyCode,
                                       @RequestParam(value = "companyName", required = true) String companyName,
-                                      @RequestParam(value = "kemuType", required = true) String kemuType,
+                                      //@RequestParam(value = "kemuType", required = true) String kemuType,
                                       HttpServletRequest req) {
         if (file == null) {
             throw new BadRequestException(CodeEnum.BAD_REQUEST, false, "File is required.");
@@ -63,10 +72,19 @@ public class FileImportExportController {
         try {
             String fileName = file.getOriginalFilename();
             log.info("new Stock upload file companyName={}, companyCode={}", companyName, companyCode);
+            String kemuType = null;
 
             try (InputStream is = new BufferedInputStream(file.getInputStream())) {
                 List<Object> sheet = MyExcelUtil.readMoreThan1000RowBySheet(is, null);
-                List<NewStockDataDto> kemuRecords = handleUpload.handleDebtBenefitCashFlowExcel(sheet, kemuType, companyCode, companyName, fileName);
+                List<NewStockDataDto> kemuRecords = handleUpload.handleDebtBenefitCashFlowExcel(sheet, companyCode, companyName, fileName);
+
+                kemuType = handleUpload.autoIdentifyKemuType(kemuRecords);
+                if (kemuType == null) {
+                    throw new BadRequestException(CodeEnum.NO_KEMU_TYPE, false, "No kemu type found.");
+                }
+                for (NewStockDataDto dto : kemuRecords) {
+                    dto.setKemuType(kemuType);
+                }
 
                 handleUpload.findAndSetKemuEnglishName(kemuRecords, kemuType);
 
@@ -112,7 +130,7 @@ public class FileImportExportController {
             e.printStackTrace();
             throw new ServerApiException(CodeEnum.INTERNAL_SERVER_ERROR, true, "--------->>File upload failed, ex:" + e.getMessage());
         }
-        return DefaultResponse.success("Upload Success");
+        return DefaultResponse.success("Upload Success!");
     }
 
     private List<NewStockDataDto> filterExists(List<NewStockDataDto> kemuRecords) {
@@ -182,6 +200,12 @@ public class FileImportExportController {
         if (fin.compareTo(BigDecimal.ZERO) < 0) {
             fin = BigDecimal.ZERO;
         }
+        //HK stock special treatment
+        if (companyCode.toUpperCase().contains("HK")) {
+            BigDecimal gross_profit_hk = opGetKemuValue(findByKemuEn(list, StkConstant.gross_profit_hk));
+            opCost = revenue.subtract(gross_profit_hk);
+        }
+
         BigDecimal coreProfit = revenue.subtract(opCost).subtract(sale).subtract(admin).subtract(fin)
                 .subtract(research).subtract(tax);
 
@@ -220,13 +244,13 @@ public class FileImportExportController {
         toInsert.add(dto);
 
 
-        //gross_profit = "gross_profit";
-        BigDecimal gross_profit = BigDecimal.ZERO;
+        //gross_profit_margin = "gross_profit_margin";
+        BigDecimal gross_profit_margin = BigDecimal.ZERO;
         if (revenue.compareTo(BigDecimal.ZERO) != 0) {
-            gross_profit = revenue.subtract(opCost).divide(revenue, 4, BigDecimal.ROUND_HALF_UP);
+            gross_profit_margin = revenue.subtract(opCost).divide(revenue, 4, BigDecimal.ROUND_HALF_UP);
         }
         dto = constructNewStockDataDto(companyCode, companyName, now, month, year
-                , "毛利率(营业收入-营业成本)/营业成本", StkConstant.gross_profit, gross_profit);
+                , "毛利率(营业收入-营业成本)/营业成本", StkConstant.gross_profit_margin, gross_profit_margin);
         toInsert.add(dto);
 
         //inventory_turnover
@@ -279,7 +303,7 @@ public class FileImportExportController {
         //heavy_assets_on_assets = "heavy_assets_on_assets";
         BigDecimal heavy_assets_on_assets = BigDecimal.ZERO;
         if (assets.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal heavyassets = sumKemuByKeywordMatch(StkConstant.debt, list, "土地", "房地产", "固定资产", "在建工程", "生物资产", "油气资产");
+            BigDecimal heavyassets = sumKemuByKeywordMatch(StkConstant.debt, list, "土地", "房地产", "固定资产", "在建工程", "生物资产", "油气资产", "不动产");
             heavy_assets_on_assets = heavyassets.divide(assets, 4, BigDecimal.ROUND_HALF_UP);
         }
         dto = constructNewStockDataDto(companyCode, companyName, now, month, year
@@ -331,6 +355,9 @@ public class FileImportExportController {
         BigDecimal coreProfit = opGetKemuValue(findByKemuEn(list, StkConstant.coreProfit));
         BigDecimal assets = opGetKemuValue(findByKemuEn(list, StkConstant.total_assets));
         BigDecimal coreProfitOnAssets = opGetKemuValue(findByKemuEn(list, StkConstant.coreProfitOnAssets));
+        if (coreProfitOnAssets.compareTo(BigDecimal.ZERO) == 0) {
+            return;
+        }
         for (NewStockData newStockData : list) {
             BigDecimal yoy = newStockData.getYoy();
             String kemu = newStockData.getKemu();
@@ -353,7 +380,8 @@ public class FileImportExportController {
                 BigDecimal deltaCoreProfitOnAssets = BigDecimal.ZERO;
                 if (fm.compareTo(BigDecimal.ZERO) != 0) {
                     deltaCoreProfitOnAssets = coreProfitOnAssets.subtract(
-                            coreProfit.divide(fm, 4, BigDecimal.ROUND_HALF_UP));
+                            coreProfit.divide(fm, 4, BigDecimal.ROUND_HALF_UP))
+                    .divide(coreProfitOnAssets, 4, BigDecimal.ROUND_HALF_UP);
                 }
                 newStockData.setCoreProfitOnAssetEffect(deltaCoreProfitOnAssets);
                 toUpdate.add(newStockData);
@@ -364,18 +392,29 @@ public class FileImportExportController {
                     toUpdate.add(newStockData);
                     continue;
                 }
-                //收入，收益，利润，利得；支出，成本，费用，损失，税，
+                //收入，收益，利润，利得, 利；支出，成本，费用，损失，税，
                 BigDecimal fz = BigDecimal.ZERO;
                 ;
                 if (kemu.contains("收入") || kemu.contains("收益")
                         || kemu.contains("利润")
-                        || kemu.contains("利得")) {
+                        || kemu.contains("利得")
+                || kemu.contains("毛利")
+                || kemu.contains("溢利")) {
                     fz = coreProfit.subtract(delta);
+                } else if (kemu.contains("支出") || kemu.contains("成本")
+                        || kemu.contains("费用")
+                        || kemu.contains("损失")) {
+                    fz = coreProfit.add(delta);
+                } else if (kemu.contains("利")) {
+                    fz = coreProfit.subtract(delta);
+                } else if (kemu.contains("税")) {
+                    fz = coreProfit.add(delta);
                 } else {
                     fz = coreProfit.add(delta);
                 }
                 BigDecimal deltaCoreProfitOnAssets = coreProfitOnAssets.subtract(
-                        fz.divide(assets, 4, BigDecimal.ROUND_HALF_UP));
+                        fz.divide(assets, 4, BigDecimal.ROUND_HALF_UP))
+                        .divide(coreProfitOnAssets, 4, BigDecimal.ROUND_HALF_UP);;
                 newStockData.setCoreProfitOnAssetEffect(deltaCoreProfitOnAssets);
                 toUpdate.add(newStockData);
             }
@@ -571,9 +610,9 @@ public class FileImportExportController {
                 NewStockData d = newStockDataList.get(0);
                 String yearMonth = d.getPeriodYear()+"-"+d.getPeriodMonth();
                 line.add(yearMonth);
-                line.add("Yoy");
-                line.add("percentInAssetOrRevenue");
-                line.add("CoreProfitOnAssetEffectByYoyDelta");
+                line.add("YOY");
+                line.add("PercentInAssetOrRevenue");
+                line.add("CoreProfitOnAssetEffectPercentByYoyDelta");
                 continue;
             }
             Optional<NewStockData> newStockData = newStockDataList.stream().filter(e -> e.getRawKemu().equals(rawKemu)).findAny();

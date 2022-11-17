@@ -26,7 +26,9 @@ public enum CodeEnum {
     INTERNAL_SERVER_ERROR("500", 200),
     NOT_IMPLEMENTED("501", 200),
 
-    DUPLICATED_KEY("10000", 200);
+    DUPLICATED_KEY("10000", 200),
+
+    NO_KEMU_TYPE("10001", 200);
 
     private String code;
     private int httpCode;
