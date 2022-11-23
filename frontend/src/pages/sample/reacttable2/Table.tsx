@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useTable, useSortBy } from 'react-table';
+import { useTable, useSortBy, useFilters } from 'react-table';
 
 import styled from 'styled-components';
 const Styles = styled.div`
@@ -29,6 +29,14 @@ const Styles = styled.div`
 
 export const Table = (props: { columns: any; data: any }) => {
   const { columns, data } = props;
+
+  const defaultColumn = React.useMemo(
+    () => ({
+      Filter: TextFilter,
+    }),
+    [],
+  );
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable(
       {
@@ -42,7 +50,9 @@ export const Table = (props: { columns: any; data: any }) => {
         //     },
         //   ],
         // },
+        defaultColumn,
       },
+      useFilters,
       useSortBy,
     );
 
@@ -63,6 +73,7 @@ export const Table = (props: { columns: any; data: any }) => {
                         : ' 🔼'
                       : ''}
                   </span>
+                  <div>{column.canFilter ? column.render('Filter') : null}</div>
                 </th>
               ))}
             </tr>
@@ -86,5 +97,19 @@ export const Table = (props: { columns: any; data: any }) => {
     </Styles>
   );
 };
+
+function TextFilter({ column: { filterValue, preFilteredRows, setFilter } }) {
+  const count = preFilteredRows.length;
+
+  return (
+    <input
+      value={filterValue || ''}
+      onChange={(e) => {
+        setFilter(e.target.value || undefined);
+      }}
+      placeholder={`筛选 ${count} 条记录`}
+    />
+  );
+}
 
 export default Table;
