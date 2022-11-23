@@ -10,7 +10,7 @@ import type { NotificationPlacement } from 'antd/es/notification';
 import { openNotification, openError } from '@/util';
 import { Form, FormItem } from '@formily/antd';
 import { Upload, TextInput, MyFormLayout } from '@/components/form';
-import { MyTable } from '@/components/table';
+import { MyTable, MyTable2 } from '@/components/table';
 import {
   createColumnHelper,
   flexRender,
@@ -90,6 +90,33 @@ const columns = [
     footer: (info) => info.column.id,
   }),
 ];
+
+//for MyTable2
+const columns2 = [
+  {
+    Header: 'PID',
+    accessor: 'pid',
+  },
+  {
+    Header: 'First Name',
+    accessor: 'firstName',
+  },
+  {
+    Header: 'Last Name',
+    accessor: 'lastName',
+  },
+  {
+    Header: 'Age',
+    accessor: 'age',
+    Cell: ({ value, row }) => {
+      if (value > 30) {
+        return <div>{value}</div>;
+      } else {
+        return <div style={{ color: 'red' }}>{value}</div>;
+      }
+    },
+  },
+];
 //end
 
 export default function IndexPage() {
@@ -145,6 +172,7 @@ export default function IndexPage() {
         </MyTable>
       </div>
       <hr />
+      <MyTable2 columns={columns2} data={defaultData}></MyTable2>
     </div>
   );
 }
