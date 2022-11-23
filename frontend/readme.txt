@@ -38,6 +38,8 @@ cnpm install --save antd moment @formily/antd
 #react table:
 cnpm install @tanstack/react-table
 
+cnpm i react-table
+
 #Visit:
 http://localhost:8000/#/todo
 
