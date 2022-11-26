@@ -24,7 +24,7 @@ const addCellFun = (columns: []) => {
   for (let col of columns) {
     if (col['Header'] == 'YOY') {
       col['Cell'] = ({ value, row }) => {
-        if (value < 0) {
+        if (Number(value) < 0) {
           return (
             <div style={{ background: 'lightyellow', color: 'red' }}>
               {value}
@@ -34,9 +34,22 @@ const addCellFun = (columns: []) => {
           return <div style={{ background: 'lightyellow' }}>{value}</div>;
         }
       };
+      col['sortType'] = (rowa, rowb, columnId: String, desc: Bool) => {
+        let a = Number(rowa.values[columnId]);
+        let b = Number(rowb.values[columnId]);
+        if (a == b) {
+          return 0;
+        }
+
+        if (a > b) {
+          return 1;
+        } else {
+          return -1;
+        }
+      };
     } else if (col['Header'] == 'PctInATOrR') {
       col['Cell'] = ({ value, row }) => {
-        if (value < 0) {
+        if (Number(value) < 0) {
           return (
             <div style={{ background: 'lightpink', color: 'red' }}>{value}</div>
           );
@@ -44,14 +57,40 @@ const addCellFun = (columns: []) => {
           return <div style={{ background: 'lightpink' }}>{value}</div>;
         }
       };
+      col['sortType'] = (rowa, rowb, columnId: String, desc: Bool) => {
+        let a = Number(rowa.values[columnId]);
+        let b = Number(rowb.values[columnId]);
+        if (a == b) {
+          return 0;
+        }
+
+        if (a > b) {
+          return 1;
+        } else {
+          return -1;
+        }
+      };
     } else if (col['Header'] == 'DeltaPctToX') {
       col['Cell'] = ({ value, row }) => {
-        if (value < 0) {
+        if (Number(value) < 0) {
           return (
             <div style={{ background: 'purple', color: 'red' }}>{value}</div>
           );
         } else {
           return <div style={{ background: 'purple' }}>{value}</div>;
+        }
+      };
+      col['sortType'] = (rowa, rowb, columnId: String, desc: Bool) => {
+        let a = Number(rowa.values[columnId]);
+        let b = Number(rowb.values[columnId]);
+        if (a == b) {
+          return 0;
+        }
+
+        if (a > b) {
+          return 1;
+        } else {
+          return -1;
         }
       };
     }
