@@ -110,6 +110,7 @@ function TextFilter({ column: { filterValue, preFilteredRows, setFilter } }) {
         setFilter(e.target.value || undefined);
       }}
       placeholder={`Filter ${count} records`}
+      style={{ width: '100px' }}
     />
   );
 }

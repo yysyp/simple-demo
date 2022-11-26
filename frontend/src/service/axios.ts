@@ -25,7 +25,7 @@ export const request = ({
     axios({ baseURL: reqBaseUrl, method, url, params, data, headers })
       .then(
         (response: AxiosResponse) => {
-          resolve(response);
+          resolve(response.data);
         },
         // Here no need to handle again as it has been handled by axios.interceptors
         // ,
@@ -65,7 +65,8 @@ axios.interceptors.response.use(
     console.log('axios res', res);
     const code: string = get(res, 'data.code');
     if (code == '200') {
-      message.openInfo(res.data.message, 'Info');
+      //message.openInfo(res.data.message, 'Info');
+      return res;
     } else {
       message.openError(res, 'axios response not 200');
       return Promise.reject(res);

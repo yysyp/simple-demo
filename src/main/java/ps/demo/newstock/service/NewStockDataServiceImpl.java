@@ -291,6 +291,11 @@ public class NewStockDataServiceImpl {
         );
     }
 
+    @Transactional
+    public void deleteByCompanyCode(String companyCode) {
+        newStockDataDao.deleteByCompanyCode(companyCode);
+    }
+
 }
 
 

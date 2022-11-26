@@ -80,6 +80,50 @@ export default (props: any) => {
       });
   };
 
+  const handleToReport = () => {
+    setSpinning(true);
+    setSubmitResult('');
+    form
+      .validate()
+      .then(() => {
+        store.dispatch.stock.updateReportParam({
+          companyCode: form.values.companyCode,
+          fromYear: form.values.fromYear,
+          toYear: form.values.toYear,
+          months: form.values.reportMonths,
+        });
+        history.push('/stock/report');
+        setSpinning(false);
+      })
+      .catch((err: any) => {
+        setSpinning(false);
+        setSubmitResult(JSON.stringify(err));
+      });
+  };
+
+  const handleDeleteByCompanyCode = () => {
+    setSpinning(true);
+    form
+      .validate()
+      .then(() => {
+        store.dispatch.stock
+          .deleteByCompanyCode({
+            companyCode: form.values.companyCode,
+          })
+          .then(() => {
+            setSpinning(false);
+          })
+          .catch((err: any) => {
+            setSpinning(false);
+            setSubmitResult(JSON.stringify(err));
+          });
+      })
+      .catch((err: any) => {
+        setSpinning(false);
+        setSubmitResult(JSON.stringify(err));
+      });
+  };
+
   return (
     <div className={styles.container}>
       <Spin spinning={spinning} tip="Loading...">
@@ -93,6 +137,9 @@ export default (props: any) => {
             }}
           >
             To Upload
+          </Button>
+          <Button onClick={handleDeleteByCompanyCode}>
+            Delete By CompanyCode
           </Button>
           <Form form={form}>
             <MyFormLayout width={'450px'}>
@@ -144,6 +191,7 @@ export default (props: any) => {
               />
 
               <Button onClick={handleSubmit}>Download</Button>
+              <Button onClick={handleToReport}>ToReport</Button>
             </MyFormLayout>
           </Form>
         </div>

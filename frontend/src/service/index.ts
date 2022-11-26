@@ -102,12 +102,62 @@ const downloadStock = (req: DownloadStock.Req): Promise<DownloadStock.Res> => {
   });
 };
 
+namespace GetReportData {
+  export type Req = {
+    companyCode: string;
+    fromYear: number;
+    toYear: number;
+    months: string;
+  };
+
+  export type Res = CommonRes & {
+    data?: {};
+  };
+}
+//http://localhost:8080/api/newstock/report/json?companyCode=600519&fromYear=2020&toYear=2022&months=12
+const getReportData = (req: GetReportData.Req): Promise<GetReportData.Res> => {
+  return request({
+    url:
+      '/api/newstock/report/json?companyCode=' +
+      req.companyCode +
+      '&fromYear=' +
+      req.fromYear +
+      '&toYear=' +
+      req.toYear +
+      '&months=' +
+      req.months,
+    method: 'get',
+  });
+};
+
+namespace DeleteByCompanyCode {
+  export type Req = {
+    companyCode: string;
+  };
+
+  export type Res = CommonRes & {
+    data?: {};
+  };
+}
+const deleteByCompanyCode = (
+  req: GetReportData.Req,
+): Promise<GetReportData.Res> => {
+  return request({
+    url: '/api/newstock/report/delete?companyCode=' + req.companyCode,
+    method: 'post',
+  });
+};
+
 export {
   GetUser,
   SubmitFormDataTest,
   GetProduct,
   SubmitStock,
   DownloadStock,
+  GetReportData,
+  DeleteByCompanyCode,
+  deleteByCompanyCode,
+  getReportData,
   downloadStock,
   submitStock,
   getProduct,

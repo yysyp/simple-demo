@@ -4,6 +4,9 @@ package ps.demo.newstock.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ps.demo.newstock.entity.NewStockData;
 import lombok.*;
@@ -35,6 +38,11 @@ public interface NewStockDataDao extends JpaRepository<NewStockData, Long>, JpaS
             Integer year,
             Integer month,
             String kemuType);
+
+
+    @Modifying
+    @Query("delete from NewStockData t where t.companyCode=:companyCode")
+    public void deleteByCompanyCode(@Param("companyCode") String companyCode);
 
 }
 

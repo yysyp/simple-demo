@@ -9,12 +9,24 @@ export const stock = createModel()({
       currentPage: 1 as number,
       pageSize: 10 as number,
     },
+    reportParam: {
+      companyCode: '' as string,
+      fromYear: (new Date().getFullYear() - 3) as number,
+      toYear: new Date().getFullYear() as number,
+      months: '3,6,9,12' as string,
+    },
   },
   reducers: {
     updatePage: (state, payload) => {
       return {
         ...state,
         pageParam: { ...state.pageParam, currentPage: payload },
+      };
+    },
+    updateReportParam: (state, payload) => {
+      return {
+        ...state,
+        reportParam: { ...payload },
       };
     },
   },
@@ -26,6 +38,17 @@ export const stock = createModel()({
 
     async downloadStock(payload) {
       let resp = service.downloadStock(payload);
+      return resp;
+    },
+
+    async getReportData(payload) {
+      let resp = await service.getReportData(payload);
+
+      return resp;
+    },
+    async deleteByCompanyCode(payload) {
+      let resp = await service.deleteByCompanyCode(payload);
+
       return resp;
     },
   }),
