@@ -1,0 +1,22 @@
+# 现成配置工作流步骤如下：
+
+1、通过 fork 方式获得现成配置
+
+2、clone 作为你的 base
+mkdir ~/ldap
+git clone https://github.com/$USER/ldap ~/ldap/base
+cd ~/ldap/base
+git remote add upstream git@github.com:$USER/ldap
+
+3、创建并填充 overlays
+mkdir -p ~/ldap/overlays/staging
+mkdir -p ~/ldap/overlays/production
+
+4、生成 variants
+kustomize build ~/ldap/overlays/staging | kubectl apply -f -
+kustomize build ~/ldap/overlays/production | kubectl apply -f -
+
+5、(可选)更新上游配置，用户可以定期更新他的 base, 以更新上游所做的修改
+cd ~/ldap/base
+git fetch upstream
+git rebase upstream/master
