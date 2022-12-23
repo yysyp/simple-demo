@@ -1,0 +1,61 @@
+script {
+    properties([
+        parameters([
+            choice(choices:['gcp', 'ali', 'aws'], name: 'cloud')
+//             ,
+//             gitParameter(branch: '',
+//             branchFilter: 'origin/(.*)',
+//             defaultValue: 'master',
+//             description: '',
+//             quickFilterEnabled: true,
+//             selectedValue: 'NONE',
+//             sortMode: 'ASCENDING_SMART',
+//             tagFilter: '*',
+//             type: 'PT_BRANCH',
+//             name: 'theBranch')
+        ])
+    ])
+}
+
+echo "--->>Input parameters: cloud=${params.cloud}, theBranch=${params.theBranch}"
+
+def sayHello(String str) {
+    print 'Hello ' + str
+}
+
+def writeToFile() {
+    writeFile(file: 'application.yaml', text: '''server:
+                   ssl:
+                     key-store-type: PKCS12
+                     key-store: classpath:keys/simpledemo.p12
+                     key-store-password: simpledemo.sp
+                     key-alias: ${USERNAME}
+                     enabled: true
+                   port: 8443
+                   originhttp:
+                     port: 8080''');
+}
+
+pipeline {
+    agent any
+    stages {
+        stage('Stage 1') {
+            steps {
+                script {
+                    sayHello(params.cloud)
+                    writeToFile();
+
+                    sh 'cat application.yaml'
+                    //String content = libraryResource 'settings.txt'
+                    String content = readFile file:'application.yaml', encoding: 'UTF-8'
+                    withCredentials([usernamePassword(credentialsId: 'KAFKA-USER-PASS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        echo "username=${USERNAME} -- password=${PASSWORD}"
+                        content = content.replace('${USERNAME}', "${USERNAME}")
+                    }
+                    echo content
+                    writeFile(file: 'application.yaml', text: content)
+                }
+            }
+        }
+    }
+}

@@ -6,6 +6,7 @@
 4) Run initsql/dml.sql to create user and role.
 5) Start up the application and visit:
    http://localhost:8080/index.html
+   http://localhost:8080/healthz
 
 
 ---------------------------------------------------------------------------------------------
