@@ -116,7 +116,12 @@ public class WebSecurityConfigCamunda2 extends WebSecurityConfigurerAdapter {
         plugin.setServerUrl("ldap://localhost:10389");
         plugin.setManagerDn("uid=admin,ou=system");
         plugin.setManagerPassword("secret");
-        //plugin.setBaseDn("ou=People,dc=maxcrc,dc=com");
+		
+		plugin.setGroupIdAttribute("cn");
+        plugin.setGroupNameAttribute("cn");
+        plugin.setGroupMemberAttribute("member");
+        
+		//plugin.setBaseDn("ou=People,dc=maxcrc,dc=com");
         //plugin.setUserSearchBase("ou=People");
         //plugin.setUserSearchFilter("(objectclass=person)");
         //plugin.setUserIdAttribute("uid");
