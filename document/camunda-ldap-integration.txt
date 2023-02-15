@@ -1,0 +1,188 @@
+Refer to: https://dzone.com/articles/open-ldap-and-camunda-integration-in-windows
+sample of edit ldap: https://www.ibm.com/docs/en/odm/8.9.2?topic=registries-task-preparing-ldap-environment
+
+0, -------------------------------------------------------------------------------------------------
+Install： 
+	a: Apache Directory Studio: https://www.maxcrc.de/wp-content/uploads/2020/04/OpenLDAPforWindows_x86.zip
+	b: ApacheDS
+
+1, ------------------------------------------------------------------------------------------------- 
+Open Apache Directory Studio to add user to OpenLDAP
+2, -------------------------------------------------------------------------------------------------
+pom.xml:
+<dependencies>
+        <dependency>
+            <groupId>org.camunda.bpm.springboot</groupId>
+            <artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.camunda.bpm.springboot</groupId>
+            <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-engine-plugin-spin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.camunda.spin</groupId>
+            <artifactId>camunda-spin-dataformat-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-ldap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.camunda.bpm.identity</groupId>
+            <artifactId>camunda-identity-ldap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-ldap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ldap</groupId>
+            <artifactId>spring-ldap-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-ldap</artifactId>
+        </dependency>
+    </dependencies>
+	
+3,  -------------------------------------------------------------------------------------------------
+application.yaml:
+#camunda.bpm.admin-user:
+#  id: demo
+#  password: demo
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:camunda-h2-database;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+
+4, -------------------------------------------------------------------------------------------------
+
+import org.camunda.bpm.engine.impl.plugin.AdministratorAuthorizationPlugin;
+import org.camunda.bpm.identity.impl.ldap.plugin.LdapIdentityProviderPlugin;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@EnableWebSecurity
+@Configuration
+public class WebSecurityConfigCamunda2 extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable();
+        http.authorizeRequests().antMatchers("/").permitAll();
+        http.headers().frameOptions().disable();
+    }
+
+    @Bean
+    public static AdministratorAuthorizationPlugin administratorAuthorizationPlugin() {
+        AdministratorAuthorizationPlugin plugin = new AdministratorAuthorizationPlugin();
+        //plugin.setAdministratorUserName("admin");
+        return plugin;
+    }
+
+    @Bean
+    public static LdapIdentityProviderPlugin ldapIdentityProviderPlugin() {
+        LdapIdentityProviderPlugin plugin = new LdapIdentityProviderPlugin();
+        plugin.setServerUrl("ldap://localhost:10389");
+        plugin.setManagerDn("uid=admin,ou=system");
+        plugin.setManagerPassword("secret");
+        //plugin.setBaseDn("ou=People,dc=maxcrc,dc=com");
+        //plugin.setUserSearchBase("ou=People");
+        //plugin.setUserSearchFilter("(objectclass=person)");
+        //plugin.setUserIdAttribute("uid");
+        //plugin.setUserFirstnameAttribute("cn");
+        //plugin.setUserLastnameAttribute("sn");
+        //plugin.setUserPasswordAttribute("userPassword");
+        //plugin.setGroupSearchBase("ou=Gruppen");
+        //plugin.setGroupSearchFilter("(member={0})");
+        //plugin.setGroupIdAttribute("ou");
+        //plugin.setGroupNameAttribute("cn");
+        //plugin.setGroupMemberAttribute("member");
+        //plugin.setAuthorizationCheckEnabled(true);
+        return plugin;
+    }
+
+}
+
+5, -------------------------------------------------------------------------------------------------
+import org.camunda.bpm.engine.rest.security.auth.ProcessEngineAuthenticationFilter;
+import org.camunda.bpm.engine.rest.security.auth.impl.HttpBasicAuthenticationProvider;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.servlet.Filter;
+
+@Configuration
+public class CmndBasicAuthenticationFilter {
+
+    @Bean
+    public FilterRegistrationBean processEngineAuthenticationFilter() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setName("comunda-auth");
+        registration.setFilter(this.getProcessEngineAuthenticationFilter());
+        registration.addInitParameter("authentication-provider",
+                HttpBasicAuthenticationProvider.class.getName());
+        registration.addUrlPatterns("/*");
+        return registration;
+    }
+
+    @Bean
+    public Filter getProcessEngineAuthenticationFilter() {
+        return new ProcessEngineAuthenticationFilter();
+    }
+
+}
+
+6, -------------------------------------------------------------------------------------------------
+http://localhost:8080/camunda/app/welcome/default/#!/login
+login with:
+patrick.song and the password in LDAP.
+
+
+====================================================================================================================
+
+Hashtable<String, String> environment = new Hashtable<String, String>();
+environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+environment.put(Context.PROVIDER_URL, "ldap://localhost:10389");
+environment.put(Context.SECURITY_AUTHENTICATION, "simple");
+environment.put(Context.SECURITY_PRINCIPAL, "cn=Joe Simms,ou=Users,dc=baeldung,dc=com");
+environment.put(Context.SECURITY_CREDENTIALS, "12345");
+DirContext context = new InitialDirContext(environment);
+context.close();
+
+...
+1) host&port
+2) dn: distinguished name
+3) password
+
