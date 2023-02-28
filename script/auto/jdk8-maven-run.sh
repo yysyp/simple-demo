@@ -1,0 +1,8 @@
+#! /bin/bash -eu
+
+# Windows use Bash here and run with: sh jdk8-maven-run -v
+
+source ./init-funs-variables.sh
+
+dockermvn $@
+

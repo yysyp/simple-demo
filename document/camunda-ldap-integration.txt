@@ -177,17 +177,83 @@ patrick.song and the password in LDAP.
 
 ====================================================================================================================
 
+LDAP connection:
+
+
 Hashtable<String, String> environment = new Hashtable<String, String>();
 environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-environment.put(Context.PROVIDER_URL, "ldap://localhost:10389");
+environment.put(Context.PROVIDER_URL, "ldap://localhost:10389/ou=system");
 environment.put(Context.SECURITY_AUTHENTICATION, "simple");
-environment.put(Context.SECURITY_PRINCIPAL, "cn=Joe Simms,ou=Users,dc=baeldung,dc=com");
-environment.put(Context.SECURITY_CREDENTIALS, "12345");
+environment.put(Context.SECURITY_PRINCIPAL, "uid=admin,ou=system");
+environment.put(Context.SECURITY_CREDENTIALS, "secret");
 DirContext context = new InitialDirContext(environment);
+SearchControls searchControls = new SearchControls();
+searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+searchControls.setCountLimit(1);
+NamingEnumeration<SearchResult> namingEnumeration = context.search("", "(uid="+username+")", searchControls);
+while(namingEnumeration) {
+	SearchResult sr = namingEnumeration.next();
+	String sshapassword = new String((byte[])sr.getAttributes().get("userPassword").get());
+}
 context.close();
+
+
+
+private static byte[] getSalt(String sshapassword) {
+	byte[] array = Base64.getMimeDecoder().decode(sshapassword.substring(6));
+	return Arrays.copyOfRange(data, 20, array.length);
+}
+
+private static String getSshaDigestFor(String rawpassword, byte[] salt) {
+	MessageDigest crypt = null;
+	try {
+			crypt = MessageDigest.getInstance("SHA-1");
+	} catch (Exception e) {
+	}
+	crypt.reset();
+	crypt.update(rawpassword.getBytes(Charset.fromName("UTF-8")));
+	crypt.update(salt);
+	byte[] hash = crypt.digest();
+	
+	byte[] hashPlusSalt = new byte[hash.length+salt.length];
+	System.arraycopy(hash, 0, hashPlusSalt, 0, hash.length);
+	System.arraycopy(salt, 0, hashPlusSalt, hash.length, salt.length);
+	return "{SSHA}"+Base64.getEncoder().encodeToString(hashPlusSalt);
+
+}
+
+
 
 ...
 1) host&port
 2) dn: distinguished name
 3) password
+
+
+
+====================================================================================================================
+Solution2: hijack camunda checkPassword method.
+
+1, Overwrite DbIdentityServiceProvider's checkPassword method.
+2, Configure CamundaProcessEngineConfiguration.
+@Bean
+public CamundaProcessEngineConfiguration custoIdProvider(DbIdentityServiceProvider identityService) {
+	return new CamundaProcessEngineConfiguration() {
+		@Override
+		public void preInit(ProcessEngineConfigurationImpl pec) {
+			pec.setIdentityProviderSessionFactory(
+				new GenericManagerFactory(MyDbIdentityServiceProvider.class.getName())
+			);
+			CamundaProcessEngineConfiguration.super.preInit(pec);
+		}
+	}
+}
+
+3, Register AuthenticationProvider filter. and add patterns "/engine-rest/*"
+
+---------------------------------------------------------------------------------------------------------------------
+
+
+ 
+
 
