@@ -1,0 +1,26 @@
+#Run by docker compose -f docker-compose-mysql-grafana.yml up -d
+#Stop by docker compose -f docker-compose-mysql-grafana.yml down
+version: '3'
+
+services:
+    mysql-db:
+        image: mysql:8.0.32
+        restart: always
+        ports:
+            - "13306:3306"
+        environment:
+            MYSQL_DATABASE: testdb
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_ROOT_HOST: '%'
+            TZ: Asia/Shanghai
+        command:
+            --max_connections=5
+            --character-set-server=utf8mb4
+            --collation-server=utf8mb4_general_ci
+    grafana:
+        image: grafana/grafana-oss:9.3.2
+        restart: always
+        ports:
+            - "13000:3000"
+        depends_on:
+            - mysql-db
