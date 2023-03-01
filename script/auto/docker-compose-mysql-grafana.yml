@@ -10,7 +10,9 @@ services:
         ports:
             - "13306:3306"
         volumes:
-            - //c/mnt/init:/docker-entrypoint-initdb.d
+            - $PWD/init:/docker-entrypoint-initdb.d
+            #- $PWD/data:/var/lib/mysql
+            #- //c/mnt/init:/docker-entrypoint-initdb.d
             - //c/mnt/data:/var/lib/mysql
         environment:
             MYSQL_DATABASE: testdb
