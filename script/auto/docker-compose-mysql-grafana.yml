@@ -1,6 +1,7 @@
 #Run by docker compose -f docker-compose-mysql-grafana.yml up -d
 #docker-compose -f docker-compose-mysql-grafana.yml up -d
 #Stop by docker compose -f docker-compose-mysql-grafana.yml down
+#Need to delete the "//c/data" content to make mysql to recreate db
 version: '3'
 
 services:
@@ -11,9 +12,11 @@ services:
             - "13306:3306"
         volumes:
             - $PWD/init:/docker-entrypoint-initdb.d
+            #- //c/data:/var/lib/mysql
+            #- $PWD/sql:/opt/sql
             #- $PWD/data:/var/lib/mysql
             #- //c/mnt/init:/docker-entrypoint-initdb.d
-            - //c/mnt/data:/var/lib/mysql
+            
         environment:
             MYSQL_DATABASE: testdb
             MYSQL_ROOT_PASSWORD: root
