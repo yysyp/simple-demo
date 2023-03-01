@@ -20,7 +20,7 @@ USER demo
 WORKDIR /app
 ENV GOOGLE_APPLICATION_CREDENTIALS=/keys/credentials.json
 ENV spring.profiles.active=dev,dev-k8
-ENTRYPOINT ["java", "-Xms512m", "-Xmx512m", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dfile.encoding=UTF-8", "-Djava.io.tmpdir=/tmp", "-Xms512m", "-Xmx512m", "-jar", "app.jar"]
 #"-XX:+UseG1GC", "-XX:+UseStringDeduplication",
 #"-XX:+HeapDumpOnOutOfMemoryError", "-XX:HeapDumpPath=./",
 #"-XX:+PrintGCDetails", "-XX:+PrintGCTimeStamps", "-Xloggc:./logs/gc.log", "-XX:+UseGCLogFileRotation", "-XX:NumberOfGCLogFiles=3", "-XX:GCLogFileSize=1024k",
