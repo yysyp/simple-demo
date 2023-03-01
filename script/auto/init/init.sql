@@ -1,6 +1,11 @@
-#CREATE DATABASE IF NOT EXISTS `testdb` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-#grant all PRIVILEGES on testdb.* to test@'%' identified by 'test';
-#flush privileges;
+#CREATE DATABASE IF NOT EXISTS 'testdb' DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+create user 'test'@'%' identified by '123456';
+GRANT ALL PRIVILEGES ON *.* TO 'test'@'%';
+flush privileges;
+ALTER USER 'test'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+flush privileges;
+
 use testdb;
 
 CREATE TABLE IF NOT EXISTS student_details (
