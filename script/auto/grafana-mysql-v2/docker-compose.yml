@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  mysql-db:
+    image: test/mysql8:latest
+    restart: unless-stopped
+    ports:
+      - "13306:3306"
+    #environment:
+    #  MYSQL_DATABASE: testdb
+    #  MYSQL_ROOT_PASSWORD: root
+    command:
+      --default_authentication_plugin=mysql_native_password
+      --max_connections=5
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+  grafana:
+    image: test/grafana9:latest
+    restart: unless-stopped
+    ports:
+      - "13000:3000"
+    depends_on:
+      - mysql-db
+    #volumes:
+      #- //c/grafana/data:/var/lib/grafana
+      #- $PWD/grafana/log:/var/log/grafana
+      #- $PWD/grafana/config/custom.ini:/etc/grafana/grafana.ini
