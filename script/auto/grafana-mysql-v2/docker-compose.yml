@@ -6,12 +6,14 @@ services:
     restart: unless-stopped
     ports:
       - "13306:3306"
+    volumes:
+      - //c/mysql/data:/var/lib/mysql
     #environment:
     #  MYSQL_DATABASE: testdb
     #  MYSQL_ROOT_PASSWORD: root
     command:
       --default_authentication_plugin=mysql_native_password
-      --max_connections=5
+      --max_connections=100
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_general_ci
   grafana:

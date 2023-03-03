@@ -1,13 +1,13 @@
 FROM mysql:8.0.32
 USER root
-RUN useradd -u 1234 demo && mkdir -p /docker-entrypoint-initdb.d
+#RUN useradd -u 1234 demo && mkdir -p /docker-entrypoint-initdb.d
 COPY *.sql /docker-entrypoint-initdb.d/
 ENV MYSQL_DATABASE=testdb
 ENV MYSQL_ROOT_PASSWORD=root
 ENV MYSQL_ROOT_HOST='%'
 ENV TZ=Asia/Shanghai
-RUN chown -R demo:demo /docker-entrypoint-initdb.d
-USER demo
+#RUN chown -R demo:demo /var/lib/mysql && chown -R demo:demo /usr/sbin/mysqld && chown -R demo:demo /docker-entrypoint-initdb.d
+#USER demo
 
 EXPOSE 3306 33060
 CMD ["mysqld"]
