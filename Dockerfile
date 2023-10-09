@@ -14,3 +14,6 @@ CMD ["java", "-Dfile.encoding=UTF-8", "-Djava.io.tmpdir=/tmp", "-jar", "app.jar"
 #docker build -t app:v1 -f script/Dockerfile .
 #docker run --rm -it -p 8080:8080 app:v1
 #docker run --rm -it app:v1 echo "hello~"
+#docker run --rm -it app:v1 watch "date >> /app/log/date.log"
+#docker exec -it c4bb5544c6dbc sh
+#docker logs c4bb5544c6dbc
