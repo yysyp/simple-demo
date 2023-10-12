@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import ps.demo.dto.response.DefaultResponse;
 
 @Slf4j
@@ -16,6 +17,13 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(value = ServletRequestBindingException.class)
     public ResponseEntity<DefaultResponse> handleException(ServletRequestBindingException e) {
         log.error("--->>ServletRequestBindingException handling, message={}", e.getMessage(), e);
+        BadRequestException bre = new BadRequestException(CodeEnum.BAD_REQUEST, false, e);
+        return new ResponseEntity<DefaultResponse>(bre.toErrorResponse(), HttpStatus.valueOf(bre.getCodeEnum().getHttpCode()));
+    }
+
+    @ExceptionHandler(value = NoHandlerFoundException.class)
+    public ResponseEntity<DefaultResponse> handleException(NoHandlerFoundException e) {
+        log.error("--->>NoHandlerFoundException handling, message={}", e.getMessage(), e);
         BadRequestException bre = new BadRequestException(CodeEnum.BAD_REQUEST, false, e);
         return new ResponseEntity<DefaultResponse>(bre.toErrorResponse(), HttpStatus.valueOf(bre.getCodeEnum().getHttpCode()));
     }

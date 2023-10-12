@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------------------------
-#Set up prod environment:
+##Set up prod environment:
 1) Create database name in i.e. Mysql and config the name in: "src/main/resources/application-prod.yml"
 2) Set "ddl-auto: create" in: "src/main/resources/application-prod.yml"
 3) Set "ddl-auto: none" in: "src/main/resources/application-prod.yml"
@@ -8,7 +8,24 @@
    http://localhost:8080/index.html
    http://localhost:8080/healthz
 
+6) visit http://localhost:8080/api/login/ and use admin/12345 to login   
 
+---------------------------------------------------------------------------------------------
+##Set up dev environment.
+1) set spring.profiles.active: dev And then start the project.
+Open H2 to set the login user data in database:
+http://localhost:8080/h2-console/login.jsp
+url: jdbc:h2:file:./ignorefolder/h2/simpledemo
+username: sa
+password:
+
+2) Run below sql to set admin Username: admin, Password: 12345
+INSERT INTO login_user
+(id, created_by, is_active, is_logical_deleted, modified_by, comments, company, department, disabled, email, failed_count, first_name, last_login_ip, last_name, password, phone, salute, sex, user_name, version)
+VALUES(0, 'sys', 1, 0, 'sys', '', '', '', 0, '', 0, '', '', '', '827CCB0EEA8A706C4C34A16891F84E7B', '', '', '', 'admin', 0);
+commit;
+   
+3) visit http://localhost:8080/api/login/ and use admin/12345 to login
 ---------------------------------------------------------------------------------------------
 
 
@@ -116,3 +133,5 @@ coreProfitOnAssetEffect: the coreProfitOnAsset delta caused by this kemu value y
 
 import excels in "newstock-import-samples" downloaded from: http://stockpage.10jqka.com.cn/600519/finance/#finance
 and these excels can be parsed and import into new_stock_data
+
+
