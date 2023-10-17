@@ -21,6 +21,7 @@ docker run --name mysql -e MYSQL_ROOT_PASSWORD=root -d --add-host=host.docker.in
 echo 'docker mysql installed'
 
 if [ ! -d "/usr/local/app1" ]; then
+    echo 'Not exists, so mkdir'
     mkdir -p /usr/local/app1
 else
     echo '/usr/local/app1 exists'
