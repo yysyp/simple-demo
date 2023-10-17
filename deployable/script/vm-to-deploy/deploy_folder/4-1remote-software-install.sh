@@ -1,9 +1,7 @@
 #! /bin/bash
 set -o nounset
-set -e -x
-#set -o errexit
-##sed -i 's/\r$//' *.sh
-##Usage sudo ./softwareinstall.sh user1 pass1
+set -o errexit
+#sed -i 's/\r$//' *.sh
 
 tar -xzvf dockerxxx.tgz
 cp docker/* /usr/bin/
@@ -18,6 +16,7 @@ java -version
 echo 'Jdk installed'
 
 docker login -u $1 -p $2 nexusxxx:12345
+docker stop mysql
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=root -d --add-host=host.docker.internal:host-gateway -p 3306:3306 nexusxxx:12345/com/xx/mysql:v5.7
 echo 'docker mysql installed'
 
@@ -26,9 +25,4 @@ if [ ! -d "/usr/local/app1" ]; then
 else
     echo '/usr/local/app1 exists'
 fi
-
-cp app1-xx.jar appdeploy.sh /usr/local/app1/
-echo 'To execute appdeploy.sh'
-cd /usr/local/app1
-./appdeploy.sh
 
