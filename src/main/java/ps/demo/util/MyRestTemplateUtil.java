@@ -1,9 +1,15 @@
 package ps.demo.util;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -11,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
+import java.net.URI;
 import java.security.cert.X509Certificate;
 
 
@@ -156,6 +163,50 @@ public class MyRestTemplateUtil {
         }
     }
 
+    public static class HttpGetWithEntity extends HttpEntityEnclosingRequestBase {
+        private final static String METHOD_NAME = "GET";
 
+        @Override
+        public String getMethod() {
+            return METHOD_NAME;
+        }
+        public HttpGetWithEntity() {
+            super();
+        }
+        public HttpGetWithEntity(final URI uri) {
+            super();
+            setURI(uri);
+        }
+        HttpGetWithEntity(final String uri) {
+            super();
+            setURI(URI.create(uri));
+        }
+
+    }
+
+    /**
+     * This works!
+     * This is not recommended, according to Restful convention, GET should not has request body data.
+     * @param url
+     * @param requestBody
+     * @param encoding
+     * @return
+     * @throws Exception
+     */
+    @SneakyThrows
+    public static String getWithRequestBody(String url, String requestBody, String encoding) {
+        String responseBody = "";
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGetWithEntity httpGetWithEntity = new HttpGetWithEntity(url);
+        StringEntity httpEntity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
+        httpGetWithEntity.setEntity(httpEntity);
+        CloseableHttpResponse response = client.execute(httpGetWithEntity);
+        org.apache.http.HttpEntity entity = response.getEntity();
+        if (entity != null) {
+            responseBody = EntityUtils.toString(entity, encoding);
+        }
+        response.close();
+        return responseBody;
+    }
 
 }
