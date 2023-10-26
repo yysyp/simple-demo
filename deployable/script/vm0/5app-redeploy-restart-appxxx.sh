@@ -11,13 +11,26 @@ cat > 5app-redeploy-restart-appxxx-sub.sh <<- 'EOF'
 #! /bin/bash
 set -o nounset
 set -o errexit
+export JAVA_HOME="/opt/jdk-xxx"
+export PATH="$JAVA_HOME"/bin:$PATH
 APP_FILE_NAME=simple-e-commerce-v2-1.0.0
-
+if [ ! -d "/usr/local/appxxx" ]; then
+    echo '/usr/local/appxxx Not exists, so mkdir'
+    mkdir -p /usr/local/appxxx
+else
+    echo '/usr/local/appxxx exists'
+fi
+if [ ! -d "/usr/local/appxxx/conf" ]; then
+    echo '/usr/local/appxxx/conf Not exists, so mkdir'
+    mkdir -p /usr/local/appxxx/conf
+else
+    echo '/usr/local/appxxx/conf exists'
+fi
 if [[ "$PWD" == "/usr/local/appxxx" ]]; then
   echo ""
 else
   echo "copy."
-  cp $APP_FILE_NAME.jar 5app-redeploy-restart-appxxx-sub.sh /usr/local/appxxx/
+  cp -f $APP_FILE_NAME.jar 5app-redeploy-restart-appxxx-sub.sh /usr/local/appxxx/
   cd /usr/local/appxxx
 fi
 #ps -ef | grep APP_FILE_NAME | grep -v grep | awk '{print $2}' | xargs kill -9
@@ -29,7 +42,7 @@ if [[ "" != "$PID" ]]; then
   kill -9 $PID
 fi
 nohup java -server -Dspring.profiles.active=dev -jar $APP_FILE_NAME.jar > /dev/null 2>&1 &
-sleep 5
+sleep 10
 PID=`ps -eaf | grep $APP_FILE_NAME | grep -v grep | awk '{print $2}'`
 echo "Started PID=$PID"
 EOF

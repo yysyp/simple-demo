@@ -1,0 +1,228 @@
+
+================================================================
+0env-set.sh
+----------------------------------------------------------------
+#! /bin/bash
+set -o nounset
+set -o errexit
+#sed -i 's/\r$//' *.sh
+
+PROJECT_ID=xxx
+ZONE=xxx
+VM_NAME=my-vm-001
+SA_ACCOUNT=auto_deploy@xxx.com
+#DEPLOY_FOLDER=deploy_folder
+LOGINUSER=ubuntu
+USERNAME=nexus1
+PASSWD=pass1
+
+echo "Env set. VM_NAME=$VM_NAME"
+
+
+================================================================
+1vm-create-gcp.sh
+----------------------------------------------------------------
+#! /bin/bash
+set -o nounset
+set -o errexit
+source 0env-set.sh
+
+gcloud config list
+gcloud auth login
+
+gcloud beta compute instances create $VM_NAME --project=$PROJECT_ID --zone=$ZONE --machine-type=n1-standard-2 \
+--network-interface=xxx \
+--service-account=$SA_ACCOUNT
+echo "VM created. vm=$VM_NAME"
+echo "gcloud compute ssh $VM_NAME --zone $ZONE --internal-ip"
+
+
+
+================================================================
+2git-clone-appxxx.sh
+----------------------------------------------------------------
+#! /bin/bash
+set -o nounset
+set -o errexit
+source 0env-set.sh
+
+#rm -rf $DEPLOY_FOLDER/aa/
+#git clone --branch main --single-branch https://xxx/aa.git $DEPLOY_FOLDER/aa
+#echo "Git cloned to $DEPLOY_FOLDER for uploading"
+
+rm -rf ./appxxx/
+git clone --branch main --single-branch https://xxx/aa.git appxxx
+echo "Git cloned to appxxx for uploading"
+
+
+
+
+================================================================
+3scp-upload-appxxx.sh
+----------------------------------------------------------------
+#! /bin/bash
+set -o nounset
+set -o errexit
+source 0env-set.sh
+
+#gcloud compute scp --zone $ZONE --internal-ip --recurse "$DEPLOY_FOLDER" $LOGINUSER@$VM_NAME:/home/$LOGINUSER/
+#gcloud compute scp --zone $ZONE --internal-ip "/c/tmp/abc.json" $LOGINUSER@$VM_NAME:/home/$LOGINUSER/$DEPLOY_FOLDER/
+#echo "Folder $DEPLOY_FOLDER uploaded to remote VM"
+
+gcloud compute scp --zone $ZONE --internal-ip --recurse "source-folder" $LOGINUSER@$VM_NAME:/home/$LOGINUSER/
+gcloud compute scp --zone $ZONE --internal-ip "/c/tmp/abc.json" $LOGINUSER@$VM_NAME:/home/$LOGINUSER/
+echo "Folder source-folder uploaded to remote VM"
+
+
+
+
+================================================================
+4remote-software-install-docker-jdk-mysqlindocker.sh
+----------------------------------------------------------------
+#! /bin/bash
+set -o nounset
+set -o errexit
+source 0env-set.sh
+
+cat > 4remote-software-install-docker-jdk-mysqlindocker-sub.sh <<- 'EOF'
+#! /bin/bash
+set -o nounset
+set -o errexit
+#sed -i 's/\r$//' *.sh
+
+tar -xzvf dockerxxx.tgz
+cp -f docker/* /usr/bin/
+nohup dockerd > /dev/null 2>&1 &
+echo 'Docker installed & started'
+
+tar -xzvf OpenJDKxxx.tar.gz -C /opt
+echo 'export JAVA_HOME="/opt/jdk-xxx"' >> ~/.bash_profile
+echo 'PATH="$JAVA_HOME"/bin:$PATH' >> ~/.bash_profile
+source ~/.bash_profile
+java -version
+echo 'Jdk installed'
+
+APP_NAME=mysql57-with-init-sql
+docker login -u $1 -p $2 nexusxxx:12345
+CONTAINERID=$(docker ps -a| grep $APP_NAME | awk '{print $1}')
+if [ -n "$CONTAINERID" ]; then
+  echo "Stopping & remove mysql"
+  docker rm -f $CONTAINERID
+else
+  echo "Mysql is not running"
+fi
+
+IMAGEID=$(docker images| grep $APP_NAME | awk '{print $1}')
+if [ -n "$IMAGEID" ]; then
+  docker rmi -f $APP_NAME
+fi
+
+docker build -t $APP_NAME -f docker-mysql/Dockerfile docker-mysql
+docker run --name $APP_NAME -e MYSQL_ROOT_PASSWORD=root -d --add-host=host.docker.internal:host-gateway -p 3306:3306 $APP_NAME
+#docker run --name $APP_NAME -e MYSQL_ROOT_PASSWORD=root -d --add-host=host.docker.internal:host-gateway -p 3306:3306 nexusxxx:12345/com/xx/mysql:5.7
+sleep 5
+CONTAINERID=$(docker ps -a| grep $APP_NAME | awk '{print $1}')
+echo "docker mysql installed CONTAINERID=$CONTAINERID"
+
+
+if [ ! -d "/usr/local/app1" ]; then
+    echo 'Not exists, so mkdir'
+    mkdir -p /usr/local/app1
+else
+    echo '/usr/local/app1 exists'
+fi
+
+EOF
+
+gcloud compute scp --zone $ZONE --internal-ip "4remote-software-install-docker-jdk-mysqlindocker-sub.sh" $LOGINUSER@$VM_NAME:/home/$LOGINUSER/
+gcloud compute ssh $VM_NAME --zone $ZONE --internal-ip --command "cd /home/$LOGINUSER && chmod 777 4remote-software-install-docker-jdk-mysqlindocker-sub.sh && sudo ./4remote-software-install-docker-jdk-mysqlindocker-sub.sh $USERNAME $PASSWD"
+rm 4remote-software-install-docker-jdk-mysqlindocker-sub.sh
+echo "Remote software installed"
+
+
+
+
+
+
+================================================================
+5app-redeploy-restart-appxxx.sh
+----------------------------------------------------------------
+#! /bin/bash
+set -o nounset
+set -o errexit
+source 0env-set.sh
+##--------------------------------------------------------------------------------##
+#Usage: find & replace "appxxx" with the actual application name.
+#Replace APP_FILE_NAME name "simple-e-commerce-v2-1.0.0" to the actual jar file name.
+#Required ENVs: $ZONE $LOGINUSER $VM_NAME
+##--------------------------------------------------------------------------------##
+cat > 5app-redeploy-restart-appxxx-sub.sh <<- 'EOF'
+#! /bin/bash
+set -o nounset
+set -o errexit
+export JAVA_HOME="/opt/jdk-xxx"
+export PATH="$JAVA_HOME"/bin:$PATH
+APP_FILE_NAME=simple-e-commerce-v2-1.0.0
+if [ ! -d "/usr/local/appxxx" ]; then
+    echo '/usr/local/appxxx Not exists, so mkdir'
+    mkdir -p /usr/local/appxxx
+else
+    echo '/usr/local/appxxx exists'
+fi
+if [ ! -d "/usr/local/appxxx/conf" ]; then
+    echo '/usr/local/appxxx/conf Not exists, so mkdir'
+    mkdir -p /usr/local/appxxx/conf
+else
+    echo '/usr/local/appxxx/conf exists'
+fi
+if [[ "$PWD" == "/usr/local/appxxx" ]]; then
+  echo ""
+else
+  echo "copy."
+  cp -f $APP_FILE_NAME.jar 5app-redeploy-restart-appxxx-sub.sh /usr/local/appxxx/
+  cd /usr/local/appxxx
+fi
+#ps -ef | grep APP_FILE_NAME | grep -v grep | awk '{print $2}' | xargs kill -9
+#ps -aux | grep APP_FILE_NAME | grep -v grep | awk '{print $2}' | xargs kill -9
+#kill -s 9 `pgrep APP_FILE_NAME`
+PID=`ps -eaf | grep $APP_FILE_NAME | grep -v grep | awk '{print $2}'`
+if [[ "" != "$PID" ]]; then
+  echo "killing $PID"
+  kill -9 $PID
+fi
+nohup java -server -Dspring.profiles.active=dev -jar $APP_FILE_NAME.jar > /dev/null 2>&1 &
+sleep 10
+PID=`ps -eaf | grep $APP_FILE_NAME | grep -v grep | awk '{print $2}'`
+echo "Started PID=$PID"
+EOF
+
+gcloud compute scp --zone $ZONE --internal-ip "5app-redeploy-restart-appxxx-sub.sh" $LOGINUSER@$VM_NAME:/home/$LOGINUSER/
+gcloud compute ssh $VM_NAME --zone $ZONE --internal-ip --command "cd /home/$LOGINUSER && chmod 777 5app-redeploy-restart-appxxx-sub.sh && sudo ./5app-redeploy-restart-appxxx-sub.sh"
+rm 5app-redeploy-restart-appxxx-sub.sh
+echo "Remote appxxx redeployed"
+
+
+================================================================
+5-dockerd-gitclone-scp-restartapps.sh
+----------------------------------------------------------------
+#! /bin/bash
+set -o nounset
+set -o errexit
+source 0env-set.sh
+
+gcloud compute ssh $VM_NAME --zone $ZONE --internal-ip --command "sudo nohup dockerd > /dev/null 2>&1 &"
+
+./2git-clone-appxxx.sh && ./3scp-upload-appxxx.sh
+
+./5app-redeploy-restart-appxxx.sh
+
+
+================================================================
+Runnable principle
+----------------------------------------------------------------
+1, File/Folder creation need to add overwrite confirmation. i.e. echo 'y' | cp xxx xxx
+    cp -f xxx.ini /usr/local/appxxx/conf/
+2, Other resource creation/modification needs to add existing check.
+   Deletion needs to add not existing check.
+
+
