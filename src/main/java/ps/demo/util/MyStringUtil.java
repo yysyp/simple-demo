@@ -23,6 +23,33 @@ public class MyStringUtil {
         return RandomStringUtils.randomAlphabetic(bytes);
     }
 
+    /**
+     * A - 1, B - 2, .. Z - 26, AA - 27
+     * @param name
+     * @return
+     */
+    public static int excelColToNum(String name) {
+        int number = 0;
+        for (int i = 0; i < name.length(); i++) {
+            number = number * 26 + (name.charAt(i) - ('A' - 1));
+        }
+        return number;
+    }
+
+    /**
+     * 1 - A, 2 - B, .. 26 - Z, 27 - AA
+     * @param number
+     * @return
+     */
+    public static String excelNumToCol(int number) {
+        StringBuilder sb = new StringBuilder();
+        while (number-- > 0) {
+            sb.append((char)('A' + (number % 26)));
+            number /= 26;
+        }
+        return sb.reverse().toString();
+    }
+
 
     public static String toJavaName(String dbName) {
         if (StringUtils.isBlank(dbName)) {

@@ -19,10 +19,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * <code>
@@ -65,7 +62,7 @@ public class MyExcelUtil {
             }
         }
         if (sheetNo < 0) {
-            throw new RuntimeException("Not find the sheet "+sheetName);
+            throw new RuntimeException("Not find the sheet " + sheetName);
         }
         log.info("Available sheets are {}", buffer);
         List<Object> excelLines = MyExcelUtil.readMoreThan1000RowBySheet(
@@ -343,6 +340,43 @@ public class MyExcelUtil {
             //destroy no-use resource
         }
 
+    }
+
+
+    public List<LinkedHashMap<String, Object>> loadExcelFile(File file) {
+        List<LinkedHashMap<String, Object>> dataList = new ArrayList<>();
+        EasyExcel.read(file, new AnalysisEventListener<Map<String, Object>>() {
+            private Map<Integer, String> headMap;
+
+            @Override
+            public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+                this.headMap = headMap;
+            }
+
+            @Override
+            public void invoke(Map<String, Object> rowData, AnalysisContext analysisContext) {
+                LinkedHashMap<String, Object> dataMap = new LinkedHashMap<>();
+                for (int i = 0, n = rowData.size(); i < n; i++) {
+                    //String key = MyRegexUtil.removeSymbols("" + headMap.get(i)) + "_" + MyStringUtil.getExcelColumnName(i + 1);
+                    Object value = rowData.get(i);
+//                    int keyPrefix = 0;
+//                    String key1 = key;
+//                    while (dataMap.containsKey(key1)) {
+//                        keyPrefix++;
+//                        key1 = key+keyPrefix;
+//                    }
+                    dataMap.put(MyStringUtil.excelNumToCol(i+1), value);
+                }
+                dataList.add(dataMap);
+            }
+
+            @Override
+            public void doAfterAllAnalysed(AnalysisContext analysisContext) {
+
+            }
+        }).sheet().headRowNumber(1).doRead();
+
+        return dataList;
     }
 
 

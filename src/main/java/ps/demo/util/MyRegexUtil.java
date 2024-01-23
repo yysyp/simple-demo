@@ -12,7 +12,7 @@ public class MyRegexUtil {
      * Email
      */
     public static final String REG_EMAIL = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
-    public static final String REG_SYMBOL = "[\\pP\\pS\\pZ\\pM\\n]";
+    public static final String REG_SYMBOL = "[\\pP\\pM\\pZ\\pS\\pC\\n]";
 
     /**
      * /pP 其中的小写 p 是 property 的意思，表示 Unicode 属性，用于 Unicode 正表达式的前缀。
