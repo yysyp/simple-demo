@@ -1,12 +1,10 @@
 package ps.demo.util;
 
 import ps.demo.util.range.MyRange;
-import sun.misc.Unsafe;
+
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 public class MyImageUtilTest {
 
